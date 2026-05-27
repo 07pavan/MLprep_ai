@@ -1,9 +1,15 @@
-"""Security sandbox & validation utilities"""
+"""Security sandbox & validation utilities.
+
+Provides:
+  - validate_file()      — filename extension check
+  - validate_dataframe() — non-empty DataFrame check
+  - sanitize_code()      — regex-based dangerous pattern stripper
+  - scan_guardrails()    — 3-layer prompt injection detector
+"""
 from __future__ import annotations
 import re
 import logging
 import pandas as pd
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +42,7 @@ def validate_dataframe(df: pd.DataFrame) -> tuple[bool, str]:
 
 
 # ---------------------------------------------------------------------------
-# Code sanitizer (security sandbox)
+# Code sanitizer (security sandbox — Layer 1)
 # ---------------------------------------------------------------------------
 
 BLOCKED_PATTERNS = [
@@ -45,17 +51,21 @@ BLOCKED_PATTERNS = [
     # Inline imports of dangerous modules
     "import os", "import sys", "import subprocess", "import shutil",
     "import socket", "import urllib", "import requests", "import http",
+    "import ctypes", "import signal", "import multiprocessing",
     # Code execution / reflection
     "eval(", "exec(", "__import__", "compile(",
     # Builtins / globals abuse
-    "__builtins__", "globals()", "locals()", "vars()",
-    "getattr(", "setattr(", "delattr(", "hasattr(",
+    "__builtins__", "globals()", "locals()", "vars(",
+    "getattr(", "setattr(", "delattr(",
     # File I/O
-    "open(", "file(", "io.open",
+    "open(", "file(", "io.open", "pathlib",
     # Dangerous builtins
     "breakpoint(", "__class__", "__bases__", "__subclasses__",
+    "__mro__", "__dict__", "__code__",
     # Network
-    "socket.", "urllib.", "requests.",
+    "socket.", "urllib.", "requests.", "http.",
+    # Process control
+    "os.system", "os.popen", "os.exec",
 ]
 
 
@@ -74,7 +84,9 @@ def sanitize_code(code: str) -> str:
             safe_lines.append(line)
             continue
 
-        dangerous = any(pat in line.lower() for pat in BLOCKED_PATTERNS)
+        # Case-insensitive check against blocked patterns
+        line_lower = line.lower()
+        dangerous = any(pat.lower() in line_lower for pat in BLOCKED_PATTERNS)
         if dangerous:
             removed.append(stripped)
             safe_lines.append(f"# [SANITIZED] {stripped}")
@@ -85,3 +97,89 @@ def sanitize_code(code: str) -> str:
         logger.warning("sanitize_code() blocked %d line(s): %s", len(removed), removed)
 
     return "\n".join(safe_lines)
+
+
+# ---------------------------------------------------------------------------
+# Prompt guardrails (3-layer input defense — Layer 2)
+# ---------------------------------------------------------------------------
+
+# Maximum question length — truncate, don't crash
+MAX_QUESTION_LENGTH = 2000
+
+# Patterns that indicate prompt injection attempts
+_INJECTION_PATTERNS = [
+    re.compile(p, re.IGNORECASE)
+    for p in [
+        r"ignore\s+(all\s+)?previous\s+instructions",
+        r"ignore\s+(all\s+)?above",
+        r"you\s+are\s+now\s+a",
+        r"pretend\s+(you\s+are|to\s+be)",
+        r"forget\s+(everything|all|your\s+instructions)",
+        r"disregard\s+(all|your|the)\s+(rules|instructions|guidelines)",
+        r"act\s+as\s+(if|though)\s+you",
+        r"new\s+instruction[s]?\s*:",
+        r"system\s*prompt\s*:",
+        r"override\s+(your|the)\s+(rules|instructions)",
+        r"do\s+not\s+follow\s+(your|the)\s+(rules|instructions)",
+        r"reveal\s+(your|the)\s+(system|initial)\s+prompt",
+        r"what\s+(is|are)\s+your\s+(system|initial)\s+(prompt|instructions)",
+        r"repeat\s+(your|the)\s+(system|initial)\s+(prompt|instructions)",
+        r"jailbreak",
+        r"DAN\s+mode",
+    ]
+]
+
+# Patterns that look like code/OS injection in natural language
+_CODE_INJECTION_PATTERNS = [
+    re.compile(p, re.IGNORECASE)
+    for p in [
+        r"import\s+os\b",
+        r"import\s+subprocess\b",
+        r"os\.system\s*\(",
+        r"subprocess\.(run|call|Popen)",
+        r"rm\s+-rf\b",
+        r"DROP\s+TABLE\b",
+        r"DELETE\s+FROM\b",
+        r";\s*--",
+        r"UNION\s+SELECT\b",
+    ]
+]
+
+
+def scan_guardrails(question: str) -> tuple[bool, str]:
+    """
+    Scan a user question for safety issues.
+
+    Returns (True, "ok") if the question is safe.
+    Returns (False, reason) if the question should be blocked.
+    """
+    # Layer 1 — Length & emptiness
+    stripped = question.strip()
+    if len(stripped) < 3:
+        return False, "Question is too short. Please ask a complete question about your data."
+
+    if len(stripped) > MAX_QUESTION_LENGTH:
+        return False, (
+            f"Question is too long ({len(stripped)} chars, max {MAX_QUESTION_LENGTH}). "
+            "Please shorten your question."
+        )
+
+    # Layer 2 — Prompt injection detection
+    for pattern in _INJECTION_PATTERNS:
+        if pattern.search(stripped):
+            logger.warning("Guardrail BLOCKED (injection): %s", stripped[:100])
+            return False, (
+                "Your question was flagged as a potential prompt injection attempt. "
+                "Please rephrase as a data analysis question."
+            )
+
+    # Layer 3 — Code/OS injection in natural language
+    for pattern in _CODE_INJECTION_PATTERNS:
+        if pattern.search(stripped):
+            logger.warning("Guardrail BLOCKED (code injection): %s", stripped[:100])
+            return False, (
+                "Your question contains patterns that look like code injection. "
+                "Please ask a natural language question about your data."
+            )
+
+    return True, "ok"
