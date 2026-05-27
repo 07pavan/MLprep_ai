@@ -1,0 +1,14 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+langgraph==0.2.16
+langchain-core==0.2.38
+langchain-groq==0.1.9
+langchain-google-genai==1.0.10
+langchain==0.2.16
+pandas==2.1.4
+numpy==1.26.4
+pyarrow==17.0.0
+openpyxl==3.1.5
+pydantic-settings==2.4.0
+python-dotenv==1.0.1
