@@ -1,0 +1,24 @@
+# Virtual environments
+venv*/
+.venv/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files with secrets
+.env
+.env.*
+!.env.example
+
+# Storage data (ephemeral on Koyeb)
+storage/
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore

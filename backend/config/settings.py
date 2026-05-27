@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     # ── LLM API Keys ──────────────────────────────────────────────
     GROQ_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
+    DATABASE_URL: str = ""
 
     # ── Multi-Model Router ────────────────────────────────────────
     # "fast" tier — cheap, low-latency (intent classification, summaries)

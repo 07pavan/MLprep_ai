@@ -84,4 +84,5 @@ class SessionManager:
 
 
 # Singleton instance used across routers
-session_manager = SessionManager()
+from config.settings import settings
+session_manager = SessionManager(storage_dir=settings.STORAGE_DIR)

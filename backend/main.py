@@ -64,3 +64,16 @@ async def on_startup():
     logger.info("   Storage  : %s", storage.resolve())
     logger.info("   Docs     : http://localhost:8000/docs")
     logger.info("   CORS     : %s", settings.CORS_ORIGINS)
+
+
+# ─── Shutdown ─────────────────────────────────────────────────────────────────
+@app.on_event("shutdown")
+async def on_shutdown():
+    try:
+        from graph.graph import db_pool
+        if db_pool is not None:
+            logger.info("🔌 Gracefully closing PostgreSQL connection pool...")
+            db_pool.close()
+            logger.info("🔒 PostgreSQL connection pool closed successfully.")
+    except Exception as e:
+        logger.error("⚠️ Error while closing PostgreSQL pool during shutdown: %s", str(e))

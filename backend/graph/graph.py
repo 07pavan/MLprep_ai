@@ -13,6 +13,9 @@ from graph.nodes.insights import insights_node
 
 logger = logging.getLogger(__name__)
 
+# Global reference for PostgreSQL connection pool
+db_pool = None
+
 
 # ---------------------------------------------------------------------------
 # Conditional routing functions
@@ -63,11 +66,36 @@ def build_graph():
     builder.add_conditional_edges("visualizer", route_after_visualizer)
     builder.add_edge("insights_generator", END)
 
-    # Compile with memory checkpointer (enables cross-turn state)
-    memory = MemorySaver()
-    compiled = builder.compile(checkpointer=memory)
+    # Compile with dynamic checkpointer (PostgresSaver if DATABASE_URL is set, otherwise MemorySaver)
+    from config.settings import settings
+    if settings.DATABASE_URL:
+        try:
+            logger.info("🔌 Initializing PostgreSQL checkpointer state store...")
+            from psycopg.rows import dict_row
+            from psycopg_pool import ConnectionPool
+            from langgraph.checkpoint.postgres import PostgresSaver
 
-    logger.info("LangGraph compiled successfully.")
+            global db_pool
+            db_pool = ConnectionPool(
+                conninfo=settings.DATABASE_URL,
+                max_size=10,
+                kwargs={"autocommit": True, "row_factory": dict_row}
+            )
+            # Create the schema tables in the Postgres database if they do not exist
+            checkpointer = PostgresSaver(db_pool)
+            checkpointer.setup()
+            
+            compiled = builder.compile(checkpointer=checkpointer)
+            logger.info("🚀 LangGraph compiled successfully with PostgresSaver checkpointer.")
+        except Exception as e:
+            logger.error("❌ Failed to setup Postgres checkpointer: %s. Falling back to MemorySaver.", str(e))
+            memory = MemorySaver()
+            compiled = builder.compile(checkpointer=memory)
+    else:
+        logger.info("ℹ️ DATABASE_URL not set. Compiling LangGraph with local in-memory MemorySaver.")
+        memory = MemorySaver()
+        compiled = builder.compile(checkpointer=memory)
+
     return compiled
 
 

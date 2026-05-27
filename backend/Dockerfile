@@ -4,7 +4,8 @@ FROM python:3.11-slim
 # Set system environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    PORT=8000
 
 # Set working directory
 WORKDIR /app
@@ -29,12 +30,15 @@ RUN mkdir -p storage
 # Copy the rest of the application files
 COPY . .
 
+# Remove local venv and caches that should never be in the image
+RUN rm -rf venv311 __pycache__ .env
+
 # Expose FastAPI service port
 EXPOSE 8000
 
 # Healthcheck configuration for container runners (ECS/Kubernetes/Docker Engine)
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/health || exit 1
 
-# Command to run the application using Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Koyeb injects PORT dynamically — use shell form so $PORT expands at runtime
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
