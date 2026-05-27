@@ -9,6 +9,7 @@ class AgentState(TypedDict):
     question: str
     chat_history: list           # list[{question, answer}]
     df_path: str                 # path to session's Parquet file
+    trace_id: str                # observability correlation ID
 
     # Orchestrator output
     intent: str                  # analysis_only | analysis_and_visualization | insights | cleaning_report

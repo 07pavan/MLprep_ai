@@ -10,6 +10,7 @@ from config.settings import settings
 from routers.upload import router as upload_router
 from routers.chat import router as chat_router
 from routers.clean import router as clean_router
+from routers.traces import router as traces_router
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -41,6 +42,7 @@ app.add_middleware(
 app.include_router(upload_router)
 app.include_router(chat_router)
 app.include_router(clean_router)
+app.include_router(traces_router)
 
 
 # ─── Health check ─────────────────────────────────────────────────────────────
