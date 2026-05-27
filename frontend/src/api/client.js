@@ -59,3 +59,19 @@ export async function checkHealth() {
   const res = await api.get('/health')
   return res.data
 }
+
+// ── Traces (Observability) ────────────────────────────────────────
+export async function getTraces(limit = 50) {
+  const res = await api.get('/traces', { params: { limit } })
+  return res.data
+}
+
+export async function getTraceDetail(traceId) {
+  const res = await api.get(`/traces/${traceId}`)
+  return res.data
+}
+
+export async function clearTraces() {
+  const res = await api.delete('/traces')
+  return res.data
+}

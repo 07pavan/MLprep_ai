@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   Menu, X, MessageSquare, BarChart2, Sparkles,
-  Wrench, Database, LogOut,
+  Wrench, Database, LogOut, Activity,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: BarChart2 },
   { id: 'insights', label: 'Insights', icon: Sparkles },
   { id: 'clean', label: 'Clean', icon: Wrench },
+  { id: 'traces', label: 'Traces', icon: Activity },
 ]
 
 export default function Layout({ children, activePage, onPageChange, datasetMeta, onClearSession }) {

@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import FileUpload from './components/FileUpload'
 import ChatInterface from './components/ChatInterface'
 import CleaningPanel from './components/CleaningPanel'
+import TraceViewer from './components/TraceViewer'
 
 // ── Overview page (inline) ──────────────────────────────────────
 function OverviewPage({ datasetMeta }) {
@@ -103,6 +104,8 @@ export default function App() {
         return <InsightsPage />
       case 'clean':
         return <CleaningPanel sessionId={sessionId} />
+      case 'traces':
+        return <TraceViewer sessionId={sessionId} />
       default:
         return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} />
     }
