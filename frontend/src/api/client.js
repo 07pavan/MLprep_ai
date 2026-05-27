@@ -1,7 +1,14 @@
 import axios from 'axios'
 
+// In production (Cloudflare Pages), VITE_API_URL points to the Koyeb backend
+// e.g. "https://your-app-xxxx.koyeb.app/api"
+// In local dev, Vite's proxy handles /api → localhost:8000, so we just use "/api"
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   timeout: 180000, // 3 minutes for long LLM calls
 })
 
