@@ -8,20 +8,27 @@ BACKEND_DIR = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
-    # LLM API Keys
+    # ── LLM API Keys ──────────────────────────────────────────────
     GROQ_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
 
-    # Model configuration
-    PRIMARY_MODEL: str = "llama-3.3-70b-versatile"
-    BACKUP_MODEL: str = "gemini-1.5-flash"
-    TEMPERATURE: float = 0.1
+    # ── Multi-Model Router ────────────────────────────────────────
+    # "fast" tier — cheap, low-latency (intent classification, summaries)
+    FAST_MODEL: str = "gemini-1.5-flash"
+    FAST_PROVIDER: str = "google"       # "groq" or "google"
 
-    # Storage — absolute path so it works regardless of CWD
+    # "smart" tier — expensive, high-reasoning (code gen, viz specs)
+    SMART_MODEL: str = "llama-3.3-70b-versatile"
+    SMART_PROVIDER: str = "groq"        # "groq" or "google"
+
+    TEMPERATURE: float = 0.1
+    LLM_TIMEOUT: int = 30               # seconds per LLM call
+
+    # ── Storage ───────────────────────────────────────────────────
     STORAGE_DIR: str = str(BACKEND_DIR / "storage")
     MAX_FILE_SIZE_MB: int = 100
 
-    # CORS origins allowed
+    # ── CORS ──────────────────────────────────────────────────────
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
         "http://localhost:3000",
@@ -29,7 +36,6 @@ class Settings(BaseSettings):
     ]
 
     class Config:
-        # Try root .env first, then backend .env
         env_file = [str(BACKEND_DIR.parent / ".env"), str(BACKEND_DIR / ".env")]
         env_file_encoding = "utf-8"
         extra = "ignore"
