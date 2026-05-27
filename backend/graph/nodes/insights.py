@@ -1,34 +1,19 @@
-"""Insights node — generates narrative bullet points from analysis results"""
+"""Insights node — generates narrative bullet points from analysis results.
+
+Uses: fast tier LLM, tracer.
+"""
 from __future__ import annotations
 import logging
+import time
 
 import pandas as pd
-from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
 
-from config.settings import settings
 from graph.state import AgentState
+from utils.llm_factory import get_llm
+from utils.tracer import tracer
 from utils.prompts import INSIGHTS_PROMPT
 
 logger = logging.getLogger(__name__)
-
-
-def _get_llm():
-    try:
-        return ChatGroq(
-            model=settings.PRIMARY_MODEL,
-            temperature=settings.TEMPERATURE,
-            groq_api_key=settings.GROQ_API_KEY,
-        )
-    except Exception:
-        try:
-            return ChatGoogleGenerativeAI(
-                model=settings.BACKUP_MODEL,
-                temperature=settings.TEMPERATURE,
-                google_api_key=settings.GOOGLE_API_KEY,
-            )
-        except Exception:
-            return None
 
 
 def _format_history_block(chat_history: list, n: int = 3) -> str:
@@ -51,6 +36,7 @@ def insights_node(state: AgentState) -> dict:
     df_path = state["df_path"]
     analysis_result = state.get("analysis_result")
     chat_history = state.get("chat_history", [])
+    trace_id = state.get("trace_id", "")
 
     # Load df for metadata
     try:
@@ -62,9 +48,14 @@ def insights_node(state: AgentState) -> dict:
     result_str = str(analysis_result)[:600] if analysis_result else "No result"
     history_block = _format_history_block(chat_history)
 
-    llm = _get_llm()
+    llm = get_llm("fast")
     if llm is None:
+        tracer.add_event(trace_id, "insights", "warning", {
+            "message": "No LLM available for insights generation",
+        })
         return {"insights": "LLM unavailable — cannot generate insights."}
+
+    model_name = getattr(llm, "model_name", getattr(llm, "model", "unknown"))
 
     try:
         prompt = INSIGHTS_PROMPT.format(
@@ -74,9 +65,28 @@ def insights_node(state: AgentState) -> dict:
             rows=rows,
             cols=cols,
         )
+
+        tracer.add_event(trace_id, "insights", "llm_call", {
+            "model": model_name, "tier": "fast",
+            "prompt_chars": len(prompt),
+            "prompt_preview": prompt[:200],
+        })
+
+        start = time.perf_counter()
         response = llm.invoke(prompt)
+        elapsed_ms = int((time.perf_counter() - start) * 1000)
+
+        tracer.add_event(trace_id, "insights", "llm_response", {
+            "response_chars": len(response.content),
+            "latency_ms": elapsed_ms,
+        })
+
         logger.info("Insights node generated successfully.")
         return {"insights": response.content}
+
     except Exception as exc:
         logger.warning("Insights generation failed: %s", exc)
+        tracer.add_event(trace_id, "insights", "error", {
+            "message": f"Insights generation failed: {exc}",
+        })
         return {"insights": f"Could not generate insights: {exc}"}

@@ -1,38 +1,24 @@
-"""Analyst node — generates and self-corrects pandas code"""
+"""Analyst node — generates and self-corrects pandas code.
+
+Uses: smart tier LLM, tracer, schema compressor, hardened sandbox.
+"""
 from __future__ import annotations
 import logging
 import re
+import time
 
 import pandas as pd
-from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
 
-from config.settings import settings
 from graph.state import AgentState
+from utils.llm_factory import get_llm
+from utils.tracer import tracer
+from utils.compressor import select_relevant_columns
 from tools.pandas_tool import PandasTool
 from utils.prompts import ANALYST_PROMPT, ANALYST_FIX_PROMPT
 
 logger = logging.getLogger(__name__)
 
 MAX_RETRIES = 3
-
-
-def _get_llm():
-    try:
-        return ChatGroq(
-            model=settings.PRIMARY_MODEL,
-            temperature=settings.TEMPERATURE,
-            groq_api_key=settings.GROQ_API_KEY,
-        )
-    except Exception:
-        try:
-            return ChatGoogleGenerativeAI(
-                model=settings.BACKUP_MODEL,
-                temperature=settings.TEMPERATURE,
-                google_api_key=settings.GOOGLE_API_KEY,
-            )
-        except Exception:
-            return None
 
 
 def _format_history_block(chat_history: list, n: int = 4) -> str:
@@ -67,11 +53,13 @@ def analyst_node(state: AgentState) -> dict:
     question = state["question"]
     df_path = state["df_path"]
     chat_history = state.get("chat_history", [])
+    trace_id = state.get("trace_id", "")
 
     # Load df
     try:
         df = pd.read_parquet(df_path)
     except Exception as exc:
+        tracer.add_event(trace_id, "analyst", "error", {"message": f"Failed to load data: {exc}"})
         return {
             "analysis_result": None,
             "analysis_error": f"Failed to load data: {exc}",
@@ -79,13 +67,21 @@ def analyst_node(state: AgentState) -> dict:
             "analyst_attempts": 0,
         }
 
-    col_list = ", ".join(df.columns.tolist()[:20])
-    dtype_info = ", ".join(f"{c}: {t}" for c, t in df.dtypes.astype(str).items())[:500]
+    # Schema compression
+    relevant = select_relevant_columns(df, question, max_cols=15)
+    col_list = ", ".join(relevant)
+    dtype_info = ", ".join(f"{c}: {df[c].dtype}" for c in relevant)
     history_block = _format_history_block(chat_history)
 
-    llm = _get_llm()
+    tracer.add_event(trace_id, "analyst", "schema_compressed", {
+        "total_cols": len(df.columns),
+        "selected_cols": len(relevant),
+    })
+
+    llm = get_llm("smart")
     if llm is None:
         # Fallback: just describe
+        tracer.add_event(trace_id, "analyst", "warning", {"message": "No LLM available, using df.describe()"})
         result = PandasTool.result_to_json(df.describe())
         return {
             "analysis_result": result,
@@ -94,6 +90,7 @@ def analyst_node(state: AgentState) -> dict:
             "analyst_attempts": 0,
         }
 
+    model_name = getattr(llm, "model_name", getattr(llm, "model", "unknown"))
     last_code = ""
     last_error = ""
 
@@ -101,28 +98,42 @@ def analyst_node(state: AgentState) -> dict:
         try:
             if attempt == 1:
                 prompt = ANALYST_PROMPT.format(
-                    rows=len(df),
-                    cols=len(df.columns),
-                    col_list=col_list,
-                    dtype_info=dtype_info,
-                    history_block=history_block,
-                    question=question,
+                    rows=len(df), cols=len(df.columns),
+                    col_list=col_list, dtype_info=dtype_info,
+                    history_block=history_block, question=question,
                 )
             else:
-                logger.warning(
-                    "Analyst attempt %d/%d — fixing: %s", attempt, MAX_RETRIES, last_error[:100]
-                )
+                logger.warning("Analyst attempt %d/%d — fixing: %s", attempt, MAX_RETRIES, last_error[:100])
                 prompt = ANALYST_FIX_PROMPT.format(
-                    question=question,
-                    col_list=col_list,
-                    broken_code=last_code,
-                    error_msg=last_error,
+                    question=question, col_list=col_list,
+                    broken_code=last_code, error_msg=last_error,
                 )
 
+            tracer.add_event(trace_id, "analyst", "llm_call", {
+                "model": model_name, "tier": "smart",
+                "prompt_chars": len(prompt), "attempt": attempt,
+                "prompt_preview": prompt[:200],
+            })
+
+            start = time.perf_counter()
             response = llm.invoke(prompt)
+            elapsed_ms = int((time.perf_counter() - start) * 1000)
+
+            tracer.add_event(trace_id, "analyst", "llm_response", {
+                "response_chars": len(response.content),
+                "latency_ms": elapsed_ms, "attempt": attempt,
+            })
+
             last_code = _extract_code(response.content)
 
             success, result = PandasTool.execute_code(df, last_code)
+
+            tracer.add_event(trace_id, "analyst", "code_exec", {
+                "code": last_code,
+                "success": success,
+                "error": None if success else str(result),
+                "attempt": attempt,
+            })
 
             if success:
                 logger.info("Analyst succeeded on attempt %d/%d", attempt, MAX_RETRIES)
@@ -139,6 +150,9 @@ def analyst_node(state: AgentState) -> dict:
         except Exception as exc:
             last_error = str(exc)
             logger.warning("Analyst attempt %d/%d exception: %s", attempt, MAX_RETRIES, last_error)
+            tracer.add_event(trace_id, "analyst", "error", {
+                "message": last_error, "attempt": attempt,
+            })
 
     logger.error("Analyst: all %d attempts failed. Last error: %s", MAX_RETRIES, last_error)
     return {
