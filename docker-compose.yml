@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # ── Backend FastAPI Container ──────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: analyst-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      # Map storage directory to host to persist uploaded datasets
+      - backend-storage:/app/storage
+    environment:
+      - PORT=8000
+      - NODE_ENV=production
+      # Read secret keys from host environment or root .env
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - FAST_MODEL=gemini-1.5-flash
+      - FAST_PROVIDER=google
+      - SMART_MODEL=llama-3.3-70b-versatile
+      - SMART_PROVIDER=groq
+      - CORS_ORIGINS=["*"]
+      # Connection to local PostgreSQL container for persistent checkpointer state
+      - DATABASE_URL=postgresql://analyst_user:analyst_secure_pass@postgres:5432/analyst_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Frontend React + Nginx Container ────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: analyst-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # ── PostgreSQL Database (LangGraph checkpointer state) ──────
+  postgres:
+    image: postgres:15-alpine
+    container_name: analyst-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=analyst_user
+      - POSTGRES_PASSWORD=analyst_secure_pass
+      - POSTGRES_DB=analyst_db
+    volumes:
+      - postgres-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analyst_user -d analyst_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  backend-storage:
+    driver: local
+  postgres-db-data:
+    driver: local
