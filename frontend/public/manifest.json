@@ -1,0 +1,10 @@
+{
+  "name": "AI Data Analyst Agent",
+  "short_name": "DataAI",
+  "theme_color": "#0A0A0F",
+  "background_color": "#0A0A0F",
+  "display": "standalone",
+  "orientation": "any",
+  "start_url": "/",
+  "icons": []
+}
