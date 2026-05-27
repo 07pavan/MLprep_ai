@@ -28,3 +28,17 @@ Thumbs.db
 # Data
 *.csv
 !sample_data/*.csv
+
+# Virtual Environments and Modules
+venv*/
+backend/venv*/
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+
+# Storage and Sessions
+backend/storage/
+storage/
+.env*
+!.env.example
