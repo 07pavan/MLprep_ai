@@ -1,5 +1,4 @@
 """Basic tests for the application"""
-import pytest
 import pandas as pd
 from agents import DataProfilerAgent, AnalystAgent
 
