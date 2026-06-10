@@ -140,6 +140,17 @@ class AnalystAgent:
         
         return None
     
+    def _basic_analysis(self, df: pd.DataFrame, question: str) -> Dict[str, Any]:
+        """Fallback when LLM is unavailable"""
+        result = df.describe()
+        code = "result = df.describe()"
+        return {
+            "success": True,
+            "result": result,
+            "code": code,
+            "raw_response": "Fallback description analysis"
+        }
+
     def _llm_analysis(self, df: pd.DataFrame, question: str) -> Dict[str, Any]:
         """Use LLM to generate code"""
         columns = df.columns.tolist()
@@ -161,3 +172,28 @@ IMPORTANT RULES:
 Example:
 ```python
 result = df['sales'].mean()
+```
+"""
+        response = self.llm.invoke(prompt)
+        text = response.content.strip()
+        
+        # Extract code
+        code = text
+        m = re.findall(r"```python\n(.*?)\n```", text, re.DOTALL)
+        if m:
+            code = m[0].strip()
+        else:
+            m = re.findall(r"```\n(.*?)\n```", text, re.DOTALL)
+            if m:
+                code = m[0].strip()
+        
+        # Run code
+        success, result = self.pandas_tool.execute_code(df, code)
+        
+        return {
+            "success": success,
+            "result": result if success else None,
+            "code": code,
+            "error": None if success else result,
+            "raw_response": text
+        }

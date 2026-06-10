@@ -11,6 +11,7 @@ from routers.upload import router as upload_router
 from routers.chat import router as chat_router
 from routers.clean import router as clean_router
 from routers.traces import router as traces_router
+from routers.insights import router as insights_router
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -43,6 +44,7 @@ app.include_router(upload_router)
 app.include_router(chat_router)
 app.include_router(clean_router)
 app.include_router(traces_router)
+app.include_router(insights_router)
 
 
 # ─── Health check ─────────────────────────────────────────────────────────────

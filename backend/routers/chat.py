@@ -1,6 +1,7 @@
 """Chat router — runs the LangGraph for natural language Q&A"""
 from __future__ import annotations
 import logging
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -13,11 +14,15 @@ from utils.tracer import tracer
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["Chat"])
 
+# Valid persona values the client may send
+VALID_PERSONAS = {"general", "finance", "marketing", "engineering"}
+
 
 class ChatRequest(BaseModel):
     sessionId: str
     question: str
     chatHistory: list[dict] = []
+    persona: str = "general"          # NEW — persona routing
 
 
 def _blocked_response(reason: str) -> dict:
@@ -40,6 +45,9 @@ def _blocked_response(reason: str) -> dict:
             "attempts": 0,
         },
         "insights": "",
+        "suggestedQuestions": [],       # NEW
+        "clarificationNeeded": False,   # NEW
+        "clarificationQuestion": "",    # NEW
         "error": reason,
     }
 
@@ -53,6 +61,9 @@ async def chat(req: ChatRequest):
     if not safe:
         logger.warning("Chat BLOCKED: %s — %s", req.question[:80], reason)
         return _blocked_response(reason)
+
+    # ── Validate persona (fall back gracefully) ───────────────────
+    persona = req.persona if req.persona in VALID_PERSONAS else "general"
 
     # ── Validate session ──────────────────────────────────────────
     if not session_manager.session_exists(req.sessionId):
@@ -70,6 +81,7 @@ async def chat(req: ChatRequest):
         "chat_history": req.chatHistory,
         "df_path": df_path,
         "trace_id": trace_id,
+        "persona": persona,                 # NEW — passed to all nodes
         "intent": "",
         "pandas_code": "",
         "analysis_result": None,
@@ -79,6 +91,9 @@ async def chat(req: ChatRequest):
         "viz_source": "",
         "viz_attempts": 0,
         "insights": "",
+        "suggested_questions": [],          # NEW
+        "clarification_needed": False,      # NEW
+        "clarification_question": "",       # NEW
         "error": None,
     }
 
@@ -92,7 +107,11 @@ async def chat(req: ChatRequest):
         raise HTTPException(status_code=500, detail=f"Agent pipeline failed: {exc}")
 
     # ── Finalize trace ────────────────────────────────────────────
-    analysis_success = final_state.get("analysis_result") is not None
+    clarification_needed = final_state.get("clarification_needed", False)
+    # A clarification response is still a "success" — the graph ran correctly
+    analysis_success = (
+        final_state.get("analysis_result") is not None or clarification_needed
+    )
     tracer.end_trace(trace_id, success=analysis_success)
 
     # ── Build response ────────────────────────────────────────────
@@ -102,19 +121,27 @@ async def chat(req: ChatRequest):
         "success": analysis_success,
         "intent": final_state.get("intent", ""),
         "traceId": trace_id,
+        "persona": persona,
+        # ── Analysis ─────────────────────────────────────────────
         "analysis": {
-            "success": analysis_success,
+            "success": final_state.get("analysis_result") is not None,
             "resultData": final_state.get("analysis_result"),
             "code": final_state.get("pandas_code", ""),
             "error": final_state.get("analysis_error"),
             "attempts": final_state.get("analyst_attempts", 0),
         },
+        # ── Visualization ─────────────────────────────────────────
         "visualization": {
             "success": viz_success,
             "vegaSpec": final_state.get("vega_spec"),
             "source": final_state.get("viz_source", ""),
             "attempts": final_state.get("viz_attempts", 0),
         },
+        # ── Insights & follow-ups ─────────────────────────────────
         "insights": final_state.get("insights", ""),
+        "suggestedQuestions": final_state.get("suggested_questions", []),   # NEW
+        # ── Clarification ─────────────────────────────────────────
+        "clarificationNeeded": clarification_needed,                         # NEW
+        "clarificationQuestion": final_state.get("clarification_question", ""),  # NEW
         "error": final_state.get("error"),
     }

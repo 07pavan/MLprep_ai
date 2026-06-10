@@ -14,7 +14,7 @@ from utils.llm_factory import get_llm
 from utils.tracer import tracer
 from utils.compressor import select_relevant_columns
 from tools.pandas_tool import PandasTool
-from utils.prompts import ANALYST_PROMPT, ANALYST_FIX_PROMPT
+from utils.prompts import ANALYST_PROMPT, ANALYST_FIX_PROMPT, get_persona_context
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +54,7 @@ def analyst_node(state: AgentState) -> dict:
     df_path = state["df_path"]
     chat_history = state.get("chat_history", [])
     trace_id = state.get("trace_id", "")
+    persona = state.get("persona", "general")
 
     # Load df
     try:
@@ -96,17 +97,20 @@ def analyst_node(state: AgentState) -> dict:
 
     for attempt in range(1, MAX_RETRIES + 1):
         try:
+            persona_context = get_persona_context(persona)
             if attempt == 1:
                 prompt = ANALYST_PROMPT.format(
                     rows=len(df), cols=len(df.columns),
                     col_list=col_list, dtype_info=dtype_info,
                     history_block=history_block, question=question,
+                    persona_context=persona_context,
                 )
             else:
                 logger.warning("Analyst attempt %d/%d — fixing: %s", attempt, MAX_RETRIES, last_error[:100])
                 prompt = ANALYST_FIX_PROMPT.format(
                     question=question, col_list=col_list,
                     broken_code=last_code, error_msg=last_error,
+                    persona_context=persona_context,
                 )
 
             tracer.add_event(trace_id, "analyst", "llm_call", {

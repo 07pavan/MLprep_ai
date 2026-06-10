@@ -13,6 +13,7 @@ class AgentState(TypedDict):
 
     # Orchestrator output
     intent: str                  # analysis_only | analysis_and_visualization | insights | cleaning_report
+    force_intent: str            # if non-empty, orchestrator skips LLM and uses this directly
 
     # Analyst output
     pandas_code: str
@@ -27,6 +28,14 @@ class AgentState(TypedDict):
 
     # Insights output
     insights: str
+    suggested_questions: list       # 3 contextual follow-up questions
+
+    # Persona & context
+    persona: str                    # "general" | "finance" | "marketing" | "engineering"
+
+    # Clarification
+    clarification_needed: bool      # True if orchestrator detects ambiguity
+    clarification_question: str     # The clarifying question to show the user
 
     # General
     error: Optional[str]

@@ -14,13 +14,16 @@ class Settings(BaseSettings):
     DATABASE_URL: str = ""
 
     # ── Multi-Model Router ────────────────────────────────────────
-    # "fast" tier — cheap, low-latency (intent classification, summaries)
-    FAST_MODEL: str = "gemini-1.5-flash"
-    FAST_PROVIDER: str = "google"       # "groq" or "google"
+    # "fast" tier — cheap, low-latency (intent classification, insights, summaries)
+    # Using Groq llama-3.1-8b-instant (free tier, fast) instead of Google gemini-1.5-flash
+    # which has been deprecated. Switch to "google" + "gemini-2.0-flash" if you have
+    # a paid Google AI Studio key.
+    FAST_MODEL: str = "llama-3.1-8b-instant"
+    FAST_PROVIDER: str = "groq"             # "groq" or "google"
 
-    # "smart" tier — expensive, high-reasoning (code gen, viz specs)
+    # "smart" tier — high-reasoning (pandas code gen, Vega-Lite specs)
     SMART_MODEL: str = "llama-3.3-70b-versatile"
-    SMART_PROVIDER: str = "groq"        # "groq" or "google"
+    SMART_PROVIDER: str = "groq"            # "groq" or "google"
 
     TEMPERATURE: float = 0.1
     LLM_TIMEOUT: int = 30               # seconds per LLM call
