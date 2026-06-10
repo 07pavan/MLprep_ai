@@ -66,7 +66,7 @@ def build_graph():
     builder.add_conditional_edges("visualizer", route_after_visualizer)
     builder.add_edge("insights_generator", END)
 
-    # Compile with dynamic checkpointer (PostgresSaver if DATABASE_URL is set, otherwise MemorySaver)
+    # Compile with dynamic checkpointer (PostgresSaver if DATABASE_URL is set, FirestoreSaver if FIREBASE_PROJECT_ID is set, otherwise MemorySaver)
     from config.settings import settings
     if settings.DATABASE_URL:
         try:
@@ -91,8 +91,29 @@ def build_graph():
             logger.error("❌ Failed to setup Postgres checkpointer: %s. Falling back to MemorySaver.", str(e))
             memory = MemorySaver()
             compiled = builder.compile(checkpointer=memory)
+    elif settings.FIREBASE_PROJECT_ID:
+        try:
+            logger.info("🔌 Initializing Firestore checkpointer state store for project %s...", settings.FIREBASE_PROJECT_ID)
+            
+            # Setup environment variable for google library credentials if provided
+            if settings.GOOGLE_APPLICATION_CREDENTIALS:
+                import os
+                os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = settings.GOOGLE_APPLICATION_CREDENTIALS
+            
+            # Set Google Cloud Project ID explicitly
+            import os
+            os.environ["GOOGLE_CLOUD_PROJECT"] = settings.FIREBASE_PROJECT_ID
+                
+            from langgraph.checkpoint.firestore import FirestoreSaver
+            checkpointer = FirestoreSaver()
+            compiled = builder.compile(checkpointer=checkpointer)
+            logger.info("🚀 LangGraph compiled successfully with FirestoreSaver checkpointer.")
+        except Exception as e:
+            logger.error("❌ Failed to setup Firestore checkpointer: %s. Falling back to MemorySaver.", str(e))
+            memory = MemorySaver()
+            compiled = builder.compile(checkpointer=memory)
     else:
-        logger.info("ℹ️ DATABASE_URL not set. Compiling LangGraph with local in-memory MemorySaver.")
+        logger.info("ℹ️ DATABASE_URL and FIREBASE_PROJECT_ID not set. Compiling LangGraph with local in-memory MemorySaver.")
         memory = MemorySaver()
         compiled = builder.compile(checkpointer=memory)
 

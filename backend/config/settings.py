@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str = ""
     DATABASE_URL: str = ""
 
+    # ── Firebase/Firestore ────────────────────────────────────────
+    FIREBASE_PROJECT_ID: str = ""
+    GOOGLE_APPLICATION_CREDENTIALS: str = ""
+
     # ── Multi-Model Router ────────────────────────────────────────
     # "fast" tier — cheap, low-latency (intent classification, insights, summaries)
     # Using Groq llama-3.1-8b-instant (free tier, fast) instead of Google gemini-1.5-flash
