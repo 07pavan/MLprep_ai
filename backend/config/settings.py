@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     # ── Firebase/Firestore ────────────────────────────────────────
     FIREBASE_PROJECT_ID: str = ""
     GOOGLE_APPLICATION_CREDENTIALS: str = ""
+    ENABLE_AUTH: bool = True
 
     # ── Multi-Model Router ────────────────────────────────────────
     # "fast" tier — cheap, low-latency (intent classification, insights, summaries)

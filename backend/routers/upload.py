@@ -6,10 +6,11 @@ import asyncio
 from functools import partial
 
 import pandas as pd
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 
 from utils.validators import validate_file, validate_dataframe
 from utils.session_manager import session_manager
+from utils.auth import verify_firebase_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["Upload"])
@@ -51,7 +52,10 @@ def _profile_columns(df: pd.DataFrame) -> list[dict]:
 
 
 @router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(
+    file: UploadFile = File(...),
+    user: dict = Depends(verify_firebase_token)
+):
     """Upload a data file (CSV, Excel, JSON, Parquet) and create a session."""
 
     # 1. Validate filename
@@ -81,8 +85,8 @@ async def upload_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=df_msg)
 
     # 5. Create session and persist (in thread pool)
-    session_id = session_manager.create_session()
-    await loop.run_in_executor(None, partial(session_manager.save_dataframe, session_id, df))
+    session_id = session_manager.create_session(user["uid"])
+    await loop.run_in_executor(None, partial(session_manager.save_dataframe, user["uid"], session_id, df))
 
     # 6. Profile columns (capped for speed) — also in thread pool
     columns_info = await loop.run_in_executor(None, partial(_profile_columns, df))

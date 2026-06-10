@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { AuthProvider, useAuth } from './hooks/useAuth'
+import AuthPage from './components/AuthPage'
 import { useSession } from './hooks/useSession'
 import Layout from './components/Layout'
 import FileUpload from './components/FileUpload'
@@ -57,10 +59,9 @@ function OverviewPage({ datasetMeta }) {
   )
 }
 
-// InsightsPage is now imported from ./components/InsightsPage
-
-// ── Root App ────────────────────────────────────────────────────
-export default function App() {
+// ── Main Dashboard Shell ─────────────────────────────────────────
+function DashboardContent() {
+  const { user } = useAuth()
   const {
     sessionId, datasetMeta,
     isUploading, uploadProgress, uploadError,
@@ -69,7 +70,7 @@ export default function App() {
 
   const [activePage, setActivePage] = useState('chat')
 
-  // No session → show upload page
+  // No dataset session → show upload page
   if (!sessionId) {
     return (
       <FileUpload
@@ -108,5 +109,41 @@ export default function App() {
     >
       {renderPage()}
     </Layout>
+  )
+}
+
+// ── Root App Wrapper ─────────────────────────────────────────────
+function AppShell() {
+  const { user, loading } = useAuth()
+
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--bg-primary)',
+        gap: 12
+      }}>
+        <div className="spinner" style={{ width: 40, height: 40 }} />
+        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Loading application...</span>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <AuthPage />
+  }
+
+  return <DashboardContent />
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppShell />
+    </AuthProvider>
   )
 }

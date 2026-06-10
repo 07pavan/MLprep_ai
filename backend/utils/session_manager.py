@@ -1,4 +1,4 @@
-"""File-based session manager — each session gets its own directory with Parquet storage"""
+"""File-based session manager — isolates sessions by user ID (uid) with Parquet storage"""
 from __future__ import annotations
 import os
 import uuid
@@ -22,38 +22,38 @@ class SessionManager:
     # Session lifecycle
     # ------------------------------------------------------------------
 
-    def create_session(self) -> str:
-        """Generate a new session ID and create its directory."""
+    def create_session(self, uid: str) -> str:
+        """Generate a new session ID and create its directory under the user's UID."""
         session_id = str(uuid.uuid4())
-        session_path = self._session_path(session_id)
+        session_path = self._session_path(uid, session_id)
         session_path.mkdir(parents=True, exist_ok=True)
-        logger.info("Created session %s", session_id)
+        logger.info("Created session %s for user %s", session_id, uid)
         return session_id
 
-    def session_exists(self, session_id: str) -> bool:
-        return self._session_path(session_id).exists()
+    def session_exists(self, uid: str, session_id: str) -> bool:
+        return self._session_path(uid, session_id).exists()
 
-    def cleanup_session(self, session_id: str) -> None:
-        path = self._session_path(session_id)
+    def cleanup_session(self, uid: str, session_id: str) -> None:
+        path = self._session_path(uid, session_id)
         if path.exists():
             shutil.rmtree(path)
-            logger.info("Cleaned up session %s", session_id)
+            logger.info("Cleaned up session %s for user %s", session_id, uid)
 
     # ------------------------------------------------------------------
     # DataFrame persistence
     # ------------------------------------------------------------------
 
-    def save_dataframe(self, session_id: str, df: pd.DataFrame) -> None:
+    def save_dataframe(self, uid: str, session_id: str, df: pd.DataFrame) -> None:
         """Persist a DataFrame as Parquet (preserves dtypes perfectly)."""
-        self._ensure_session(session_id)
-        parquet_path = self._data_path(session_id)
+        self._ensure_session(uid, session_id)
+        parquet_path = self._data_path(uid, session_id)
         df.to_parquet(parquet_path, index=False)
         logger.debug("Saved %d×%d df to %s", len(df), len(df.columns), parquet_path)
 
-    def load_dataframe(self, session_id: str) -> pd.DataFrame:
+    def load_dataframe(self, uid: str, session_id: str) -> pd.DataFrame:
         """Load the session DataFrame from Parquet."""
-        self._ensure_session(session_id)
-        parquet_path = self._data_path(session_id)
+        self._ensure_session(uid, session_id)
+        parquet_path = self._data_path(uid, session_id)
         if not parquet_path.exists():
             raise HTTPException(
                 status_code=404,
@@ -61,22 +61,22 @@ class SessionManager:
             )
         return pd.read_parquet(parquet_path)
 
-    def get_data_path(self, session_id: str) -> str:
+    def get_data_path(self, uid: str, session_id: str) -> str:
         """Return the string path to the session's Parquet file."""
-        return str(self._data_path(session_id))
+        return str(self._data_path(uid, session_id))
 
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _session_path(self, session_id: str) -> Path:
-        return self.storage_dir / session_id
+    def _session_path(self, uid: str, session_id: str) -> Path:
+        return self.storage_dir / uid / session_id
 
-    def _data_path(self, session_id: str) -> Path:
-        return self._session_path(session_id) / "data.parquet"
+    def _data_path(self, uid: str, session_id: str) -> Path:
+        return self._session_path(uid, session_id) / "data.parquet"
 
-    def _ensure_session(self, session_id: str) -> None:
-        if not self.session_exists(session_id):
+    def _ensure_session(self, uid: str, session_id: str) -> None:
+        if not self.session_exists(uid, session_id):
             raise HTTPException(
                 status_code=404,
                 detail=f"Session '{session_id}' not found. Please upload a file first.",

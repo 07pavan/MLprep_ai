@@ -379,12 +379,12 @@ class TestLLMAccuracy:
         assert int(val) == 8, f"Row count wrong: {val}"
 
     def test_llm_max_sales_region(self):
-        """LLM must identify West as having the maximum total sales region."""
+        """LLM must identify West or East as having the maximum total sales region (tied at 500)."""
         result = self._run_analyst("Which region has the highest total sales?")
         assert result["analysis_result"] is not None
         text = str(result["analysis_result"]).lower()
-        assert "west" in text, \
-            f"Expected 'West' in result, got: {result['analysis_result']}"
+        assert "west" in text or "east" in text, \
+            f"Expected 'West' or 'East' in result, got: {result['analysis_result']}"
 
     def test_llm_groupby_correctness(self):
         """LLM groupby East = 500, West = 500, North = 200, South = 180."""

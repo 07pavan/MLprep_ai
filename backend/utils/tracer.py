@@ -1,11 +1,6 @@
 """Thread-safe, size-bounded trace collector for agent observability.
 
-Captures structured events per request:
-  - LLM calls (model, tier, prompt preview, latency)
-  - Code execution (code, success/fail, error, attempt #)
-  - Intent classification (intent, source, reasoning)
-  - Vega-Lite spec validation (valid/invalid, error)
-  - Schema compression (total cols, selected cols)
+Isolates traces per user ID (uid) for multi-tenant SaaS safety.
 """
 from __future__ import annotations
 import time
@@ -19,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class Tracer:
-    """In-memory trace storage with auto-pruning."""
+    """In-memory trace storage with auto-pruning, isolated by user ID (uid)."""
 
     MAX_TRACES = 200  # rolling window
 
@@ -30,12 +25,13 @@ class Tracer:
 
     # ── Lifecycle ─────────────────────────────────────────────────
 
-    def start_trace(self, session_id: str, question: str) -> str:
+    def start_trace(self, session_id: str, question: str, uid: str = "") -> str:
         """Begin a new trace. Returns trace_id."""
         trace_id = str(uuid.uuid4())[:12]
         trace = {
             "trace_id": trace_id,
             "session_id": session_id,
+            "uid": uid,
             "question": question,
             "started_at": time.time(),
             "ended_at": None,
@@ -46,12 +42,12 @@ class Tracer:
         with self._lock:
             # Prune oldest if at capacity
             if len(self._order) >= self.MAX_TRACES:
-                oldest = self._order[0]  # will be auto-popped by deque maxlen
+                oldest = self._order[0]
                 self._traces.pop(oldest, None)
             self._order.append(trace_id)
             self._traces[trace_id] = trace
 
-        logger.debug("Trace %s started for question: %s", trace_id, question[:60])
+        logger.debug("Trace %s started for user %s, question: %s", trace_id, uid, question[:60])
         return trace_id
 
     def end_trace(self, trace_id: str, success: bool) -> None:
@@ -76,17 +72,7 @@ class Tracer:
         event_type: str,
         data: Optional[dict] = None,
     ) -> None:
-        """Append a structured event to the trace.
-
-        Args:
-            trace_id: Correlation ID from start_trace()
-            node: Node name (e.g. "orchestrator", "analyst", "visualizer")
-            event_type: One of:
-                "llm_call", "llm_response", "code_exec", "code_error",
-                "intent", "spec_valid", "spec_invalid", "schema_compressed",
-                "info", "warning", "error"
-            data: Event-specific payload dict
-        """
+        """Append a structured event to the trace."""
         event = {
             "timestamp": time.time(),
             "node": node,
@@ -100,14 +86,14 @@ class Tracer:
 
     # ── Query ─────────────────────────────────────────────────────
 
-    def get_traces(self, limit: int = 50) -> list[dict]:
-        """Return recent trace summaries, newest first."""
+    def get_traces(self, limit: int = 50, uid: str = "") -> list[dict]:
+        """Return recent trace summaries for a specific user, newest first."""
         with self._lock:
-            trace_ids = list(reversed(self._order))[:limit]
+            trace_ids = list(reversed(self._order))
             result = []
             for tid in trace_ids:
                 trace = self._traces.get(tid)
-                if trace:
+                if trace and trace.get("uid") == uid:
                     result.append({
                         "traceId": trace["trace_id"],
                         "sessionId": trace["session_id"],
@@ -116,18 +102,19 @@ class Tracer:
                         "durationMs": trace["duration_ms"],
                         "success": trace["success"],
                         "eventCount": len(trace["events"]),
-                        # Extract key facts for the summary
                         "intent": _extract_intent(trace["events"]),
                         "model": _extract_model(trace["events"]),
                         "attempts": _extract_attempts(trace["events"]),
                     })
+                    if len(result) >= limit:
+                        break
             return result
 
-    def get_trace_detail(self, trace_id: str) -> Optional[dict]:
-        """Return a full trace with all events."""
+    def get_trace_detail(self, trace_id: str, uid: str = "") -> Optional[dict]:
+        """Return a full trace with all events if it belongs to the user."""
         with self._lock:
             trace = self._traces.get(trace_id)
-            if not trace:
+            if not trace or trace.get("uid") != uid:
                 return None
             return {
                 "traceId": trace["trace_id"],
@@ -140,17 +127,26 @@ class Tracer:
                 "events": trace["events"],
             }
 
-    def clear(self) -> int:
-        """Wipe all stored traces. Returns count cleared."""
+    def clear(self, uid: str = "") -> int:
+        """Wipe all stored traces for a specific user. Returns count cleared."""
         with self._lock:
-            count = len(self._traces)
-            self._traces.clear()
-            self._order.clear()
-            return count
+            cleared_ids = []
+            for tid, trace in list(self._traces.items()):
+                if trace.get("uid") == uid:
+                    self._traces.pop(tid)
+                    cleared_ids.append(tid)
+            
+            # Rebuild order deque without the cleared traces
+            new_order = deque(maxlen=self.MAX_TRACES)
+            for tid in self._order:
+                if tid not in cleared_ids:
+                    new_order.append(tid)
+            self._order = new_order
+            
+            return len(cleared_ids)
 
 
-# ── Helpers ───────────────────────────────────────────────────────
-
+# Helpers
 def _extract_intent(events: list[dict]) -> str:
     for e in events:
         if e["type"] == "intent":

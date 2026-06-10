@@ -51,3 +51,9 @@ _sanitize_path()
 # Sanitize before every single test is executed to counter pytest's automatic path adjustments
 def pytest_runtest_setup(item):
     _sanitize_path()
+
+@pytest.fixture(scope="session", autouse=True)
+def disable_auth_for_tests():
+    from config.settings import settings
+    settings.ENABLE_AUTH = False
+

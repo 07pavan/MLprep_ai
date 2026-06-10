@@ -1,22 +1,15 @@
-"""Insights router — dedicated endpoint that always runs analyst → insights_generator.
-
-Unlike /api/chat (which classifies intent via LLM), this endpoint bypasses the
-orchestrator's LLM classification by injecting force_intent="insights" directly
-into the graph state. This guarantees that:
-  1. The analyst computes data grounded in the actual dataset.
-  2. The insights_generator always runs and returns ✦ bullets + suggested questions.
-  3. No misclassification can produce an empty insights response.
-"""
+"""Insights router — dedicated endpoint that always runs analyst → insights_generator."""
 from __future__ import annotations
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
 from graph.graph import app_graph
 from utils.session_manager import session_manager
 from utils.validators import scan_guardrails
 from utils.tracer import tracer
+from utils.auth import verify_firebase_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["Insights"])
@@ -31,12 +24,11 @@ class InsightsRequest(BaseModel):
 
 
 @router.post("/insights")
-async def run_insights(req: InsightsRequest):
-    """Run the analyst + insights_generator pipeline for a given question.
-
-    The orchestrator is bypassed (force_intent='insights') so insights are
-    ALWAYS generated — no risk of misclassification.
-    """
+async def run_insights(
+    req: InsightsRequest,
+    user: dict = Depends(verify_firebase_token)
+):
+    """Run the analyst + insights_generator pipeline for a given question."""
     # ── Guardrails ────────────────────────────────────────────────
     safe, reason = scan_guardrails(req.question)
     if not safe:
@@ -54,13 +46,13 @@ async def run_insights(req: InsightsRequest):
     persona = req.persona if req.persona in VALID_PERSONAS else "general"
 
     # ── Validate session ──────────────────────────────────────────
-    if not session_manager.session_exists(req.sessionId):
+    if not session_manager.session_exists(user["uid"], req.sessionId):
         raise HTTPException(status_code=404, detail="Session not found. Upload a file first.")
 
-    df_path = session_manager.get_data_path(req.sessionId)
+    df_path = session_manager.get_data_path(user["uid"], req.sessionId)
 
     # ── Start trace ───────────────────────────────────────────────
-    trace_id = tracer.start_trace(req.sessionId, req.question)
+    trace_id = tracer.start_trace(req.sessionId, req.question, uid=user["uid"])
 
     # ── Build initial state — force insights intent ───────────────
     initial_state = {
@@ -70,7 +62,7 @@ async def run_insights(req: InsightsRequest):
         "df_path": df_path,
         "trace_id": trace_id,
         "persona": persona,
-        "force_intent": "insights",   # ← key: bypasses orchestrator LLM
+        "force_intent": "insights",
         "intent": "",
         "pandas_code": "",
         "analysis_result": None,
@@ -88,7 +80,7 @@ async def run_insights(req: InsightsRequest):
 
     # ── Run graph ─────────────────────────────────────────────────
     try:
-        config = {"configurable": {"thread_id": f"insights_{req.sessionId}"}}
+        config = {"configurable": {"thread_id": f"insights_{user['uid']}_{req.sessionId}"}}
         final_state = app_graph.invoke(initial_state, config=config)
     except Exception as exc:
         logger.error("Insights graph error: %s", exc, exc_info=True)

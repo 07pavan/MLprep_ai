@@ -3,13 +3,14 @@ from __future__ import annotations
 import logging
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
 from graph.graph import app_graph
 from utils.session_manager import session_manager
 from utils.validators import scan_guardrails
 from utils.tracer import tracer
+from utils.auth import verify_firebase_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["Chat"])
@@ -53,7 +54,10 @@ def _blocked_response(reason: str) -> dict:
 
 
 @router.post("/chat")
-async def chat(req: ChatRequest):
+async def chat(
+    req: ChatRequest,
+    user: dict = Depends(verify_firebase_token)
+):
     """Process a natural language question through the LangGraph pipeline."""
 
     # ── Guardrails check ──────────────────────────────────────────
@@ -66,10 +70,10 @@ async def chat(req: ChatRequest):
     persona = req.persona if req.persona in VALID_PERSONAS else "general"
 
     # ── Validate session ──────────────────────────────────────────
-    if not session_manager.session_exists(req.sessionId):
+    if not session_manager.session_exists(user["uid"], req.sessionId):
         raise HTTPException(status_code=404, detail="Session not found. Upload a file first.")
 
-    df_path = session_manager.get_data_path(req.sessionId)
+    df_path = session_manager.get_data_path(user["uid"], req.sessionId)
 
     # ── Start trace ───────────────────────────────────────────────
     trace_id = tracer.start_trace(req.sessionId, req.question)
@@ -99,7 +103,7 @@ async def chat(req: ChatRequest):
 
     # ── Run the compiled graph ────────────────────────────────────
     try:
-        config = {"configurable": {"thread_id": req.sessionId}}
+        config = {"configurable": {"thread_id": f"{user['uid']}_{req.sessionId}"}}
         final_state = app_graph.invoke(initial_state, config=config)
     except Exception as exc:
         logger.error("Graph execution error: %s", exc, exc_info=True)

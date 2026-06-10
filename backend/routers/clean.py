@@ -2,13 +2,14 @@
 from __future__ import annotations
 import logging
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import io
 
 from agents.cleaner import DataCleanerAgent
 from utils.session_manager import session_manager
+from utils.auth import verify_firebase_token
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["Cleaning"])
@@ -22,9 +23,12 @@ class CleanRequest(BaseModel):
 
 
 @router.get("/clean/report")
-async def get_cleaning_report(sessionId: str = Query(...)):
+async def get_cleaning_report(
+    sessionId: str = Query(...),
+    user: dict = Depends(verify_firebase_token)
+):
     """Return a data quality report for the session's dataset."""
-    df = session_manager.load_dataframe(sessionId)
+    df = session_manager.load_dataframe(user["uid"], sessionId)
     report = cleaner.get_cleaning_report(df)
     suggestions = cleaner.suggest_cleaning_steps(df)
     return {
@@ -34,16 +38,19 @@ async def get_cleaning_report(sessionId: str = Query(...)):
 
 
 @router.post("/clean")
-async def apply_cleaning(req: CleanRequest):
+async def apply_cleaning(
+    req: CleanRequest,
+    user: dict = Depends(verify_firebase_token)
+):
     """Apply cleaning operations and persist the cleaned dataset."""
-    df = session_manager.load_dataframe(req.sessionId)
+    df = session_manager.load_dataframe(user["uid"], req.sessionId)
     rows_before = len(df)
     cols_before = len(df.columns)
 
     cleaned_df, change_log = cleaner.clean(df, req.options)
 
     # Persist cleaned version
-    session_manager.save_dataframe(req.sessionId, cleaned_df)
+    session_manager.save_dataframe(user["uid"], req.sessionId, cleaned_df)
 
     return {
         "success": True,
@@ -58,9 +65,12 @@ async def apply_cleaning(req: CleanRequest):
 
 
 @router.get("/clean/download")
-async def download_cleaned(sessionId: str = Query(...)):
+async def download_cleaned(
+    sessionId: str = Query(...),
+    user: dict = Depends(verify_firebase_token)
+):
     """Download the current session dataset as CSV."""
-    df = session_manager.load_dataframe(sessionId)
+    df = session_manager.load_dataframe(user["uid"], sessionId)
     buf = io.StringIO()
     df.to_csv(buf, index=False)
     buf.seek(0)

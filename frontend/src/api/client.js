@@ -12,6 +12,20 @@ const api = axios.create({
   timeout: 180000, // 3 minutes for long LLM calls
 })
 
+// Attach authorization headers dynamically
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
 // ── Upload ────────────────────────────────────────────────────────
 export async function uploadFile(file, onProgress) {
   const form = new FormData()

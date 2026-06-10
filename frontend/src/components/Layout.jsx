@@ -3,6 +3,7 @@ import {
   Menu, X, MessageSquare, BarChart2, Sparkles,
   Wrench, Database, LogOut, Activity,
 } from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
 
 const NAV_ITEMS = [
   { id: 'chat', label: 'Chat', icon: MessageSquare },
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
 
 export default function Layout({ children, activePage, onPageChange, datasetMeta, onClearSession }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, logOut } = useAuth()
 
   // Close sidebar on page change (mobile)
   useEffect(() => { setSidebarOpen(false) }, [activePage])
@@ -63,10 +65,70 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
           ))}
         </nav>
 
-        <div className="sidebar-footer">
-          <button className="btn-ghost" style={{ width: '100%' }} onClick={onClearSession}>
-            <LogOut size={16} /> Reset Session
-          </button>
+        {/* Sidebar Footer — User profile and session reset */}
+        <div className="sidebar-footer" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {datasetMeta && (
+            <button className="btn-ghost" style={{ width: '100%', justifyContent: 'flex-start', color: '#ef4444' }} onClick={onClearSession}>
+              <X size={16} /> Close Dataset
+            </button>
+          )}
+          
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '12px 4px 0',
+            borderTop: '1px solid var(--border-subtle)',
+            marginTop: 4
+          }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              fontSize: '0.8rem',
+              color: '#fff',
+              flexShrink: 0
+            }}>
+              {user?.displayName ? user.displayName[0].toUpperCase() : 'U'}
+            </div>
+            
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap'
+              }}>
+                {user?.displayName || 'User'}
+              </div>
+              <div style={{
+                fontSize: '0.7rem',
+                color: 'var(--text-secondary)',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                opacity: 0.7
+              }}>
+                {user?.email}
+              </div>
+            </div>
+
+            <button
+              className="btn-icon"
+              onClick={logOut}
+              title="Log Out"
+              style={{ width: 28, height: 28, flexShrink: 0 }}
+            >
+              <LogOut size={14} />
+            </button>
+          </div>
         </div>
       </aside>
 
