@@ -62,6 +62,25 @@ async def health():
 async def on_startup():
     storage = Path(settings.STORAGE_DIR)
     storage.mkdir(parents=True, exist_ok=True)
+
+    # Initialize Firebase Admin SDK
+    import firebase_admin
+    from firebase_admin import credentials
+    if not firebase_admin._apps:
+        if settings.GOOGLE_APPLICATION_CREDENTIALS:
+            try:
+                cred = credentials.Certificate(settings.GOOGLE_APPLICATION_CREDENTIALS)
+                firebase_admin.initialize_app(cred)
+                logger.info("🔥 Firebase Admin SDK initialized with certificate")
+            except Exception as e:
+                logger.error("❌ Failed to initialize Firebase Admin with certificate: %s", e)
+        else:
+            try:
+                firebase_admin.initialize_app()
+                logger.info("🔥 Firebase Admin SDK initialized with default credentials")
+            except Exception as e:
+                logger.warning("⚠️ Firebase Admin SDK initialized without credentials (ENABLE_AUTH must be False to allow local calls): %s", e)
+
     logger.info("🚀 AI Data Analyst API v2.0.0 started")
     logger.info("   Storage  : %s", storage.resolve())
     logger.info("   Docs     : http://localhost:8000/docs")
