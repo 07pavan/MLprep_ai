@@ -5,6 +5,7 @@ import FileUpload from './components/FileUpload'
 import ChatInterface from './components/ChatInterface'
 import CleaningPanel from './components/CleaningPanel'
 import TraceViewer from './components/TraceViewer'
+import InsightsPage from './components/InsightsPage'
 
 // ── Overview page (inline) ──────────────────────────────────────
 function OverviewPage({ datasetMeta }) {
@@ -56,20 +57,7 @@ function OverviewPage({ datasetMeta }) {
   )
 }
 
-// ── Insights placeholder page ──────────────────────────────────
-function InsightsPage() {
-  return (
-    <div className="chat-hero">
-      <h1 className="chat-hero-title">
-        <span className="gradient-text">Auto Insights</span>
-      </h1>
-      <p className="chat-hero-subtitle">
-        Ask questions in the Chat tab and insights will be generated automatically.
-        You can also ask "Give me insights about this data" to get a full analysis.
-      </p>
-    </div>
-  )
-}
+// InsightsPage is now imported from ./components/InsightsPage
 
 // ── Root App ────────────────────────────────────────────────────
 export default function App() {
@@ -101,7 +89,7 @@ export default function App() {
       case 'overview':
         return <OverviewPage datasetMeta={datasetMeta} />
       case 'insights':
-        return <InsightsPage />
+        return <InsightsPage sessionId={sessionId} />
       case 'clean':
         return <CleaningPanel sessionId={sessionId} />
       case 'traces':

@@ -29,8 +29,14 @@ export async function uploadFile(file, onProgress) {
 }
 
 // ── Chat ──────────────────────────────────────────────────────────
-export async function sendMessage(sessionId, question, chatHistory = []) {
-  const res = await api.post('/chat', { sessionId, question, chatHistory })
+export async function sendMessage(sessionId, question, chatHistory = [], persona = 'general') {
+  const res = await api.post('/chat', { sessionId, question, chatHistory, persona })
+  return res.data
+}
+
+// ── Insights (dedicated — always runs insights_generator node) ────
+export async function getInsights(sessionId, question, persona = 'general') {
+  const res = await api.post('/insights', { sessionId, question, persona })
   return res.data
 }
 

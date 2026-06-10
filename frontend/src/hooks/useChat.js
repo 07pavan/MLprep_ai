@@ -9,11 +9,15 @@ export function useChat() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const sendQuestion = useCallback(async (sessionId, question) => {
+  /**
+   * sendQuestion(sessionId, question, persona?)
+   *   persona — one of: 'general' | 'finance' | 'marketing' | 'engineering'
+   */
+  const sendQuestion = useCallback(async (sessionId, question, persona = 'general') => {
     setIsLoading(true)
     setError(null)
 
-    // Add user message immediately
+    // Optimistically add the user message
     const userMsg = {
       id: nextId(),
       role: 'user',
@@ -22,10 +26,10 @@ export function useChat() {
     }
     setMessages((prev) => [...prev, userMsg])
 
-    // Build chat history from existing messages for context
+    // Build chat history from existing messages for context (last 4 exchanges)
     const chatHistory = messages
       .filter((m) => m.role === 'user' || m.role === 'agent')
-      .slice(-8) // last 4 exchanges = 8 messages
+      .slice(-8)
       .map((m) =>
         m.role === 'user'
           ? { question: m.question }
@@ -33,28 +37,33 @@ export function useChat() {
       )
 
     try {
-      const data = await sendMessage(sessionId, question, chatHistory)
+      const data = await sendMessage(sessionId, question, chatHistory, persona)
 
       const agentMsg = {
         id: nextId(),
         role: 'agent',
         question,
+        intent: data.intent,
         analysis: data.analysis,
         visualization: data.visualization,
         insights: data.insights,
-        intent: data.intent,
+        suggestedQuestions: data.suggestedQuestions || [],       // NEW
+        clarificationNeeded: data.clarificationNeeded || false,  // NEW
+        clarificationQuestion: data.clarificationQuestion || '', // NEW
         timestamp: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, agentMsg])
     } catch (err) {
       const msg = err.response?.data?.detail || err.message || 'Something went wrong'
       setError(msg)
-      // Add error message
       const errMsg = {
         id: nextId(),
         role: 'agent',
         question,
         analysis: { success: false, error: msg },
+        suggestedQuestions: [],
+        clarificationNeeded: false,
+        clarificationQuestion: '',
         timestamp: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, errMsg])
