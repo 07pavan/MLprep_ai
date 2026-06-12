@@ -1,0 +1,17 @@
+# Netlify configuration file to override root settings and build the frontend React app
+
+[build]
+  # Tell Netlify to run the build inside the frontend directory
+  base = "frontend"
+  
+  # The build command for Vite
+  command = "npm run build"
+  
+  # The directory Vite outputs the compiled SPA to (relative to the base directory)
+  publish = "dist"
+
+# Single Page Application routing rule to prevent 404s on page refresh
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
