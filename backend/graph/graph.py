@@ -105,7 +105,7 @@ def build_graph():
             os.environ["GOOGLE_CLOUD_PROJECT"] = settings.FIREBASE_PROJECT_ID
                 
             from langgraph_checkpoint_firestore import FirestoreSaver
-            checkpointer = FirestoreSaver()
+            checkpointer = FirestoreSaver(project_id=settings.FIREBASE_PROJECT_ID)
             compiled = builder.compile(checkpointer=checkpointer)
             logger.info("🚀 LangGraph compiled successfully with FirestoreSaver checkpointer.")
         except Exception as e:
