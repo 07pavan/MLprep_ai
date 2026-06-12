@@ -63,6 +63,18 @@ async def on_startup():
     storage = Path(settings.STORAGE_DIR)
     storage.mkdir(parents=True, exist_ok=True)
 
+    # Decode Firebase credentials from environment if provided as base64
+    if settings.FIREBASE_SERVICE_ACCOUNT_JSON and not settings.GOOGLE_APPLICATION_CREDENTIALS:
+        try:
+            import base64
+            key_data = base64.b64decode(settings.FIREBASE_SERVICE_ACCOUNT_JSON)
+            key_file = storage / "firebase-key.json"
+            key_file.write_bytes(key_data)
+            settings.GOOGLE_APPLICATION_CREDENTIALS = str(key_file.resolve())
+            logger.info("🔥 Decoded and saved Firebase Service Account JSON to %s", settings.GOOGLE_APPLICATION_CREDENTIALS)
+        except Exception as e:
+            logger.error("❌ Failed to decode FIREBASE_SERVICE_ACCOUNT_JSON: %s", e)
+
     # Initialize Firebase Admin SDK
     import firebase_admin
     from firebase_admin import credentials

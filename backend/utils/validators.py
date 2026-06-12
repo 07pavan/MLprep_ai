@@ -89,7 +89,7 @@ def sanitize_code(code: str) -> str:
         dangerous = any(pat.lower() in line_lower for pat in BLOCKED_PATTERNS)
         if dangerous:
             removed.append(stripped)
-            safe_lines.append("# [SANITIZED]")
+            safe_lines.append(f"# [SANITIZED] {stripped}")
         else:
             safe_lines.append(line)
 
