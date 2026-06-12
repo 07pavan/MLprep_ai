@@ -1,17 +1,9 @@
 """FastAPI application entry point"""
 from __future__ import annotations
 import logging
+import os
+import base64
 from pathlib import Path
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from config.settings import settings
-from routers.upload import router as upload_router
-from routers.chat import router as chat_router
-from routers.clean import router as clean_router
-from routers.traces import router as traces_router
-from routers.insights import router as insights_router
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
@@ -20,6 +12,32 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+from config.settings import settings
+
+# ─── Decode Firebase credentials immediately (before importing routers/graph) ───
+if settings.FIREBASE_SERVICE_ACCOUNT_JSON and not settings.GOOGLE_APPLICATION_CREDENTIALS:
+    try:
+        storage = Path(settings.STORAGE_DIR)
+        storage.mkdir(parents=True, exist_ok=True)
+        key_data = base64.b64decode(settings.FIREBASE_SERVICE_ACCOUNT_JSON)
+        key_file = storage / "firebase-key.json"
+        key_file.write_bytes(key_data)
+        settings.GOOGLE_APPLICATION_CREDENTIALS = str(key_file.resolve())
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = settings.GOOGLE_APPLICATION_CREDENTIALS
+        logger.info("🔥 Decoded and saved Firebase Service Account JSON to %s", settings.GOOGLE_APPLICATION_CREDENTIALS)
+    except Exception as e:
+        logger.error("❌ Failed to decode FIREBASE_SERVICE_ACCOUNT_JSON: %s", e)
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from routers.upload import router as upload_router
+from routers.chat import router as chat_router
+from routers.clean import router as clean_router
+from routers.traces import router as traces_router
+from routers.insights import router as insights_router
+
 
 # ─── App factory ──────────────────────────────────────────────────────────────
 app = FastAPI(
@@ -62,18 +80,6 @@ async def health():
 async def on_startup():
     storage = Path(settings.STORAGE_DIR)
     storage.mkdir(parents=True, exist_ok=True)
-
-    # Decode Firebase credentials from environment if provided as base64
-    if settings.FIREBASE_SERVICE_ACCOUNT_JSON and not settings.GOOGLE_APPLICATION_CREDENTIALS:
-        try:
-            import base64
-            key_data = base64.b64decode(settings.FIREBASE_SERVICE_ACCOUNT_JSON)
-            key_file = storage / "firebase-key.json"
-            key_file.write_bytes(key_data)
-            settings.GOOGLE_APPLICATION_CREDENTIALS = str(key_file.resolve())
-            logger.info("🔥 Decoded and saved Firebase Service Account JSON to %s", settings.GOOGLE_APPLICATION_CREDENTIALS)
-        except Exception as e:
-            logger.error("❌ Failed to decode FIREBASE_SERVICE_ACCOUNT_JSON: %s", e)
 
     # Initialize Firebase Admin SDK
     import firebase_admin
