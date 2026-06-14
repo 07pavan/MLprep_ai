@@ -169,6 +169,18 @@ class TestSandbox(unittest.TestCase):
         # Timeout is 5 seconds, should finish close to 5 seconds (not hang forever)
         self.assertLess(elapsed, 7.0)
 
+    def test_sandbox_result_to_json_nested(self):
+        """Test result_to_json with nested structures containing DataFrames and Series."""
+        df = pd.DataFrame({"sales": [100, 200]})
+        nested = {
+            "status": "success",
+            "data": [df, pd.Series([1, 2], name="test")]
+        }
+        serialized = PandasTool.result_to_json(nested)
+        self.assertEqual(serialized["status"], "success")
+        self.assertEqual(serialized["data"][0], [{"sales": 100}, {"sales": 200}])
+        self.assertEqual(serialized["data"][1], {"0": 1, "1": 2})
+
 
 class TestSchemaCompression(unittest.TestCase):
     """Test semantic schema compression."""

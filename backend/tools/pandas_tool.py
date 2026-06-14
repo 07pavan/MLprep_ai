@@ -100,33 +100,40 @@ class PandasTool:
         """
         Convert a pandas result into a JSON-serializable form.
 
-        DataFrame  → list[dict]
-        Series     → dict
-        scalar     → native Python type
+        Recursively converts DataFrames, Series, numpy types, lists, and dicts.
         """
-        if isinstance(result, pd.DataFrame):
-            df_out = result.head(500)
-            for col in df_out.select_dtypes(include=["datetime64"]).columns:
-                df_out[col] = df_out[col].astype(str)
-            return df_out.to_dict(orient="records")
-
-        if isinstance(result, pd.Series):
-            s = result.head(200)
-            return {str(k): _make_serializable(v) for k, v in s.items()}
-
         return _make_serializable(result)
 
 
 def _make_serializable(val: Any) -> Any:
-    """Convert numpy/pandas scalars to native Python types."""
+    """Convert numpy/pandas types, DataFrames, Series, and collections to JSON-serializable native Python types."""
+    if isinstance(val, pd.DataFrame):
+        df_out = val.head(500)
+        # Avoid warnings/errors with copy if needed, but select_dtypes is safe
+        for col in df_out.select_dtypes(include=["datetime64"]).columns:
+            df_out[col] = df_out[col].astype(str)
+        return df_out.to_dict(orient="records")
+
+    if isinstance(val, pd.Series):
+        s = val.head(200)
+        return {str(k): _make_serializable(v) for k, v in s.items()}
+
     if isinstance(val, (np.integer,)):
         return int(val)
     if isinstance(val, (np.floating,)):
         return float(val)
     if isinstance(val, np.ndarray):
-        return val.tolist()
+        return [_make_serializable(x) for x in val.tolist()]
     if isinstance(val, pd.Timestamp):
         return val.isoformat()
+    if isinstance(val, list):
+        return [_make_serializable(x) for x in val]
+    if isinstance(val, tuple):
+        return [_make_serializable(x) for x in val]
+    if isinstance(val, set):
+        return [_make_serializable(x) for x in val]
+    if isinstance(val, dict):
+        return {str(k): _make_serializable(v) for k, v in val.items()}
     try:
         if pd.isna(val):
             return None
