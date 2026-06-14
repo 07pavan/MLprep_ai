@@ -1,7 +1,8 @@
 """Application settings loaded from environment variables"""
 from pathlib import Path
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
-from typing import List
+from typing import List, Any
 
 # Absolute path to the backend/ directory
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -39,11 +40,26 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE_MB: int = 100
 
     # ── CORS ──────────────────────────────────────────────────────
-    CORS_ORIGINS: List[str] = [
+    CORS_ORIGINS: Any = [
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
     ]
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            import json
+            v_stripped = v.strip()
+            if v_stripped.startswith("[") and v_stripped.endswith("]"):
+                try:
+                    return json.loads(v_stripped)
+                except Exception:
+                    pass
+            # Split by comma and strip whitespace
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     class Config:
         env_file = [str(BACKEND_DIR.parent / ".env"), str(BACKEND_DIR / ".env")]
