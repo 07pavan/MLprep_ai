@@ -37,5 +37,18 @@ class AgentState(TypedDict):
     clarification_needed: bool      # True if orchestrator detects ambiguity
     clarification_question: str     # The clarifying question to show the user
 
+    # Profiling output
+    profiling_result: Optional[dict]
+
+    # Quality output
+    quality_result: Optional[dict]
+
+    # ML Readiness output
+    ml_readiness_result: Optional[dict]
+
+    # Cleaning plan output
+    cleaning_plan: Optional[dict]
+
     # General
     error: Optional[str]
+

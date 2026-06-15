@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GOOGLE_API_KEY: str = ""
     DATABASE_URL: str = ""
+    SENTRY_DSN: str = ""
 
     # ── Firebase/Firestore ────────────────────────────────────────
     FIREBASE_PROJECT_ID: str = ""
@@ -44,6 +45,7 @@ class Settings(BaseSettings):
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
+        "https://datacopilote-ai.netlify.app",
     ]
 
     @field_validator("CORS_ORIGINS", mode="before")

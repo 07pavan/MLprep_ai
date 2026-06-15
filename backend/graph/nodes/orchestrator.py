@@ -25,7 +25,11 @@ def _keyword_classify(question: str) -> str:
         return "analysis_and_visualization"
     if any(w in q for w in ["insight", "pattern", "discover", "anomaly", "unusual", "why"]):
         return "insights"
-    if any(w in q for w in ["clean", "missing", "quality", "duplicate", "preprocess"]):
+    if any(w in q for w in ["profile", "profiling", "schema", "describe", "overview", "summary", "shape"]):
+        return "profiling"
+    if any(w in q for w in ["quality", "missing", "duplicate", "outlier", "readiness", "imbalance"]):
+        return "quality_check"
+    if any(w in q for w in ["clean", "preprocess", "fix data", "repair"]):
         return "cleaning_report"
     return "analysis_only"
 
@@ -39,7 +43,7 @@ def orchestrator_node(state: AgentState) -> dict:
 
     # ── Fast-path: caller already decided the intent ──────────────
     force_intent = state.get("force_intent", "")
-    if force_intent in {"analysis_only", "analysis_and_visualization", "insights", "cleaning_report"}:
+    if force_intent in {"analysis_only", "analysis_and_visualization", "insights", "cleaning_report", "profiling", "quality_check"}:
         logger.info("Orchestrator: force_intent=%s — skipping LLM classification", force_intent)
         tracer.add_event(trace_id, "orchestrator", "intent", {
             "intent": force_intent,
@@ -121,6 +125,8 @@ def orchestrator_node(state: AgentState) -> dict:
                     "analysis_and_visualization",
                     "insights",
                     "cleaning_report",
+                    "profiling",
+                    "quality_check",
                     "clarification",
                 }
                 llm_intent = parsed["intent"]

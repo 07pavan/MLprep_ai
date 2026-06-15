@@ -75,6 +75,9 @@ async def run_insights(
         "suggested_questions": [],
         "clarification_needed": False,
         "clarification_question": "",
+        "profiling_result": None,
+        "quality_result": None,
+        "ml_readiness_result": None,
         "error": None,
     }
 

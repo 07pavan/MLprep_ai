@@ -94,6 +94,46 @@ async def upload_file(
     # 7. Memory estimate — use fast non-deep estimate to avoid blocking
     mem_mb = round(df.memory_usage(deep=False).sum() / (1024 * 1024), 2)
 
+    # 8. Score ML Readiness and register dataset in Dataset Registry
+    import uuid
+    from datetime import datetime
+    from tools.ml_readiness_tool import score_ml_readiness
+    from services.dataset_service import get_dataset_service
+
+    try:
+        ml_score = score_ml_readiness(df)["score"]
+    except Exception as exc:
+        logger.error("Failed to score uploaded dataset: %s", exc, exc_info=True)
+        ml_score = 0
+
+    dataset_id = str(uuid.uuid4())
+    upload_timestamp = datetime.utcnow().isoformat() + "Z"
+    parquet_path = session_manager.get_data_path(user["uid"], session_id)
+
+    dataset_record = {
+        "dataset_id": dataset_id,
+        "user_id": user["uid"],
+        "dataset_name": file.filename,
+        "source": "upload",
+        "original_file_type": name.rsplit(".", 1)[-1] if "." in name else "unknown",
+        "upload_timestamp": upload_timestamp,
+        "row_count": len(df),
+        "column_count": len(df.columns),
+        "memory_usage": mem_mb,
+        "parquet_path": parquet_path,
+        "ml_readiness_score": ml_score,
+        "dataset_version": 1,
+        "status": "active"
+    }
+
+    try:
+        db_service = get_dataset_service()
+        db_service.create_dataset(dataset_record)
+        logger.info("Registered uploaded dataset %s in metadata registry", dataset_id)
+    except Exception as exc:
+        logger.error("Failed to store dataset metadata: %s", exc, exc_info=True)
+        # We don't fail the upload entirely if registry fails, but we log the error
+
     logger.info(
         "Uploaded '%s' → session %s (%d×%d, %.2f MB in)",
         file.filename, session_id, len(df), len(df.columns), size_mb,
@@ -101,6 +141,7 @@ async def upload_file(
 
     return {
         "sessionId": session_id,
+        "datasetId": dataset_id,
         "filename": file.filename,
         "format": name.rsplit(".", 1)[-1] if "." in name else "unknown",
         "shape": {"rows": len(df), "cols": len(df.columns)},

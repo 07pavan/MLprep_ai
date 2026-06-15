@@ -67,6 +67,24 @@ class SessionManager:
 
     # ------------------------------------------------------------------
     # Private helpers
+    def create_backup_if_not_exists(self, uid: str, session_id: str) -> None:
+        """Create a backup of the original data.parquet if data_orig.parquet doesn't exist."""
+        data_file = self._data_path(uid, session_id)
+        backup_file = self._session_path(uid, session_id) / "data_orig.parquet"
+        if data_file.exists() and not backup_file.exists():
+            shutil.copy2(data_file, backup_file)
+            logger.info("Created backup data_orig.parquet for session %s", session_id)
+
+    def restore_backup(self, uid: str, session_id: str) -> bool:
+        """Restore data.parquet from data_orig.parquet. Returns True if restored, False if no backup existed."""
+        backup_file = self._session_path(uid, session_id) / "data_orig.parquet"
+        data_file = self._data_path(uid, session_id)
+        if backup_file.exists():
+            shutil.copy2(backup_file, data_file)
+            logger.info("Restored data.parquet from backup for session %s", session_id)
+            return True
+        return False
+
     # ------------------------------------------------------------------
 
     def _session_path(self, uid: str, session_id: str) -> Path:

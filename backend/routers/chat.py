@@ -98,6 +98,9 @@ async def chat(
         "suggested_questions": [],          # NEW
         "clarification_needed": False,      # NEW
         "clarification_question": "",       # NEW
+        "profiling_result": None,
+        "quality_result": None,
+        "ml_readiness_result": None,
         "error": None,
     }
 
@@ -147,5 +150,9 @@ async def chat(
         # ── Clarification ─────────────────────────────────────────
         "clarificationNeeded": clarification_needed,                         # NEW
         "clarificationQuestion": final_state.get("clarification_question", ""),  # NEW
+        # ── Profiling & Quality (populated when intent is profiling/quality_check)
+        "profiling": final_state.get("profiling_result"),
+        "qualityCheck": final_state.get("quality_result"),
+        "mlReadiness": final_state.get("ml_readiness_result"),
         "error": final_state.get("error"),
     }

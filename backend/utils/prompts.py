@@ -59,7 +59,9 @@ YOUR TASKS:
    - "analysis_only"              — data query, stats, aggregations, filtering
    - "analysis_and_visualization" — requests a chart, graph, plot, trend, or visual
    - "insights"                   — asks for patterns, anomalies, discoveries, or why something happened
-   - "cleaning_report"            — asks about data quality, missing values, cleaning
+   - "profiling"                  — asks for dataset overview, profile, schema, shape, describe, summary, column info
+   - "quality_check"              — asks about data quality, missing values, duplicates, outliers, ML readiness
+   - "cleaning_report"            — explicitly asks to clean or fix data, preprocess, or repair
    - "clarification"              — the question is too ambiguous to answer reliably (see rule below)
 
 2. AMBIGUITY CHECK — classify as "clarification" ONLY when ALL of these are true:

@@ -10,6 +10,9 @@ from graph.nodes.orchestrator import orchestrator_node
 from graph.nodes.analyst import analyst_node
 from graph.nodes.visualizer import visualizer_node
 from graph.nodes.insights import insights_node
+from graph.nodes.profiler import profiler_node
+from graph.nodes.quality import quality_node
+from graph.nodes.ml_readiness import ml_readiness_node
 
 logger = logging.getLogger(__name__)
 
@@ -22,10 +25,14 @@ db_pool = None
 # ---------------------------------------------------------------------------
 
 def route_after_orchestrator(state: AgentState) -> str:
-    """Always run the analyst first (every question needs data work)."""
+    """Route to the appropriate node based on classified intent."""
     intent = state.get("intent", "analysis_only")
     if intent == "cleaning_report":
         return END   # cleaning is handled by a dedicated router, not the graph
+    if intent == "profiling":
+        return "profiler"
+    if intent == "quality_check":
+        return "quality"
     return "analyst"
 
 
@@ -56,6 +63,9 @@ def build_graph():
     builder.add_node("analyst", analyst_node)
     builder.add_node("visualizer", visualizer_node)
     builder.add_node("insights_generator", insights_node)
+    builder.add_node("profiler", profiler_node)
+    builder.add_node("quality", quality_node)
+    builder.add_node("ml_readiness", ml_readiness_node)
 
     # Entry point
     builder.set_entry_point("orchestrator")
@@ -65,6 +75,9 @@ def build_graph():
     builder.add_conditional_edges("analyst", route_after_analyst)
     builder.add_conditional_edges("visualizer", route_after_visualizer)
     builder.add_edge("insights_generator", END)
+    builder.add_edge("profiler", END)
+    builder.add_edge("quality", "ml_readiness")
+    builder.add_edge("ml_readiness", END)
 
     # Compile with dynamic checkpointer (PostgresSaver if DATABASE_URL is set, FirestoreSaver if FIREBASE_PROJECT_ID is set, otherwise MemorySaver)
     from config.settings import settings
