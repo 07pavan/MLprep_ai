@@ -273,18 +273,23 @@ class TestSecurity:
     def test_os_import_stripped(self):
         code = "import os\nresult = df.head()"
         sanitized = self.sanitize(code)
-        assert "import os" not in sanitized
-        assert "SANITIZED" in sanitized
+        assert "# [SANITIZED] import os" in sanitized
+        lines = [line.strip() for line in sanitized.split("\n")]
+        assert "import os" not in lines
 
     def test_eval_stripped(self):
         code = "eval('__import__(\"os\").system(\"ls\")')\nresult = 1"
         sanitized = self.sanitize(code)
-        assert "eval(" not in sanitized
+        assert "# [SANITIZED] eval('__import__(\"os\").system(\"ls\")')" in sanitized
+        lines = [line.strip() for line in sanitized.split("\n")]
+        assert "eval('__import__(\"os\").system(\"ls\")')" not in lines
 
     def test_exec_stripped(self):
         code = "exec('print(\"pwned\")')\nresult = 1"
         sanitized = self.sanitize(code)
-        assert "exec(" not in sanitized
+        assert "# [SANITIZED] exec('print(\"pwned\")')" in sanitized
+        lines = [line.strip() for line in sanitized.split("\n")]
+        assert "exec('print(\"pwned\")')" not in lines
 
     def test_dangerous_code_blocked_in_sandbox(self):
         from tools.pandas_tool import PandasTool
