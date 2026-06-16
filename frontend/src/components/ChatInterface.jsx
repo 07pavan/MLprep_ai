@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { Send, Trash2, Brain, ChevronDown, HelpCircle } from 'lucide-react'
+import { Send, Trash2, Brain, ChevronDown, HelpCircle, Code } from 'lucide-react'
 import { useChat } from '../hooks/useChat'
 import MessageBubble from './MessageBubble'
 
@@ -74,58 +74,7 @@ function PersonaSelector({ value, onChange }) {
   )
 }
 
-// ── ClarificationCard ────────────────────────────────────────────────────────
-function ClarificationCard({ question, onAnswer }) {
-  const [answer, setAnswer] = useState('')
-
-  const handleSubmit = () => {
-    const q = answer.trim()
-    if (!q) return
-    setAnswer('')
-    onAnswer(q)
-  }
-
-  return (
-    <div className="message-row agent">
-      <div className="message-bubble agent" style={{ maxWidth: '92%' }}>
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: 10,
-          padding: '12px 14px', borderRadius: 8,
-          background: 'var(--surface-alt)',
-          border: '1px solid var(--accent)',
-          marginBottom: 12,
-        }}>
-          <HelpCircle size={18} style={{ color: 'var(--accent)', flexShrink: 0, marginTop: 2 }} />
-          <div>
-            <div style={{ fontWeight: 600, fontSize: '0.84rem', color: 'var(--accent)', marginBottom: 4 }}>
-              Clarification needed
-            </div>
-            <div style={{ fontSize: '0.84rem', color: 'var(--text-primary)' }}>{question}</div>
-          </div>
-        </div>
-
-        {/* Inline reply box */}
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input
-            type="text"
-            className="input-field"
-            style={{ flex: 1, fontSize: '0.84rem', padding: '7px 12px' }}
-            placeholder="Type your clarification…"
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit() }}
-            autoFocus
-          />
-          <button className="chat-send-btn" onClick={handleSubmit} disabled={!answer.trim()}>
-            <Send size={15} />
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ── SuggestedQuestions ───────────────────────────────────────────────────────
+// ── SuggestedQuestions (follow-up chips) ──────────────────────────────────────
 function SuggestedQuestions({ questions, onSelect }) {
   if (!questions || questions.length === 0) return null
   return (
@@ -151,9 +100,10 @@ function SuggestedQuestions({ questions, onSelect }) {
 
 // ── ChatInterface (main export) ───────────────────────────────────────────────
 export default function ChatInterface({ sessionId, datasetMeta }) {
-  const { messages, isLoading, sendQuestion, clearHistory } = useChat()
+  const { messages, isLoading, sendQuestion, clearHistory, threadId } = useChat(sessionId)
   const [input, setInput] = useState('')
   const [persona, setPersona] = useState('general')
+  const [debugMode, setDebugMode] = useState(false)
   const feedRef = useRef(null)
 
   // Auto-scroll to bottom on new messages
@@ -185,7 +135,7 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
     const q = (questionOverride || input).trim()
     if (!q || isLoading) return
     setInput('')
-    sendQuestion(sessionId, q, persona)
+    sendQuestion(q, persona, debugMode)
   }
 
   const handleKeyDown = (e) => {
@@ -195,10 +145,9 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
     }
   }
 
-  // Find the last agent message (for suggested questions display)
+  // Find the last agent message
   const lastAgentMsg = [...messages].reverse().find((m) => m.role === 'agent')
   const showSuggested = !isLoading && lastAgentMsg?.suggestedQuestions?.length > 0
-  const showClarification = !isLoading && lastAgentMsg?.clarificationNeeded
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
@@ -206,7 +155,7 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
       {messages.length > 0 && (
         <div className="memory-banner">
           <Brain size={14} />
-          Memory active — agent remembers last {Math.min(Math.floor(messages.length / 2), 4)} question{messages.length > 2 ? 's' : ''}
+          Memory active — Copilot thread ID: {threadId?.slice(0, 8)}
         </div>
       )}
 
@@ -219,7 +168,7 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
               <span className="gradient-text">Ask anything about your data</span>
             </h1>
             <p className="chat-hero-subtitle">
-              I can analyze, visualize, and discover insights from your dataset. Try a question below.
+              I can analyze and summarize your dataset using natural language. Try a question below.
             </p>
             <div className="suggestions-grid">
               {suggestions.map((s, i) => (
@@ -235,19 +184,9 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
           </div>
         ) : (
           /* Message thread */
-          messages.map((msg) => {
-            // Render clarification card instead of normal bubble when flagged
-            if (msg.role === 'agent' && msg.clarificationNeeded) {
-              return (
-                <ClarificationCard
-                  key={msg.id}
-                  question={msg.clarificationQuestion}
-                  onAnswer={(answer) => sendQuestion(sessionId, answer, persona)}
-                />
-              )
-            }
-            return <MessageBubble key={msg.id} message={msg} />
-          })
+          messages.map((msg) => (
+            <MessageBubble key={msg.id} message={msg} />
+          ))
         )}
 
         {/* Suggested follow-up questions below last response */}
@@ -271,10 +210,49 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
         )}
       </div>
 
+      {/* Quick Action Buttons */}
+      <div style={{
+        display: 'flex',
+        gap: 8,
+        padding: '8px 12px',
+        overflowX: 'auto',
+        borderTop: '1px solid var(--border-subtle)',
+        background: 'rgba(10,10,15,0.4)',
+        whiteSpace: 'nowrap',
+        scrollbarWidth: 'none',
+      }}>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Show dataset summary")}>📊 Summary</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("count rows")}>🔢 Count Rows</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Show missing values")}>🔍 Missing Values</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Find correlations")}>📈 Correlations</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Find outliers in data")}>🚨 Outliers</button>
+      </div>
+
       {/* Input bar */}
       <div className="chat-input-bar">
         {/* Persona selector (left side) */}
         <PersonaSelector value={persona} onChange={setPersona} />
+
+        {/* Developer Mode toggle */}
+        <button 
+          className="btn-ghost"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 6, 
+            fontSize: '0.8rem', 
+            padding: '4px 10px',
+            borderRadius: 8,
+            border: debugMode ? '1px solid var(--accent-1)' : '1px solid var(--border-subtle)',
+            background: debugMode ? 'rgba(255,0,127,0.12)' : 'transparent',
+            color: debugMode ? 'var(--text-primary)' : 'var(--text-secondary)'
+          }}
+          onClick={() => setDebugMode(!debugMode)}
+          title="Toggle developer mode to inspect executed code"
+        >
+          <Code size={14} style={{ color: debugMode ? 'var(--accent-1)' : 'inherit' }} />
+          <span>Dev Mode</span>
+        </button>
 
         {/* Clear history icon */}
         {messages.length > 0 && (

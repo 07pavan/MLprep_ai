@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import AuthPage from './components/AuthPage'
 import { useSession } from './hooks/useSession'
@@ -6,8 +6,17 @@ import Layout from './components/Layout'
 import FileUpload from './components/FileUpload'
 import ChatInterface from './components/ChatInterface'
 import CleaningPanel from './components/CleaningPanel'
+import CleaningPlannerPage from './components/CleaningPlannerPage'
 import TraceViewer from './components/TraceViewer'
-import InsightsPage from './components/InsightsPage'
+import InsightPanel from './components/InsightPanel'
+import DatasetProfile from './components/DatasetProfile'
+import DataQuality from './components/DataQuality'
+import MLReadiness from './components/MLReadiness'
+import DatasetManagement from './components/DatasetManagement'
+import ExplanationPanel from './components/ExplanationPanel'
+import VisualizationPanel from './components/VisualizationPanel'
+import StoryPanel from './components/StoryPanel'
+
 
 // ── Overview page (inline) ──────────────────────────────────────
 function OverviewPage({ datasetMeta }) {
@@ -63,15 +72,61 @@ function OverviewPage({ datasetMeta }) {
 function DashboardContent() {
   const { user } = useAuth()
   const {
-    sessionId, datasetMeta,
+    sessionId, datasetMeta, currentDatasetId,
     isUploading, uploadProgress, uploadError,
-    uploadDataset, clearSession,
+    uploadDataset, activateSession, clearSession,
   } = useSession()
 
-  const [activePage, setActivePage] = useState('chat')
+  const getInitialPage = () => {
+    const path = window.location.pathname
+    if (path === '/profile') return 'profile'
+    if (path === '/quality') return 'quality'
+    if (path === '/ml-readiness') return 'ml-readiness'
+    if (path === '/datasets') return 'datasets'
+    if (path === '/insights') return 'insights'
+    if (path === '/explanation') return 'explanation'
+    if (path === '/visualization') return 'visualization'
+    if (path === '/story') return 'story'
+    if (path === '/clean') return 'clean'
+    if (path === '/cleaning-planner') return 'cleaning-planner'
+    if (path === '/traces') return 'traces'
+    if (path === '/overview') return 'overview'
+    return 'chat'
+  }
 
-  // No dataset session → show upload page
+  const [activePage, setActivePage] = useState(getInitialPage)
+
+  const handlePageChange = (page) => {
+    setActivePage(page)
+    const path = page === 'chat' ? '/' : `/${page}`
+    window.history.pushState(null, '', path)
+  }
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setActivePage(getInitialPage())
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  // No dataset session → show upload page unless visiting datasets page
   if (!sessionId) {
+    if (activePage === 'datasets') {
+      return (
+        <Layout
+          activePage={activePage}
+          onPageChange={handlePageChange}
+          datasetMeta={null}
+          onClearSession={clearSession}
+        >
+          <DatasetManagement 
+            onActivateSuccess={activateSession} 
+            currentDatasetId={currentDatasetId} 
+          />
+        </Layout>
+      )
+    }
     return (
       <FileUpload
         onUpload={uploadDataset}
@@ -89,10 +144,36 @@ function DashboardContent() {
         return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} />
       case 'overview':
         return <OverviewPage datasetMeta={datasetMeta} />
+      case 'datasets':
+        return (
+          <DatasetManagement 
+            onActivateSuccess={activateSession} 
+            currentDatasetId={currentDatasetId} 
+          />
+        )
+      case 'profile':
+        return <DatasetProfile sessionId={sessionId} />
+      case 'quality':
+        return <DataQuality sessionId={sessionId} />
+      case 'ml-readiness':
+        return <MLReadiness sessionId={sessionId} />
       case 'insights':
-        return <InsightsPage sessionId={sessionId} />
+        return <InsightPanel sessionId={sessionId} />
+      case 'explanation':
+        return <ExplanationPanel sessionId={sessionId} />
+      case 'visualization':
+        return <VisualizationPanel sessionId={sessionId} />
+      case 'story':
+        return <StoryPanel sessionId={sessionId} />
       case 'clean':
         return <CleaningPanel sessionId={sessionId} />
+      case 'cleaning-planner':
+        return (
+          <CleaningPlannerPage
+            sessionId={sessionId}
+            currentDatasetId={currentDatasetId}
+          />
+        )
       case 'traces':
         return <TraceViewer sessionId={sessionId} />
       default:
@@ -103,7 +184,7 @@ function DashboardContent() {
   return (
     <Layout
       activePage={activePage}
-      onPageChange={setActivePage}
+      onPageChange={handlePageChange}
       datasetMeta={datasetMeta}
       onClearSession={clearSession}
     >

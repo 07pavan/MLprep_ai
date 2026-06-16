@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Menu, X, MessageSquare, BarChart2, Sparkles,
-  Wrench, Database, LogOut, Activity,
+  Menu, X, MessageSquare, BarChart2, Sparkles, HelpCircle,
+  Wrench, Database, LogOut, Activity, ShieldCheck, Brain, Folder, Wand2, AreaChart, BookOpen,
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 
 const NAV_ITEMS = [
   { id: 'chat', label: 'Chat', icon: MessageSquare },
   { id: 'overview', label: 'Overview', icon: BarChart2 },
+  { id: 'datasets', label: 'Datasets', icon: Folder },
+  { id: 'profile', label: 'Profile', icon: Database },
+  { id: 'quality', label: 'Quality', icon: ShieldCheck },
+  { id: 'ml-readiness', label: 'ML Readiness', icon: Brain },
   { id: 'insights', label: 'Insights', icon: Sparkles },
+  { id: 'explanation', label: 'AI Explainer', icon: HelpCircle },
+  { id: 'visualization', label: 'AI Visualizer', icon: AreaChart },
+  { id: 'story', label: 'AI Storytelling', icon: BookOpen },
   { id: 'clean', label: 'Clean', icon: Wrench },
+  { id: 'cleaning-planner', label: 'AI Planner', icon: Wand2 },
   { id: 'traces', label: 'Traces', icon: Activity },
 ]
 

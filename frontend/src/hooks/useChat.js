@@ -1,55 +1,80 @@
-import { useState, useCallback } from 'react'
-import { sendMessage } from '../api/client'
+import { useState, useCallback, useEffect } from 'react'
+import { sendCopilotQuery, createThread, deleteThread } from '../api/client'
 
 let msgIdCounter = 0
 const nextId = () => `msg_${Date.now()}_${++msgIdCounter}`
 
-export function useChat() {
+export function useChat(sessionId) {
   const [messages, setMessages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [threadId, setThreadId] = useState(null)
 
-  /**
-   * sendQuestion(sessionId, question, persona?)
-   *   persona — one of: 'general' | 'finance' | 'marketing' | 'engineering'
-   */
-  const sendQuestion = useCallback(async (sessionId, question, persona = 'general') => {
+  // Initialize/recreate thread when sessionId changes
+  useEffect(() => {
+    if (!sessionId) {
+      setThreadId(null)
+      setMessages([])
+      return
+    }
+
+    let isMounted = true
+
+    async function initThread() {
+      setIsLoading(true)
+      try {
+        const thread = await createThread(sessionId)
+        if (isMounted) {
+          setThreadId(thread.thread_id)
+          setMessages([])
+        }
+      } catch (err) {
+        console.error("Failed to initialize chat thread:", err)
+        if (isMounted) {
+          setError("Failed to initialize chat thread.")
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    initThread()
+
+    return () => {
+      isMounted = false
+    }
+  }, [sessionId])
+
+  const sendQuestion = useCallback(async (question, persona = 'general', debugMode = false) => {
+    if (!sessionId || !threadId) return
     setIsLoading(true)
     setError(null)
 
-    // Optimistically add the user message
+    // Optimistically add user message
     const userMsg = {
       id: nextId(),
       role: 'user',
-      question,
+      content: question,
       timestamp: new Date().toISOString(),
     }
     setMessages((prev) => [...prev, userMsg])
 
-    // Build chat history from existing messages for context (last 4 exchanges)
-    const chatHistory = messages
-      .filter((m) => m.role === 'user' || m.role === 'agent')
-      .slice(-8)
-      .map((m) =>
-        m.role === 'user'
-          ? { question: m.question }
-          : { question: m.question || '', answer: JSON.stringify(m.analysis?.resultData || '').slice(0, 300) }
-      )
-
     try {
-      const data = await sendMessage(sessionId, question, chatHistory, persona)
+      const data = await sendCopilotQuery(sessionId, question, [], persona, debugMode, threadId)
 
       const agentMsg = {
         id: nextId(),
         role: 'agent',
-        question,
-        intent: data.intent,
-        analysis: data.analysis,
-        visualization: data.visualization,
-        insights: data.insights,
-        suggestedQuestions: data.suggestedQuestions || [],       // NEW
-        clarificationNeeded: data.clarificationNeeded || false,  // NEW
-        clarificationQuestion: data.clarificationQuestion || '', // NEW
+        success: data.success,
+        answer: data.answer,
+        data: data.data,
+        truncation_meta: data.truncation_meta,
+        execution_type: data.execution_type,
+        execution_time_ms: data.execution_time_ms,
+        code: data.code,
+        error: data.error,
         timestamp: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, agentMsg])
@@ -59,23 +84,43 @@ export function useChat() {
       const errMsg = {
         id: nextId(),
         role: 'agent',
-        question,
-        analysis: { success: false, error: msg },
-        suggestedQuestions: [],
-        clarificationNeeded: false,
-        clarificationQuestion: '',
+        success: false,
+        answer: `An error occurred: ${msg}`,
+        error: msg,
         timestamp: new Date().toISOString(),
       }
       setMessages((prev) => [...prev, errMsg])
     } finally {
       setIsLoading(false)
     }
-  }, [messages])
+  }, [sessionId, threadId])
 
-  const clearHistory = useCallback(() => {
+  const clearHistory = useCallback(async () => {
+    if (threadId) {
+      try {
+        await deleteThread(threadId)
+      } catch (err) {
+        console.error("Failed to delete thread:", err)
+      }
+    }
     setMessages([])
     setError(null)
-  }, [])
+    setThreadId(null)
+    
+    // Re-initialize a new thread
+    if (sessionId) {
+      setIsLoading(true)
+      try {
+        const thread = await createThread(sessionId)
+        setThreadId(thread.thread_id)
+      } catch (err) {
+        console.error("Failed to recreate thread:", err)
+        setError("Failed to initialize new chat thread.")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }, [sessionId, threadId])
 
-  return { messages, isLoading, error, sendQuestion, clearHistory }
+  return { messages, isLoading, error, sendQuestion, clearHistory, threadId }
 }

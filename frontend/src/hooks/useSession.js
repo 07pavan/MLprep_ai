@@ -6,6 +6,7 @@ const STORAGE_KEY = 'dataai_session'
 export function useSession() {
   const [sessionId, setSessionId] = useState(null)
   const [datasetMeta, setDatasetMeta] = useState(null)
+  const [currentDatasetId, setCurrentDatasetId] = useState(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadError, setUploadError] = useState(null)
@@ -19,6 +20,7 @@ export function useSession() {
         if (parsed.sessionId && parsed.datasetMeta) {
           setSessionId(parsed.sessionId)
           setDatasetMeta(parsed.datasetMeta)
+          setCurrentDatasetId(parsed.datasetId || null)
         }
       }
     } catch {
@@ -41,10 +43,11 @@ export function useSession() {
       }
       setSessionId(data.sessionId)
       setDatasetMeta(meta)
+      setCurrentDatasetId(data.datasetId)
       setUploadProgress(100)
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ sessionId: data.sessionId, datasetMeta: meta })
+        JSON.stringify({ sessionId: data.sessionId, datasetMeta: meta, datasetId: data.datasetId })
       )
     } catch (err) {
       const msg =
@@ -57,9 +60,20 @@ export function useSession() {
     }
   }
 
+  const activateSession = (sessId, meta, destId) => {
+    setSessionId(sessId)
+    setDatasetMeta(meta)
+    setCurrentDatasetId(destId)
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ sessionId: sessId, datasetMeta: meta, datasetId: destId })
+    )
+  }
+
   const clearSession = () => {
     setSessionId(null)
     setDatasetMeta(null)
+    setCurrentDatasetId(null)
     setUploadError(null)
     setUploadProgress(0)
     localStorage.removeItem(STORAGE_KEY)
@@ -68,10 +82,12 @@ export function useSession() {
   return {
     sessionId,
     datasetMeta,
+    currentDatasetId,
     isUploading,
     uploadProgress,
     uploadError,
     uploadDataset,
+    activateSession,
     clearSession,
   }
 }
