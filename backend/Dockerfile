@@ -40,5 +40,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:${PORT}/health || exit 1
 
-# Koyeb injects PORT dynamically — use shell form so $PORT expands at runtime
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+# Run application in production using Gunicorn with Uvicorn workers
+CMD ["gunicorn", "-c", "gunicorn_conf.py", "main:app"]
