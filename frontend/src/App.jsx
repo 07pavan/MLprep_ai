@@ -73,8 +73,8 @@ function DashboardContent() {
   const { user } = useAuth()
   const {
     sessionId, datasetMeta, currentDatasetId,
-    isUploading, uploadProgress, uploadError,
-    uploadDataset, activateSession, clearSession,
+    isUploading, uploadProgress, uploadError, isSuccess,
+    uploadDataset, importDataset, activateSession, clearSession,
   } = useSession()
 
   const getInitialPage = () => {
@@ -130,9 +130,11 @@ function DashboardContent() {
     return (
       <FileUpload
         onUpload={uploadDataset}
+        onImportURL={importDataset}
         isUploading={isUploading}
         uploadProgress={uploadProgress}
         uploadError={uploadError}
+        isSuccess={isSuccess}
       />
     )
   }

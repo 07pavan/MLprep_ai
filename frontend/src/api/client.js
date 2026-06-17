@@ -19,6 +19,20 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+
+    // Attach custom LLM credentials dynamically if configured
+    const provider = localStorage.getItem('customLlmProvider')
+    const key = localStorage.getItem('customLlmKey')
+    const model = localStorage.getItem('customLlmModel')
+
+    if (key) {
+      config.headers['X-LLM-Provider'] = provider || 'groq'
+      config.headers['X-LLM-API-Key'] = key
+      if (model) {
+        config.headers['X-LLM-Model'] = model
+      }
+    }
+
     return config
   },
   (error) => {
@@ -39,6 +53,16 @@ export async function uploadFile(file, onProgress) {
       }
     },
   })
+  return res.data
+}
+
+export async function importDatasetURL(url) {
+  const res = await api.post('/datasets/import', { url })
+  return res.data
+}
+
+export async function getRateLimits() {
+  const res = await api.get('/v3/llm/rate-limits')
   return res.data
 }
 

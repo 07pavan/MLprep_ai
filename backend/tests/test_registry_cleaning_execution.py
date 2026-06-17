@@ -234,7 +234,8 @@ def test_postgres_dataset_service_crud():
     assert insert_args == (
         "ds-pg", "user-pg", "pg.parquet", "parquet", "upload",
         "2026-06-14T12:00:00Z", 10, 2, 0.5,
-        "/path/pg.parquet", 85, 1, "active", "ds-parent"
+        "/path/pg.parquet", 85, 1, "active", "ds-parent",
+        None, None
     )
     
     # Test get_dataset
@@ -242,13 +243,14 @@ def test_postgres_dataset_service_crud():
     mock_cur.fetchone.return_value = (
         "ds-pg", "user-pg", "pg.parquet", "parquet", "upload",
         "2026-06-14T12:00:00Z", 10, 2, 0.5,
-        "/path/pg.parquet", 85, 1, "active", "ds-parent"
+        "/path/pg.parquet", 85, 1, "active", "ds-parent",
+        None, None
     )
     mock_cur.description = [
         ("dataset_id",), ("user_id",), ("dataset_name",), ("original_file_type",), ("source",),
         ("upload_timestamp",), ("row_count",), ("column_count",), ("memory_usage",),
         ("parquet_path",), ("ml_readiness_score",), ("dataset_version",), ("status",),
-        ("parent_dataset_id",)
+        ("parent_dataset_id",), ("source_url",), ("import_options",)
     ]
     
     result = service.get_dataset("ds-pg")
@@ -269,7 +271,8 @@ def test_postgres_dataset_service_crud():
         (
             "ds-pg", "user-pg", "pg.parquet", "parquet", "upload",
             "2026-06-14T12:00:00Z", 10, 2, 0.5,
-            "/path/pg.parquet", 85, 1, "active", "ds-parent"
+            "/path/pg.parquet", 85, 1, "active", "ds-parent",
+            None, None
         )
     ]
     list_res = service.list_datasets("user-pg")

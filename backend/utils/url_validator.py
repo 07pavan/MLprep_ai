@@ -7,7 +7,7 @@ from __future__ import annotations
 import socket
 import ipaddress
 import logging
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +77,12 @@ def validate_url_safety(url: str) -> str:
             f"Unsupported scheme '{scheme}'. Only 'http' and 'https' are allowed."
         )
 
+    # Reject embedded credentials
+    if parsed.username is not None or parsed.password is not None:
+        raise InvalidURLException(
+            "URLs containing embedded credentials are not allowed."
+        )
+
     # Validate host
     hostname = parsed.hostname
     if not hostname:
@@ -105,4 +111,18 @@ def validate_url_safety(url: str) -> str:
                 f"Connection to unsafe host IP '{ip_str}' is forbidden."
             )
 
-    return url
+    # Reconstruct normalized URL without fragments or credentials
+    netloc = hostname
+    if parsed.port is not None:
+        netloc = f"{netloc}:{parsed.port}"
+
+    normalized_url = urlunparse((
+        scheme,
+        netloc,
+        parsed.path,
+        parsed.params,
+        parsed.query,
+        ""
+    ))
+
+    return normalized_url

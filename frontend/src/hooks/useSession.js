@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { uploadFile } from '../api/client'
+import { uploadFile, importDatasetURL } from '../api/client'
 
 const STORAGE_KEY = 'dataai_session'
 
@@ -10,6 +10,7 @@ export function useSession() {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadError, setUploadError] = useState(null)
+  const [isSuccess, setIsSuccess] = useState(false)
 
   // Restore session from localStorage on mount
   useEffect(() => {
@@ -32,6 +33,7 @@ export function useSession() {
     setIsUploading(true)
     setUploadProgress(0)
     setUploadError(null)
+    setIsSuccess(false)
     try {
       const data = await uploadFile(file, (pct) => setUploadProgress(pct))
       const meta = {
@@ -40,11 +42,14 @@ export function useSession() {
         shape: data.shape,
         columns: data.columns,
         memoryMb: data.memoryMb,
+        warning: data.warning,
       }
+      setUploadProgress(100)
+      setIsSuccess(true)
+      await new Promise((resolve) => setTimeout(resolve, 1500))
       setSessionId(data.sessionId)
       setDatasetMeta(meta)
       setCurrentDatasetId(data.datasetId)
-      setUploadProgress(100)
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({ sessionId: data.sessionId, datasetMeta: meta, datasetId: data.datasetId })
@@ -55,6 +60,7 @@ export function useSession() {
         err.message ||
         'Upload failed — check that the backend is running on port 8000.'
       setUploadError(msg)
+      setIsSuccess(false)
     } finally {
       setIsUploading(false)
     }
@@ -76,7 +82,47 @@ export function useSession() {
     setCurrentDatasetId(null)
     setUploadError(null)
     setUploadProgress(0)
+    setIsSuccess(false)
     localStorage.removeItem(STORAGE_KEY)
+  }
+
+  const importDataset = async (url) => {
+    setIsUploading(true)
+    setUploadProgress(25)
+    setUploadError(null)
+    setIsSuccess(false)
+    try {
+      const data = await importDatasetURL(url)
+      const meta = {
+        filename: data.filename,
+        format: data.format,
+        shape: data.shape,
+        columns: data.columns,
+        memoryMb: data.memoryMb,
+        warning: data.warning,
+      }
+      setUploadProgress(100)
+      setIsSuccess(true)
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      setSessionId(data.sessionId)
+      setDatasetMeta(meta)
+      setCurrentDatasetId(data.datasetId)
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ sessionId: data.sessionId, datasetMeta: meta, datasetId: data.datasetId })
+      )
+      return true
+    } catch (err) {
+      const msg =
+        err.response?.data?.detail ||
+        err.message ||
+        'Import failed — check that the backend is running and the URL is reachable.'
+      setUploadError(msg)
+      setIsSuccess(false)
+      return false
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   return {
@@ -86,7 +132,9 @@ export function useSession() {
     isUploading,
     uploadProgress,
     uploadError,
+    isSuccess,
     uploadDataset,
+    importDataset,
     activateSession,
     clearSession,
   }

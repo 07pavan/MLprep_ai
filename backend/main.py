@@ -75,6 +75,9 @@ from routers.explanation import router as explanation_router
 from routers.insight import router as insight_router
 from routers.visualization import router as visualization_router
 from routers.story import router as story_router
+from routers.imports import router as imports_router
+from utils.llm_middleware import LLMContextMiddleware
+from utils.rate_limit_tracker import router as rate_limit_router
 
 
 # ─── App factory ──────────────────────────────────────────────────────────────
@@ -94,6 +97,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ─── Custom LLM context propagation middleware ─────────────────────────────
+app.add_middleware(LLMContextMiddleware)
 
 # ─── Structured Logging & Request Context Middleware ──────────────────────────
 import uuid
@@ -147,6 +153,8 @@ app.include_router(explanation_router)
 app.include_router(insight_router)
 app.include_router(visualization_router)
 app.include_router(story_router)
+app.include_router(imports_router)
+app.include_router(rate_limit_router)
 
 
 

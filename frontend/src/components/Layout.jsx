@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import {
   Menu, X, MessageSquare, BarChart2, Sparkles, HelpCircle,
-  Wrench, Database, LogOut, Activity, ShieldCheck, Brain, Folder, Wand2, AreaChart, BookOpen,
+  Wrench, Database, LogOut, Activity, ShieldCheck, Brain, Folder, Wand2, AreaChart, BookOpen, Sliders,
+  AlertTriangle
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import LLMConfigModal from './LLMConfigModal'
 
 const NAV_ITEMS = [
   { id: 'chat', label: 'Chat', icon: MessageSquare },
@@ -23,6 +25,7 @@ const NAV_ITEMS = [
 
 export default function Layout({ children, activePage, onPageChange, datasetMeta, onClearSession }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isConfigOpen, setIsConfigOpen] = useState(false)
   const { user, logOut } = useAuth()
 
   // Close sidebar on page change (mobile)
@@ -130,6 +133,15 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
 
             <button
               className="btn-icon"
+              onClick={() => setIsConfigOpen(true)}
+              title="AI Provider Settings"
+              style={{ width: 28, height: 28, flexShrink: 0, marginRight: 4 }}
+            >
+              <Sliders size={14} />
+            </button>
+
+            <button
+              className="btn-icon"
               onClick={logOut}
               title="Log Out"
               style={{ width: 28, height: 28, flexShrink: 0 }}
@@ -153,7 +165,15 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
 
       {/* Main content */}
       <div className="main-content">
-        <div className="main-inner">{children}</div>
+        <div className="main-inner">
+          {datasetMeta?.warning && (
+            <div className="warning-card flex gap-2 items-center p-3 mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 text-amber-500 text-xs">
+              <AlertTriangle size={14} className="flex-shrink-0" />
+              <span>{datasetMeta.warning}</span>
+            </div>
+          )}
+          {children}
+        </div>
       </div>
 
       {/* Mobile bottom nav */}
@@ -169,6 +189,9 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
           </button>
         ))}
       </div>
+      
+      {/* Dynamic LLM configuration modal */}
+      <LLMConfigModal isOpen={isConfigOpen} onClose={() => setIsConfigOpen(false)} />
     </div>
   )
 }

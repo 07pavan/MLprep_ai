@@ -25,3 +25,4 @@ streamlit==1.39.0
 # Utilities
 python-dotenv==1.0.1
 openpyxl==3.1.5
+kaggle

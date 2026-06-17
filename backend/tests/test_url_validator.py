@@ -125,3 +125,30 @@ def test_failed_dns_resolution():
         with pytest.raises(InvalidURLException) as exc:
             validate_url_safety("https://thisdomaindoesnotexist.invalid/data.csv")
         assert "Failed to resolve host" in str(exc.value)
+
+
+def test_embedded_credentials_rejected():
+    """Verify that URLs containing embedded usernames or passwords are rejected."""
+    with pytest.raises(InvalidURLException) as exc:
+        validate_url_safety("https://user:pass@example.com/data.csv")
+    assert "embedded credentials" in str(exc.value)
+
+    with pytest.raises(InvalidURLException) as exc:
+        validate_url_safety("https://user@example.com/data.csv")
+    assert "embedded credentials" in str(exc.value)
+
+
+def test_url_normalization():
+    """Verify that validated URLs are returned normalized, keeping query params but stripping fragments and credentials."""
+    with patch("socket.getaddrinfo") as mock_resolve:
+        mock_resolve.return_value = [
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("8.8.8.8", 0))
+        ]
+        
+        # Test fragment stripping and scheme lowercasing
+        res = validate_url_safety("HTTPS://example.com/data.csv?version=1#secret")
+        assert res == "https://example.com/data.csv?version=1"
+        
+        # Test port retention
+        res_port = validate_url_safety("http://example.com:8080/data.json?a=b")
+        assert res_port == "http://example.com:8080/data.json?a=b"

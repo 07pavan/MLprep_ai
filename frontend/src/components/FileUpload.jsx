@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Upload, Database, CheckCircle, AlertCircle } from 'lucide-react'
 
@@ -25,8 +25,26 @@ function isAcceptedByExtension(filename) {
   return EXT_WHITELIST.some((ext) => lower.endsWith(ext))
 }
 
-export default function FileUpload({ onUpload, isUploading, uploadProgress = 0, uploadError }) {
+export default function FileUpload({ onUpload, onImportURL, isUploading, uploadProgress = 0, uploadError, isSuccess }) {
   const [rejected, setRejected] = useState(null)
+  const [url, setUrl] = useState('')
+  const [isImportingUrl, setIsImportingUrl] = useState(false)
+
+  useEffect(() => {
+    if (!isUploading) {
+      setIsImportingUrl(false)
+    }
+  }, [isUploading])
+
+  const handleImportSubmit = async (e) => {
+    e.preventDefault()
+    if (!url.trim()) return
+    setRejected(null)
+    setIsImportingUrl(true)
+    if (onImportURL) {
+      await onImportURL(url.trim())
+    }
+  }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     // Don't rely solely on MIME — also validate by extension in onDrop
@@ -57,7 +75,9 @@ export default function FileUpload({ onUpload, isUploading, uploadProgress = 0, 
   })
 
   const error = uploadError || rejected
-  const phase = uploadProgress < 100 ? `Uploading… ${uploadProgress}%` : 'Profiling dataset…'
+  const phase = isImportingUrl
+    ? (uploadProgress < 100 ? 'Importing from URL…' : 'Profiling dataset…')
+    : (uploadProgress < 100 ? `Uploading… ${uploadProgress}%` : 'Profiling dataset…')
 
   return (
     <div className="upload-page">
@@ -80,7 +100,7 @@ export default function FileUpload({ onUpload, isUploading, uploadProgress = 0, 
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%' }}>
               <div className="spinner" />
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>{phase}</p>
-              {uploadProgress > 0 && uploadProgress < 100 && (
+              {uploadProgress > 0 && uploadProgress < 100 && !isImportingUrl && (
                 <div style={{
                   width: '80%', height: 6, borderRadius: 3,
                   background: 'var(--border)', overflow: 'hidden',
@@ -115,6 +135,64 @@ export default function FileUpload({ onUpload, isUploading, uploadProgress = 0, 
             <AlertCircle size={16} />
             <span>{error}</span>
           </div>
+        )}
+
+        {isSuccess && (
+          <div className="glass-card" style={{
+            marginTop: 16,
+            padding: '10px 16px',
+            borderColor: 'rgba(16,185,129,0.3)',
+            backgroundColor: 'rgba(16,185,129,0.05)',
+            color: '#10b981',
+            fontSize: '0.84rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            justifyContent: 'center'
+          }}>
+            <CheckCircle size={16} />
+            <span>Dataset loaded successfully! Redirecting...</span>
+          </div>
+        )}
+
+        {!isUploading && !isSuccess && (
+          <>
+            <div className="flex items-center my-5">
+              <div className="flex-grow border-t border-[rgba(255,255,255,0.08)]"></div>
+              <span className="mx-4 text-xs font-semibold uppercase tracking-wider text-gray-500" style={{ color: 'var(--text-muted)' }}>OR</span>
+              <div className="flex-grow border-t border-[rgba(255,255,255,0.08)]"></div>
+            </div>
+
+            <form onSubmit={handleImportSubmit} className="space-y-2 text-left" style={{ width: '100%' }}>
+              <label htmlFor="dataset-url" className="block text-xs font-semibold text-gray-400 mb-1" style={{ color: 'var(--text-secondary)' }}>
+                Import from URL
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="dataset-url"
+                  type="url"
+                  placeholder="https://example.com/data.csv"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  disabled={isUploading}
+                  className="input-field flex-grow"
+                  required
+                  style={{ flexGrow: 1 }}
+                />
+                <button
+                  type="submit"
+                  disabled={isUploading || !url.trim()}
+                  className="btn-primary flex-shrink-0"
+                  style={{ padding: '10px 16px', flexShrink: 0 }}
+                >
+                  Import
+                </button>
+              </div>
+              <p className="text-[11px] text-gray-500 mt-1 leading-normal" style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginTop: 4 }}>
+                Supports GitHub CSV/JSON, Kaggle datasets, or any public CSV/Excel/JSON/Parquet URL.
+              </p>
+            </form>
+          </>
         )}
 
         <div className="upload-formats">

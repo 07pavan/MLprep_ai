@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     DATABASE_URL: str = ""
     SENTRY_DSN: str = ""
 
+    # ── Kaggle API ────────────────────────────────────────────────
+    KAGGLE_USERNAME: str = ""
+    KAGGLE_KEY: str = ""
+    KAGGLE_API_TOKEN: str = ""
+
     # ── Firebase/Firestore ────────────────────────────────────────
     FIREBASE_PROJECT_ID: str = ""
     GOOGLE_APPLICATION_CREDENTIALS: str = ""

@@ -21,6 +21,8 @@ class DatasetBase(BaseModel):
     dataset_version: int = 1
     status: str = "active"
     parent_dataset_id: Optional[str] = None
+    source_url: Optional[str] = None
+    import_options: Optional[dict] = None
 
 class DatasetCreate(DatasetBase):
     pass
@@ -31,6 +33,8 @@ class DatasetUpdate(BaseModel):
     ml_readiness_score: Optional[int] = None
     dataset_version: Optional[int] = None
     parent_dataset_id: Optional[str] = None
+    source_url: Optional[str] = None
+    import_options: Optional[dict] = None
 
 class DatasetResponse(DatasetBase):
     dataset_id: str

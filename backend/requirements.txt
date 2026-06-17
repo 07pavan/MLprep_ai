@@ -18,3 +18,5 @@ langgraph-checkpoint-firestore
 firebase-admin
 gunicorn==22.0.0
 sentry-sdk[fastapi]==2.4.0
+kaggle
+

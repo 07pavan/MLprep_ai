@@ -170,8 +170,8 @@ async def activate_dataset_endpoint(
     session_id = session_manager.create_session(user["uid"])
     session_manager.save_dataframe(user["uid"], session_id, df)
     
-    # Build columns info (reusing _profile_columns logic from upload.py)
-    from routers.upload import _profile_columns
+    # Build columns info (reusing _profile_columns logic from services/data_ingestion_service.py)
+    from services.data_ingestion_service import _profile_columns
     columns_info = _profile_columns(df)
     
     dataset_meta = {

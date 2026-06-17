@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from services.http_dataset_downloader import download_dataset
+from services.http_dataset_downloader import HTTPDatasetDownloader
 
 logger = logging.getLogger(__name__)
 
@@ -117,8 +117,17 @@ async def load_remote_dataset(url: str, storage_dir: str | None = None) -> pd.Da
     # 1. Preprocess and resolve GitHub URLs to raw content
     resolved_url = _load_github(url)
 
+    # Detect Kaggle dataset URLs (e.g. kaggle.com/datasets/owner/dataset)
+    if "kaggle.com/datasets/" in resolved_url.lower():
+        from services.kaggle_connector import KaggleConnector
+        connector = KaggleConnector()
+        return await connector.download_dataset(resolved_url)
+
     # 2. Download remote file to a safe, validated temporary file
-    temp_path, detected_format, _ = await download_dataset(resolved_url, storage_dir=storage_dir)
+    downloader = HTTPDatasetDownloader(storage_dir=storage_dir)
+    result = await downloader.download(resolved_url)
+    temp_path = result.path
+    detected_format = result.format
 
     # 3. Load DataFrame based on detected format
     try:

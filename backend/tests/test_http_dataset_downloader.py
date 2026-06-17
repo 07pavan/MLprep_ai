@@ -9,7 +9,8 @@ from pathlib import Path
 from unittest.mock import patch, AsyncMock, MagicMock
 
 from services.http_dataset_downloader import (
-    download_dataset,
+    HTTPDatasetDownloader,
+    DownloadResult,
     DownloadException,
     DownloadSizeLimitExceeded,
     MAX_DATASET_SIZE_BYTES
@@ -56,8 +57,11 @@ async def test_successful_streaming_download():
     # Patch URL safety check (to bypass DNS resolution) and httpx AsyncClient
     with patch("services.http_dataset_downloader.validate_url_safety") as mock_validate, \
          patch("httpx.AsyncClient", return_value=mock_client_ctx):
-         
-         temp_path, fmt, size = await download_dataset(url)
+         downloader = HTTPDatasetDownloader()
+         result = await downloader.download(url)
+         temp_path = result.path
+         fmt = result.format
+         size = result.size_bytes
          
          try:
              # Verify URL validation was called
@@ -89,9 +93,9 @@ async def test_content_length_exceeded_raises_immediately():
 
     with patch("services.http_dataset_downloader.validate_url_safety"), \
          patch("httpx.AsyncClient", return_value=mock_client_ctx):
-         
+         downloader = HTTPDatasetDownloader()
          with pytest.raises(DownloadSizeLimitExceeded) as exc:
-             await download_dataset(url)
+             await downloader.download(url)
          
          assert "exceeds limit" in str(exc.value)
 
@@ -127,8 +131,9 @@ async def test_stream_limit_exceeded_mid_stream_and_cleanup():
          temp_path = Path(real_temp.name)
          
          try:
+             downloader = HTTPDatasetDownloader()
              with pytest.raises(DownloadSizeLimitExceeded) as exc:
-                 await download_dataset(url)
+                 await downloader.download(url)
              
              assert "exceeded maximum allowed limit" in str(exc.value)
              # Verify the file was cleaned up/deleted
@@ -149,9 +154,9 @@ async def test_non_200_status_raises_error():
 
     with patch("services.http_dataset_downloader.validate_url_safety"), \
          patch("httpx.AsyncClient", return_value=mock_client_ctx):
-         
+         downloader = HTTPDatasetDownloader()
          with pytest.raises(DownloadException) as exc:
-             await download_dataset(url)
+             await downloader.download(url)
          assert "non-200" in str(exc.value)
 
 
@@ -160,6 +165,7 @@ async def test_ssrf_safety_error_propagation():
     """Verify that SSRF validator errors are propagated directly."""
     url = "http://localhost/private.csv"
 
+    downloader = HTTPDatasetDownloader()
     with patch("services.http_dataset_downloader.validate_url_safety", side_effect=UnsafeURLException("SSRF")):
         with pytest.raises(UnsafeURLException):
-            await download_dataset(url)
+            await downloader.download(url)

@@ -46,10 +46,13 @@ def test_postgres_schema_preservation():
     assert mock_cur.execute.called
     
     # Verify absolutely no DROP TABLE statement was executed
+    has_create_table = False
     for call in mock_cur.execute.call_args_list:
         query = call[0][0]
         assert "DROP TABLE" not in query
-        assert "CREATE TABLE IF NOT EXISTS datasets" in query
+        if "CREATE TABLE IF NOT EXISTS datasets" in query:
+            has_create_table = True
+    assert has_create_table
 
 
 # 2. Ephemeral Storage Warning Test

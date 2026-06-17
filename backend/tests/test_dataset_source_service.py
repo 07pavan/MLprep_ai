@@ -18,6 +18,7 @@ from services.dataset_source_service import (
     _load_github,
     DatasetLoadException
 )
+from services.http_dataset_downloader import DownloadResult
 
 
 def test_github_url_rewriting():
@@ -45,12 +46,13 @@ async def test_load_csv_success():
         tmp_path = Path(tmp.name)
         
     try:
-        # Mock download_dataset to return our local temp file
-        with patch("services.dataset_source_service.download_dataset", return_value=(tmp_path, "csv", 100)) as mock_download:
+        # Mock download to return our local temp file result
+        mock_result = DownloadResult(path=tmp_path, format="csv", size_bytes=100, content_type="text/csv")
+        with patch("services.dataset_source_service.HTTPDatasetDownloader.download", return_value=mock_result) as mock_download:
             df = await load_remote_dataset("https://example.com/data.csv")
             
             # Verify download mock was called
-            mock_download.assert_called_once_with("https://example.com/data.csv", storage_dir=None)
+            mock_download.assert_called_once_with("https://example.com/data.csv")
             
             # Verify DataFrame content
             assert isinstance(df, pd.DataFrame)
@@ -78,7 +80,8 @@ async def test_load_json_flattening_success():
         tmp_path = Path(tmp.name)
         
     try:
-        with patch("services.dataset_source_service.download_dataset", return_value=(tmp_path, "json", 150)):
+        mock_result = DownloadResult(path=tmp_path, format="json", size_bytes=150, content_type="application/json")
+        with patch("services.dataset_source_service.HTTPDatasetDownloader.download", return_value=mock_result):
             df = await load_remote_dataset("https://example.com/data.json")
             
             assert isinstance(df, pd.DataFrame)
@@ -104,7 +107,8 @@ async def test_load_malformed_csv_raises_exception():
         tmp_path = Path(tmp.name)
         
     try:
-        with patch("services.dataset_source_service.download_dataset", return_value=(tmp_path, "csv", 50)):
+        mock_result = DownloadResult(path=tmp_path, format="csv", size_bytes=50, content_type="text/csv")
+        with patch("services.dataset_source_service.HTTPDatasetDownloader.download", return_value=mock_result):
             with pytest.raises(DatasetLoadException):
                 # pandas read_csv might throw parse or encoding errors on raw binary garbage
                 # We will trigger a load error

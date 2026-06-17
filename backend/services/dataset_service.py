@@ -62,11 +62,39 @@ class PostgresDatasetService:
                         ml_readiness_score INTEGER,
                         dataset_version INTEGER NOT NULL,
                         status VARCHAR(50) NOT NULL,
-                        parent_dataset_id VARCHAR(255)
+                        parent_dataset_id VARCHAR(255),
+                        source_url VARCHAR(1000),
+                        import_options JSON
                     );
                 """)
+                
+                # Check and add source_url column (migration safety check)
+                cur.execute("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name='datasets' AND column_name='source_url';
+                """)
+                if not cur.fetchone():
+                    cur.execute("ALTER TABLE datasets ADD COLUMN source_url VARCHAR(1000);")
+                    logger.info("Migrated datasets table: Added source_url column.")
+
+                # Check and add import_options column (migration safety check)
+                cur.execute("""
+                    SELECT column_name 
+                    FROM information_schema.columns 
+                    WHERE table_name='datasets' AND column_name='import_options';
+                """)
+                if not cur.fetchone():
+                    cur.execute("ALTER TABLE datasets ADD COLUMN import_options JSON;")
+                    logger.info("Migrated datasets table: Added import_options column.")
 
     def create_dataset(self, data: dict[str, Any]):
+        import json
+        import_options_json = (
+            json.dumps(data.get("import_options"))
+            if data.get("import_options") is not None
+            else None
+        )
         with self.pool.connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
@@ -75,16 +103,30 @@ class PostgresDatasetService:
                         dataset_id, user_id, dataset_name, original_file_type, source,
                         upload_timestamp, row_count, column_count, memory_usage,
                         parquet_path, ml_readiness_score, dataset_version, status,
-                        parent_dataset_id
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                        parent_dataset_id, source_url, import_options
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     (
                         data["dataset_id"], data["user_id"], data["dataset_name"], data["original_file_type"], data["source"],
                         data["upload_timestamp"], data["row_count"], data["column_count"], data["memory_usage"],
                         data["parquet_path"], data["ml_readiness_score"], data["dataset_version"], data["status"],
-                        data.get("parent_dataset_id")
+                        data.get("parent_dataset_id"), data.get("source_url"), import_options_json
                     )
                 )
+
+    def _parse_row(self, colnames: list[str], row: tuple | None) -> Optional[dict[str, Any]]:
+        if not row:
+            return None
+        res = dict(zip(colnames, row))
+        
+        # Deserialize import_options back into a dictionary if stored as a string
+        if "import_options" in res and isinstance(res["import_options"], str):
+            try:
+                import json
+                res["import_options"] = json.loads(res["import_options"])
+            except Exception:
+                pass
+        return res
 
     def get_dataset(self, dataset_id: str) -> Optional[dict[str, Any]]:
         with self.pool.connection() as conn:
@@ -94,7 +136,7 @@ class PostgresDatasetService:
                 if not row:
                     return None
                 colnames = [desc[0] for desc in cur.description]
-                return dict(zip(colnames, row))
+                return self._parse_row(colnames, row)
 
     def list_datasets(self, user_id: str) -> list[dict[str, Any]]:
         with self.pool.connection() as conn:
@@ -102,7 +144,7 @@ class PostgresDatasetService:
                 cur.execute("SELECT * FROM datasets WHERE user_id = %s", (user_id,))
                 rows = cur.fetchall()
                 colnames = [desc[0] for desc in cur.description]
-                return [dict(zip(colnames, r)) for r in rows]
+                return [r for r in (self._parse_row(colnames, row) for row in rows) if r is not None]
 
     def update_dataset(self, dataset_id: str, data: dict[str, Any]):
         if not data:
@@ -111,7 +153,11 @@ class PostgresDatasetService:
         values = []
         for k, v in data.items():
             set_clauses.append(f"{k} = %s")
-            values.append(v)
+            if k == "import_options" and v is not None:
+                import json
+                values.append(json.dumps(v))
+            else:
+                values.append(v)
         values.append(dataset_id)
         query = f"UPDATE datasets SET {', '.join(set_clauses)} WHERE dataset_id = %s"
         with self.pool.connection() as conn:
