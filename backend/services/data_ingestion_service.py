@@ -1,6 +1,6 @@
 """
 Data ingestion service.
-Provides a unified pipeline to ingest pandas DataFrames into DataCopilote.
+Provides a unified pipeline to ingest pandas DataFrames into MLPrep AI.
 Handles session creation, Parquet persistence, column profiling, ML readiness scoring,
 and dataset registry metadata insertion.
 """

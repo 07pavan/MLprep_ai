@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "DataAI Mobile",
-    "slug": "dataai-mobile",
+    "name": "MLPrep AI Mobile",
+    "slug": "mlprep-ai-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",

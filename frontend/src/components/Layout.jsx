@@ -43,7 +43,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
           <div className="sidebar-brand-icon"><Database size={22} /></div>
-          <span className="sidebar-brand-text">DataAI</span>
+          <span className="sidebar-brand-text">MLPrep AI</span>
           <button
             className="btn-icon"
             style={{ marginLeft: 'auto', display: 'none' }}
@@ -157,7 +157,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
         <button className="top-bar-btn" onClick={() => setSidebarOpen(true)}>
           <Menu size={22} />
         </button>
-        <span className="top-bar-title">{NAV_ITEMS.find(i => i.id === activePage)?.label || 'DataAI'}</span>
+        <span className="top-bar-title">{NAV_ITEMS.find(i => i.id === activePage)?.label || 'MLPrep AI'}</span>
         {datasetMeta && (
           <span className="top-bar-chip">{datasetMeta.filename}</span>
         )}

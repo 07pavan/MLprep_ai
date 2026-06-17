@@ -73,10 +73,10 @@ export default function AuthPage() {
             <Database size={32} />
           </div>
           <h1 className="upload-title" style={{ fontSize: '1.75rem', fontWeight: 800 }}>
-            <span className="gradient-text">DataAI SaaS</span>
+            <span className="gradient-text">MLPrep AI</span>
           </h1>
           <p className="upload-subtitle" style={{ fontSize: '0.85rem', marginBottom: 0 }}>
-            Enterprise Multi-Agent Data Analytics Platform
+            Transform raw data into model-ready datasets
           </p>
         </div>
 

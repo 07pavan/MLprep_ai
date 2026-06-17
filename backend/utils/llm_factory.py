@@ -100,8 +100,8 @@ def _create_openrouter(model: str, temperature: float, timeout: int, api_key: st
             openai_api_key=api_key,
             openai_api_base="https://openrouter.ai/api/v1",
             default_headers={
-                "HTTP-Referer": "https://datacopilote-ai.netlify.app",
-                "X-Title": "DataCopilote v2.1"
+                "HTTP-Referer": "https://mlprep-ai.netlify.app",
+                "X-Title": "MLPrep AI v3.0"
             },
             timeout=timeout,
             max_retries=1,

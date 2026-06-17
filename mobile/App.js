@@ -253,7 +253,7 @@ export default function App() {
         <View style={styles.header}>
           <View style={styles.headerBrand}>
             <Database size={18} color={THEME.accent} />
-            <Text style={styles.headerBrandText}>DataAI Mobile</Text>
+            <Text style={styles.headerBrandText}>MLPrep AI Mobile</Text>
           </View>
           <TouchableOpacity onPress={handleLogout} style={styles.headerLogoutBtn}>
             <LogOut size={16} color={THEME.textMuted} />
@@ -272,8 +272,8 @@ export default function App() {
           <ScrollView contentContainerStyle={styles.authContainer} keyboardShouldPersistTaps="handled">
             <View style={styles.authLogoBox}>
               <Database size={40} color={THEME.accent} />
-              <Text style={styles.authTitle}>DataAI Analyst</Text>
-              <Text style={styles.authSubtitle}>Mobile Companion Platform</Text>
+              <Text style={styles.authTitle}>MLPrep AI</Text>
+              <Text style={styles.authSubtitle}>Transform raw data into model-ready datasets</Text>
             </View>
 
             <View style={styles.card}>
