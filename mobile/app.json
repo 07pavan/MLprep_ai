@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "DataAI Mobile",
+    "slug": "dataai-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#090B11"
+      }
+    },
+    "web": {
+      "backgroundColor": "#090B11"
+    }
+  }
+}
