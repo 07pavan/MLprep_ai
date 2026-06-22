@@ -130,6 +130,28 @@ async def delete_dataset_endpoint(
         
     try:
         service.delete_dataset(dataset_id)
+        
+        # Physically delete the parquet file and session directory from disk
+        parquet_path_str = dataset.get("parquet_path")
+        if parquet_path_str:
+            try:
+                from pathlib import Path
+                import shutil
+                parquet_path = Path(parquet_path_str)
+                if parquet_path.exists():
+                    parquet_path.unlink(missing_ok=True)
+                    logger.info("Successfully deleted physical parquet file: %s", parquet_path_str)
+                
+                # Deleting the parent session directory
+                session_dir = parquet_path.parent
+                if session_dir.exists() and session_dir.is_dir():
+                    # Sanity check to avoid deleting root directories
+                    if len(session_dir.parts) >= 2:
+                        shutil.rmtree(session_dir, ignore_errors=True)
+                        logger.info("Successfully deleted session directory: %s", session_dir)
+            except Exception as clean_exc:
+                logger.error("Failed to clean up physical storage files for dataset %s: %s", dataset_id, clean_exc)
+                
     except Exception as exc:
         logger.error("Failed to delete dataset %s: %s", dataset_id, exc, exc_info=True)
         raise HTTPException(status_code=500, detail=f"Database delete failed: {exc}")

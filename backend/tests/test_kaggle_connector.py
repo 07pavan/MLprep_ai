@@ -46,7 +46,8 @@ async def test_download_without_credentials_raises_exception():
     connector = KaggleConnector()
     
     with patch.object(settings, "KAGGLE_USERNAME", ""), \
-         patch.object(settings, "KAGGLE_KEY", ""):
+         patch.object(settings, "KAGGLE_KEY", ""), \
+         patch.object(settings, "KAGGLE_API_TOKEN", ""):
         with pytest.raises(DownloadException) as exc:
             await connector.download_dataset("https://www.kaggle.com/datasets/uciml/iris")
         assert "Kaggle credentials" in str(exc.value)

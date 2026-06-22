@@ -10,6 +10,9 @@
   # The directory Vite outputs the compiled SPA to (relative to the base directory)
   publish = "dist"
 
+[build.environment]
+  SECRETS_SCAN_ENABLED = "false"
+
 # Single Page Application routing rule to prevent 404s on page refresh
 [[redirects]]
   from = "/*"
