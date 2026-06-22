@@ -15,6 +15,12 @@
 
 # Single Page Application routing rule to prevent 404s on page refresh
 [[redirects]]
+  from = "/api/*"
+  to = "https://ai-data-analyst-backend-ni2l.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
