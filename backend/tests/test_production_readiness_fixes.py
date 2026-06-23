@@ -142,11 +142,14 @@ def test_firestore_index_missing_error_handling(mock_firestore_client):
     
     service = FirestoreChatService()
     
-    # Verify that calling get_thread raises a clean RuntimeError and hides the internal exception details
-    with pytest.raises(RuntimeError) as exc_info:
-        service.get_thread("thread_123", "user_123")
+    # Verify that calling get_thread falls back to scanning user's datasets directly without crashing
+    mock_db.collection.return_value.document.return_value.collection.return_value.list_documents.return_value = []
     
-    assert "Database configuration error: Required index is missing" in str(exc_info.value)
+    result = service.get_thread("thread_123", "user_123")
+    assert result is None
+    
+    # Verify that it attempted fallback by listing documents in the user's datasets subcollection
+    mock_db.collection.assert_called_with("users")
 
 
 # 5. JSON Logging Formatter Test

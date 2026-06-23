@@ -126,7 +126,7 @@ async def query_copilot(
     # 3. Handle thread history loading if threadId is supplied
     chat_history = []
     if req.threadId:
-        thread = get_chat_service().get_thread(req.threadId, user_id)
+        thread = get_chat_service().get_thread(req.threadId, user_id, session_id)
         if not thread:
             raise HTTPException(status_code=404, detail="Thread not found.")
         # Override client-supplied chatHistory with database truth
@@ -194,8 +194,8 @@ async def query_copilot(
                 }
             }
             # Save User Message and Assistant Message to thread
-            get_chat_service().add_message(req.threadId, user_id, user_message)
-            get_chat_service().add_message(req.threadId, user_id, assistant_message)
+            get_chat_service().add_message(req.threadId, user_id, user_message, session_id)
+            get_chat_service().add_message(req.threadId, user_id, assistant_message, session_id)
         except Exception as exc:
             # We don't block query output if saving to DB fails, but we log the incident.
             logger.error(

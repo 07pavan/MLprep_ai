@@ -29,48 +29,67 @@ class FirestoreChatService:
         logger.info("Created Firestore chat thread %s for user %s", thread_id, user_id)
         return thread_data
 
-    def _get_thread_doc(self, thread_id: str, user_id: str):
+    def _get_thread_doc(self, thread_id: str, user_id: str, dataset_id: Optional[str] = None):
         """Helper to safely retrieve the firestore document reference for a thread,
-        catching index exceptions and keeping internal details hidden from the API consumer.
+        supporting direct O(1) lookups and fallback scanning when index is missing.
         """
+        # 1. Direct Lookup (O(1) time, index-free) if dataset_id (session_id) is provided
+        if dataset_id:
+            try:
+                doc_ref = self.db.collection("users").document(user_id).collection("datasets").document(dataset_id).collection("threads").document(thread_id)
+                doc = doc_ref.get()
+                if doc.exists:
+                    return doc
+            except Exception as direct_exc:
+                logger.warning("Direct lookup failed for thread %s under dataset %s: %s", thread_id, dataset_id, direct_exc)
+
+        # 2. Try Collection Group query (standard)
         try:
-            # collection_group query will fail if the index is not yet built
             docs_stream = self.db.collection_group("threads").where("thread_id", "==", thread_id).stream()
-            # Resolve the stream to list to trigger the query and network request
             docs = list(docs_stream)
             for doc in docs:
                 data = doc.to_dict()
                 if data.get("user_id") == user_id:
                     return doc
-            return None
         except Exception as e:
             err_str = str(e)
             if "FailedPrecondition" in err_str or "index" in err_str.lower():
-                logger.error(
-                    "❌ FIRESTORE INDEX MISSING: Collection Group query on 'threads' with filter 'thread_id' failed. "
-                    "You must build a Collection Group Index in the Firebase Console. "
-                    "Link/Details: %s", err_str
+                logger.warning(
+                    "⚠️ Firestore Collection Group index missing for 'threads'. "
+                    "Falling back to direct dataset/session scanning..."
                 )
-                raise RuntimeError("Database configuration error: Required index is missing. Please contact administrator.")
             else:
                 logger.error("❌ Firestore error during collection group query: %s", err_str)
                 raise RuntimeError("Failed to retrieve thread data due to a database error.")
 
-    def get_thread(self, thread_id: str, user_id: str) -> Optional[dict[str, Any]]:
-        # Retrieve using collection group helper
-        doc = self._get_thread_doc(thread_id, user_id)
+        # 3. Index-free Fallback Scan: Search user's active session/dataset paths directly
+        try:
+            doc_refs = self.db.collection("users").document(user_id).collection("datasets").list_documents()
+            for doc_ref in doc_refs:
+                thread_ref = doc_ref.collection("threads").document(thread_id)
+                thread_doc = thread_ref.get()
+                if thread_doc.exists:
+                    logger.info("Found thread %s via direct fallback scan.", thread_id)
+                    return thread_doc
+        except Exception as scan_exc:
+            logger.error("❌ Failed direct fallback scan for thread %s: %s", thread_id, scan_exc)
+            
+        return None
+
+    def get_thread(self, thread_id: str, user_id: str, dataset_id: Optional[str] = None) -> Optional[dict[str, Any]]:
+        doc = self._get_thread_doc(thread_id, user_id, dataset_id)
         return doc.to_dict() if doc else None
 
-    def delete_thread(self, thread_id: str, user_id: str) -> bool:
-        doc = self._get_thread_doc(thread_id, user_id)
+    def delete_thread(self, thread_id: str, user_id: str, dataset_id: Optional[str] = None) -> bool:
+        doc = self._get_thread_doc(thread_id, user_id, dataset_id)
         if doc:
             doc.reference.delete()
             logger.info("Deleted Firestore chat thread %s", thread_id)
             return True
         return False
 
-    def add_message(self, thread_id: str, user_id: str, message: dict[str, Any]) -> bool:
-        doc = self._get_thread_doc(thread_id, user_id)
+    def add_message(self, thread_id: str, user_id: str, message: dict[str, Any], dataset_id: Optional[str] = None) -> bool:
+        doc = self._get_thread_doc(thread_id, user_id, dataset_id)
         if doc:
             data = doc.to_dict()
             messages = data.get("messages", [])
@@ -145,7 +164,7 @@ class PostgresChatService:
         logger.info("Created PostgreSQL chat thread %s for user %s", thread_id, user_id)
         return thread_data
 
-    def get_thread(self, thread_id: str, user_id: str) -> Optional[dict[str, Any]]:
+    def get_thread(self, thread_id: str, user_id: str, dataset_id: Optional[str] = None) -> Optional[dict[str, Any]]:
         import json
         with self.pool.connection() as conn:
             with conn.cursor() as cur:
@@ -174,8 +193,8 @@ class PostgresChatService:
                     "messages": msgs
                 }
 
-    def delete_thread(self, thread_id: str, user_id: str) -> bool:
-        thread = self.get_thread(thread_id, user_id)
+    def delete_thread(self, thread_id: str, user_id: str, dataset_id: Optional[str] = None) -> bool:
+        thread = self.get_thread(thread_id, user_id, dataset_id)
         if not thread:
             return False
         with self.pool.connection() as conn:
@@ -184,9 +203,9 @@ class PostgresChatService:
         logger.info("Deleted PostgreSQL chat thread %s", thread_id)
         return True
 
-    def add_message(self, thread_id: str, user_id: str, message: dict[str, Any]) -> bool:
+    def add_message(self, thread_id: str, user_id: str, message: dict[str, Any], dataset_id: Optional[str] = None) -> bool:
         import json
-        thread = self.get_thread(thread_id, user_id)
+        thread = self.get_thread(thread_id, user_id, dataset_id)
         if not thread:
             return False
         
@@ -229,22 +248,22 @@ class InMemoryChatService:
         logger.info("Created In-Memory chat thread %s for user %s", thread_id, user_id)
         return thread_data
 
-    def get_thread(self, thread_id: str, user_id: str) -> Optional[dict[str, Any]]:
+    def get_thread(self, thread_id: str, user_id: str, dataset_id: Optional[str] = None) -> Optional[dict[str, Any]]:
         thread = self.store.get(thread_id)
         if thread and thread.get("user_id") == user_id:
             return thread
         return None
 
-    def delete_thread(self, thread_id: str, user_id: str) -> bool:
-        thread = self.get_thread(thread_id, user_id)
+    def delete_thread(self, thread_id: str, user_id: str, dataset_id: Optional[str] = None) -> bool:
+        thread = self.get_thread(thread_id, user_id, dataset_id)
         if thread:
             del self.store[thread_id]
             logger.info("Deleted In-Memory chat thread %s", thread_id)
             return True
         return False
 
-    def add_message(self, thread_id: str, user_id: str, message: dict[str, Any]) -> bool:
-        thread = self.get_thread(thread_id, user_id)
+    def add_message(self, thread_id: str, user_id: str, message: dict[str, Any], dataset_id: Optional[str] = None) -> bool:
+        thread = self.get_thread(thread_id, user_id, dataset_id)
         if thread:
             messages = thread.get("messages", [])
             
