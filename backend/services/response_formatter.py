@@ -67,13 +67,19 @@ class ResponseFormatter:
         if isinstance(val, pd.DataFrame):
             total_rows = len(val)
             limit = 500
-            df_out = val.head(limit)
+            df_out = val.head(limit).copy()
             
             # Avoid datetime warnings by converting them to str
             for col in df_out.select_dtypes(include=["datetime64"]).columns:
                 df_out[col] = df_out[col].astype(str)
                 
             records = df_out.to_dict(orient="records")
+            
+            # Sanitize values recursively to convert NaN to None
+            records = [
+                {str(k): ResponseFormatter._serialize_val_recursive(v) for k, v in r.items()}
+                for r in records
+            ]
             
             truncation_meta = None
             if total_rows > limit:

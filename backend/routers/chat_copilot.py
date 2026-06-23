@@ -102,6 +102,7 @@ async def query_copilot(
     """v3 AI Data Copilot query endpoint.
     
     Processes natural language queries and records interaction to the active thread if threadId is set.
+    Works with or without a threadId — threadless mode is fully supported.
     """
     user_id = user.get("uid")
     session_id = req.sessionId
@@ -121,16 +122,29 @@ async def query_copilot(
             "Session not found: user_id=%s, session_id=%s",
             user_id, session_id
         )
-        raise HTTPException(status_code=404, detail="Session not found.")
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"Session '{session_id}' not found on the server. "
+                "The backend may have restarted and lost your session data. "
+                "Please re-upload your dataset to start a new session."
+            )
+        )
 
-    # 3. Handle thread history loading if threadId is supplied
+    # 3. Handle thread history loading if threadId is supplied (optional)
     chat_history = []
     if req.threadId:
-        thread = get_chat_service().get_thread(req.threadId, user_id, session_id)
-        if not thread:
-            raise HTTPException(status_code=404, detail="Thread not found.")
-        # Override client-supplied chatHistory with database truth
-        chat_history = _build_chat_history_from_messages(thread.get("messages", []))
+        try:
+            thread = get_chat_service().get_thread(req.threadId, user_id, session_id)
+            if thread:
+                # Override client-supplied chatHistory with database truth
+                chat_history = _build_chat_history_from_messages(thread.get("messages", []))
+            else:
+                logger.warning("Thread %s not found for user %s — proceeding threadless", req.threadId, user_id)
+                chat_history = req.chatHistory or []
+        except Exception as exc:
+            logger.warning("Failed to load thread history %s — proceeding threadless: %s", req.threadId, exc)
+            chat_history = req.chatHistory or []
     else:
         chat_history = req.chatHistory or []
 
@@ -143,7 +157,10 @@ async def query_copilot(
             "Failed to load dataframe: user_id=%s, session_id=%s, error=%s",
             user_id, session_id, exc, exc_info=True
         )
-        raise HTTPException(status_code=500, detail="Failed to load session dataset.")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to load session dataset. The session data may be corrupted."
+        )
 
     # 4. Process the query using CopilotQueryEngine
     try:
@@ -162,10 +179,10 @@ async def query_copilot(
         )
         raise HTTPException(
             status_code=500,
-            detail="An internal error occurred while processing the query."
+            detail=f"Query processing failed: {str(exc)}"
         )
 
-    # 5. Handle conversation persistence saving if threadId is supplied
+    # 5. Handle conversation persistence saving if threadId is supplied (optional, non-blocking)
     if req.threadId:
         try:
             user_message = {

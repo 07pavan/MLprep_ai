@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react'
-import { Send, Trash2, Brain, ChevronDown, HelpCircle, Code } from 'lucide-react'
+import { Send, Trash2, Brain, ChevronDown, Code, RefreshCw, AlertTriangle } from 'lucide-react'
 import { useChat } from '../hooks/useChat'
 import MessageBubble from './MessageBubble'
 
@@ -98,8 +98,56 @@ function SuggestedQuestions({ questions, onSelect }) {
   )
 }
 
+// ── SessionLostBanner — shown when session is missing from server ─────────────
+function SessionLostBanner({ onClearSession }) {
+  return (
+    <div style={{
+      margin: '16px',
+      padding: '16px 20px',
+      background: 'rgba(255, 165, 0, 0.08)',
+      border: '1px solid rgba(255, 165, 0, 0.3)',
+      borderRadius: 12,
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: 12,
+    }}>
+      <AlertTriangle size={18} style={{ color: '#f5a623', flexShrink: 0, marginTop: 2 }} />
+      <div>
+        <div style={{ fontWeight: 600, color: '#f5a623', fontSize: '0.88rem', marginBottom: 4 }}>
+          Session expired — dataset not found on server
+        </div>
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+          The backend server restarted and your session data was cleared. This is normal on free hosting plans.
+          Please re-upload your dataset to start a new chat session.
+        </div>
+        {onClearSession && (
+          <button
+            onClick={onClearSession}
+            style={{
+              marginTop: 10,
+              padding: '6px 14px',
+              borderRadius: 8,
+              border: '1px solid rgba(255,165,0,0.4)',
+              background: 'rgba(255,165,0,0.12)',
+              color: '#f5a623',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <RefreshCw size={13} />
+            Clear &amp; Re-upload
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ── ChatInterface (main export) ───────────────────────────────────────────────
-export default function ChatInterface({ sessionId, datasetMeta }) {
+export default function ChatInterface({ sessionId, datasetMeta, onClearSession }) {
   const { messages, isLoading, sendQuestion, clearHistory, threadId } = useChat(sessionId)
   const [input, setInput] = useState('')
   const [persona, setPersona] = useState('general')
@@ -145,17 +193,29 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
     }
   }
 
-  // Find the last agent message
+  // Detect if the last error was a session-not-found error
   const lastAgentMsg = [...messages].reverse().find((m) => m.role === 'agent')
   const showSuggested = !isLoading && lastAgentMsg?.suggestedQuestions?.length > 0
+  const isSessionLost =
+    lastAgentMsg?.error &&
+    (lastAgentMsg.error.includes('Session') ||
+      lastAgentMsg.error.includes('session') ||
+      lastAgentMsg.error.includes('not found on the server') ||
+      lastAgentMsg.error.includes('re-upload'))
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
       {/* Memory banner */}
-      {messages.length > 0 && (
+      {messages.length > 0 && threadId && (
         <div className="memory-banner">
           <Brain size={14} />
           Memory active — Copilot thread ID: {threadId?.slice(0, 8)}
+        </div>
+      )}
+      {messages.length > 0 && !threadId && (
+        <div className="memory-banner" style={{ background: 'rgba(255,165,0,0.08)', borderColor: 'rgba(255,165,0,0.2)', color: 'var(--text-secondary)' }}>
+          <Brain size={14} style={{ opacity: 0.5 }} />
+          Threadless mode — chat history not persisted (backend restart)
         </div>
       )}
 
@@ -187,6 +247,11 @@ export default function ChatInterface({ sessionId, datasetMeta }) {
           messages.map((msg) => (
             <MessageBubble key={msg.id} message={msg} />
           ))
+        )}
+
+        {/* Session lost banner */}
+        {isSessionLost && (
+          <SessionLostBanner onClearSession={onClearSession} />
         )}
 
         {/* Suggested follow-up questions below last response */}

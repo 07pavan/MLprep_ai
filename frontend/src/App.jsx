@@ -143,7 +143,7 @@ function DashboardContent() {
   const renderPage = () => {
     switch (activePage) {
       case 'chat':
-        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} />
+        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} onClearSession={clearSession} />
       case 'overview':
         return <OverviewPage datasetMeta={datasetMeta} />
       case 'datasets':
@@ -179,7 +179,7 @@ function DashboardContent() {
       case 'traces':
         return <TraceViewer sessionId={sessionId} />
       default:
-        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} />
+        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} onClearSession={clearSession} />
     }
   }
 

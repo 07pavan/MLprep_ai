@@ -161,10 +161,38 @@ app.include_router(rate_limit_router)
 # ─── Health check ─────────────────────────────────────────────────────────────
 @app.get("/health", tags=["System"])
 async def health():
+    """Extended health check with LLM and configuration diagnostics."""
+    from utils.llm_factory import get_llm
+    from pathlib import Path
+    
+    # Check LLM availability
+    llm_ok = False
+    llm_provider = "unknown"
+    try:
+        llm = get_llm("smart")
+        llm_ok = llm is not None
+        llm_provider = settings.SMART_PROVIDER if llm_ok else "none"
+    except Exception:
+        llm_ok = False
+    
+    # Check storage
+    storage_path = Path(settings.STORAGE_DIR)
+    storage_ok = storage_path.exists() and storage_path.is_dir()
+    
     return {
         "status": "ok",
         "version": "2.0.0",
         "engine": "LangGraph + Vega-Lite",
+        "config": {
+            "auth_enabled": settings.ENABLE_AUTH,
+            "llm_ready": llm_ok,
+            "llm_provider": llm_provider,
+            "llm_model": settings.SMART_MODEL,
+            "groq_key_set": bool(settings.GROQ_API_KEY),
+            "google_key_set": bool(settings.GOOGLE_API_KEY),
+            "storage_dir": settings.STORAGE_DIR,
+            "storage_accessible": storage_ok,
+        }
     }
 
 

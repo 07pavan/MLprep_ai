@@ -69,8 +69,13 @@ class LLMGenerator:
         
         llm = get_llm("smart")
         if llm is None:
-            # Fallback when LLM is unavailable: return error or simple describe
-            return False, None, "", "LLM service is not available (check API keys)"
+            # Fallback when LLM is unavailable: return actionable error
+            return (
+                False, None, "",
+                "No LLM is configured. Please click the ⚙️ Settings button in the sidebar "
+                "and enter your Groq API key (free at console.groq.com), "
+                "or set the GROQ_API_KEY environment variable on your server."
+            )
             
         last_code = ""
         last_error = ""

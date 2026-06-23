@@ -47,7 +47,11 @@ class SessionManager:
         """Persist a DataFrame as Parquet (preserves dtypes perfectly)."""
         self._ensure_session(uid, session_id)
         parquet_path = self._data_path(uid, session_id)
-        df.to_parquet(parquet_path, index=False)
+        # Try pyarrow first, fall back to fastparquet
+        try:
+            df.to_parquet(parquet_path, index=False, engine="pyarrow")
+        except Exception:
+            df.to_parquet(parquet_path, index=False, engine="fastparquet")
         logger.debug("Saved %d×%d df to %s", len(df), len(df.columns), parquet_path)
 
     def load_dataframe(self, uid: str, session_id: str) -> pd.DataFrame:
@@ -59,7 +63,11 @@ class SessionManager:
                 status_code=404,
                 detail=f"No dataset found for session '{session_id}'. Please upload a file first.",
             )
-        return pd.read_parquet(parquet_path)
+        # Try pyarrow first, fall back to fastparquet
+        try:
+            return pd.read_parquet(parquet_path, engine="pyarrow")
+        except Exception:
+            return pd.read_parquet(parquet_path, engine="fastparquet")
 
     def get_data_path(self, uid: str, session_id: str) -> str:
         """Return the string path to the session's Parquet file."""
