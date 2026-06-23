@@ -208,10 +208,32 @@ function AppShell() {
         alignItems: 'center',
         justifyContent: 'center',
         background: 'var(--bg-primary)',
-        gap: 12
+        gap: 20,
       }}>
-        <div className="spinner" style={{ width: 40, height: 40 }} />
-        <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>Loading application...</span>
+        <div style={{
+          width: 64, height: 64,
+          borderRadius: 20,
+          background: 'linear-gradient(135deg, #D97706, #F59E0B)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 28,
+          boxShadow: '0 8px 32px rgba(217,119,6,0.35)',
+          animation: 'pulseGlow 2s ease-in-out infinite',
+        }}>🧠</div>
+        <div style={{
+          width: 36, height: 36, borderRadius: '50%',
+          border: '3px solid rgba(217,119,6,0.15)',
+          borderTopColor: '#F59E0B',
+          animation: 'spin 0.8s linear infinite',
+        }} />
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontSize: '1.1rem', fontWeight: 700,
+            background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            marginBottom: 4,
+          }}>MLPrep AI</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Initializing…</div>
+        </div>
       </div>
     )
   }
