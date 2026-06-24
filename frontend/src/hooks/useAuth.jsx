@@ -140,6 +140,8 @@ export function AuthProvider({ children }) {
     }
     localStorage.removeItem('authToken')
     localStorage.removeItem('mockUser')
+    // Clean up legacy global session key (pre-fix) so it never bleeds into another user
+    localStorage.removeItem('dataai_session')
     setUser(null)
     setToken(null)
   }

@@ -75,7 +75,7 @@ function DashboardContent() {
     sessionId, datasetMeta, currentDatasetId,
     isUploading, uploadProgress, uploadError, isSuccess,
     uploadDataset, importDataset, activateSession, clearSession,
-  } = useSession()
+  } = useSession(user?.uid)   // ← scoped to this user's UID
 
   const getInitialPage = () => {
     const path = window.location.pathname
