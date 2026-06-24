@@ -2,10 +2,116 @@ import React, { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import {
   Upload, Database, CheckCircle, AlertCircle, Link2, FileText,
-  ArrowRight, Sparkles, Cloud, X, ChevronRight, Zap
+  ArrowRight, Sparkles, Cloud, X, ChevronRight, Zap, Info
 } from 'lucide-react'
 
 const FORMATS = ['CSV', 'XLSX', 'XLS', 'JSON', 'Parquet']
+
+// ── Kaggle URL helpers ───────────────────────────────────────────────────────
+const KAGGLE_DATASET_RE = /^https:\/\/(www\.)?kaggle\.com\/datasets\/[\w-]+\/[\w-]+\/?$/i
+
+function isKaggleUrl(url) {
+  return url && url.toLowerCase().includes('kaggle.com')
+}
+
+function getKaggleUrlStatus(url) {
+  if (!isKaggleUrl(url)) return null
+  if (KAGGLE_DATASET_RE.test(url.trim())) return 'valid'
+  return 'invalid'
+}
+
+// ── Kaggle guide panel ────────────────────────────────────────────────────────
+function KaggleGuide() {
+  return (
+    <div style={{
+      marginTop: 14,
+      background: 'rgba(251,191,36,0.05)',
+      border: '1px solid rgba(251,191,36,0.2)',
+      borderRadius: 14,
+      overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8,
+        padding: '10px 14px',
+        borderBottom: '1px solid rgba(251,191,36,0.12)',
+        background: 'rgba(251,191,36,0.07)',
+      }}>
+        <span style={{ fontSize: '1rem' }}>🐾</span>
+        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#FCD34D' }}>
+          How to copy the correct Kaggle dataset link
+        </span>
+      </div>
+
+      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {/* Steps */}
+        {[
+          { step: '1', text: 'Go to', link: 'kaggle.com/datasets', href: 'https://www.kaggle.com/datasets' },
+          { step: '2', text: 'Search for and open the dataset you want' },
+          { step: '3', text: 'Copy the URL directly from your browser\'s address bar' },
+        ].map(({ step, text, link, href }) => (
+          <div key={step} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <div style={{
+              width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+              background: 'rgba(251,191,36,0.15)',
+              border: '1px solid rgba(251,191,36,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.65rem', fontWeight: 800, color: '#FCD34D',
+            }}>{step}</div>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5, paddingTop: 1 }}>
+              {text}{' '}
+              {link && (
+                <a href={href} target="_blank" rel="noopener noreferrer"
+                  style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}>
+                  {link} ↗
+                </a>
+              )}
+            </span>
+          </div>
+        ))}
+
+        {/* Correct format */}
+        <div style={{
+          marginTop: 4,
+          background: 'rgba(0,0,0,0.3)',
+          borderRadius: 8,
+          padding: '10px 12px',
+          border: '1px solid rgba(255,255,255,0.05)',
+        }}>
+          <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: 5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            ✅ Correct URL format
+          </p>
+          <code style={{
+            fontSize: '0.75rem',
+            color: '#86EFAC',
+            fontFamily: 'monospace',
+            wordBreak: 'break-all',
+            lineHeight: 1.5,
+          }}>
+            https://www.kaggle.com/datasets/<span style={{ color: '#FCD34D' }}>username</span>/<span style={{ color: '#FCD34D' }}>dataset-name</span>
+          </code>
+        </div>
+
+        {/* Common mistakes */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            ❌ Common mistakes to avoid
+          </p>
+          {[
+            'www.kaggle.com/... (missing https://)',
+            'kaggle.com/username/dataset (missing /datasets/)',
+            'kaggle.com/datasets/username/dataset/download (extra paths)',
+          ].map(m => (
+            <div key={m} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ color: '#FCA5A5', fontSize: '0.7rem' }}>✕</span>
+              <code style={{ fontSize: '0.7rem', color: '#FCA5A5', fontFamily: 'monospace' }}>{m}</code>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const ACCEPT = {
   'text/csv': ['.csv'],
@@ -357,21 +463,27 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                         }} />
                         <input
                           id="dataset-url"
-                          type="url"
-                          placeholder="https://example.com/dataset.csv"
+                          type="text"
+                          placeholder="https://www.kaggle.com/datasets/owner/name  or  direct .csv URL"
                           value={url}
                           onChange={e => setUrl(e.target.value)}
                           disabled={isUploading}
                           style={{
                             width: '100%', padding: '12px 14px 12px 40px',
                             background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid rgba(255,255,255,0.08)',
+                            border: `1px solid ${
+                              getKaggleUrlStatus(url) === 'invalid'
+                                ? 'rgba(251,191,36,0.45)'
+                                : getKaggleUrlStatus(url) === 'valid'
+                                  ? 'rgba(52,211,153,0.45)'
+                                  : 'rgba(255,255,255,0.08)'
+                            }`,
                             borderRadius: 12, color: 'var(--text-primary)',
                             fontSize: '0.88rem', fontFamily: 'inherit',
-                            outline: 'none',
+                            outline: 'none', boxSizing: 'border-box',
                           }}
-                          onFocus={e => { e.target.style.borderColor = 'rgba(217,119,6,0.45)'; e.target.style.boxShadow = '0 0 0 3px rgba(217,119,6,0.08)' }}
-                          onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.08)'; e.target.style.boxShadow = 'none' }}
+                          onFocus={e => { e.target.style.boxShadow = '0 0 0 3px rgba(217,119,6,0.08)' }}
+                          onBlur={e => { e.target.style.boxShadow = 'none' }}
                         />
                         {url && (
                           <button type="button" onClick={() => setUrl('')} style={{
@@ -383,9 +495,27 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                           </button>
                         )}
                       </div>
-                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.5 }}>
-                        Supports Kaggle datasets, GitHub CSV/JSON, or any public direct URL
-                      </p>
+
+                      {/* Kaggle valid badge */}
+                      {getKaggleUrlStatus(url) === 'valid' && (
+                        <div style={{
+                          marginTop: 8, display: 'flex', alignItems: 'center', gap: 6,
+                          fontSize: '0.75rem', color: '#34d399',
+                        }}>
+                          <CheckCircle size={13} />
+                          Kaggle dataset URL looks correct — ready to import!
+                        </div>
+                      )}
+
+                      {/* Kaggle invalid guide */}
+                      {getKaggleUrlStatus(url) === 'invalid' && <KaggleGuide />}
+
+                      {/* Generic hint for non-Kaggle URLs */}
+                      {url && !isKaggleUrl(url) && (
+                        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.5 }}>
+                          Supports Kaggle datasets, GitHub raw CSV/JSON, or any public direct URL
+                        </p>
+                      )}
                     </div>
 
                     {isUploading ? (
