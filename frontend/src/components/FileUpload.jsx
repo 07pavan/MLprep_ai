@@ -73,10 +73,10 @@ function KaggleGuide() {
         {/* Correct format */}
         <div style={{
           marginTop: 4,
-          background: 'var(--color-slate)',
-          borderRadius: 'var(--radius-md)',
+          background: 'var(--color-fog)',
+          borderRadius: 'var(--radius-sm)',
           padding: '10px 12px',
-          border: '1px solid var(--border-subtle)',
+          border: '1px solid rgba(163, 166, 175, 0.35)',
         }}>
           <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginBottom: 5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             ✅ Correct URL format
@@ -329,18 +329,18 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                         {/* Spinner ring */}
                         <div style={{
                           width: 52, height: 52, borderRadius: '50%',
-                          border: '3px solid rgba(204, 145, 102, 0.15)',
-                          borderTopColor: 'var(--color-vermillion-signal)',
+                          border: '3px solid rgba(93, 42, 26, 0.12)',
+                          borderTopColor: 'var(--color-rust)',
                           animation: 'spin 0.9s linear infinite',
                         }} />
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
                           {uploadPhase}
                         </div>
                         {uploadProgress > 0 && uploadProgress < 100 && !isImportingUrl && (
-                          <div style={{ width: '70%', height: 6, borderRadius: 'var(--radius-sm)', background: 'var(--color-slate)', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
+                          <div style={{ width: '70%', height: 6, borderRadius: 'var(--radius-full)', background: 'var(--color-mist)', border: '1px solid rgba(163, 166, 175, 0.35)', overflow: 'hidden' }}>
                             <div style={{
                               height: '100%', width: `${uploadProgress}%`,
-                              background: 'var(--color-vermillion-signal)',
+                              background: 'var(--color-rust)',
                               transition: 'width 0.3s ease',
                             }} />
                           </div>
@@ -374,11 +374,11 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                           {FORMATS.map(f => (
                             <span key={f} style={{
                               padding: '3px 10px',
-                              background: 'var(--color-slate)',
-                              border: '1px solid var(--border-subtle)',
-                              borderRadius: 'var(--radius-sm)',
+                              background: 'var(--color-fog)',
+                              border: '1px solid rgba(163, 166, 175, 0.35)',
+                              borderRadius: 'var(--radius-full)',
                               fontSize: '0.68rem', fontWeight: 600,
-                              color: 'var(--text-secondary)',
+                              color: 'var(--color-graphite)',
                               letterSpacing: '0.04em',
                             }}>{f}</span>
                           ))}
@@ -468,8 +468,8 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '20px 0' }}>
                         <div style={{
                           width: 44, height: 44, borderRadius: '50%',
-                          border: '3px solid rgba(204, 145, 102, 0.15)',
-                          borderTopColor: 'var(--color-vermillion-signal)',
+                          border: '3px solid rgba(93, 42, 26, 0.12)',
+                          borderTopColor: 'var(--color-rust)',
                           animation: 'spin 0.9s linear infinite',
                         }} />
                         <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>{uploadPhase}</span>
@@ -479,20 +479,21 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                         type="submit"
                         disabled={!url.trim() || isUploading}
                         style={{
-                          padding: '12px 20px',
-                          borderRadius: '2px',
+                          padding: '12px 24px',
+                          borderRadius: 'var(--radius-full)',
                           background: url.trim()
-                            ? 'var(--color-paper)'
-                            : 'var(--color-slate)',
-                          color: url.trim() ? 'var(--color-inkwell)' : 'var(--color-silver)',
-                          fontWeight: 500, fontSize: '15px',
+                            ? 'var(--color-ink)'
+                            : 'var(--color-mist)',
+                          color: url.trim() ? 'var(--color-white)' : 'var(--color-dove)',
+                          fontWeight: 600, fontSize: '0.9rem',
                           letterSpacing: '-0.007em',
-                          border: url.trim() ? 'none' : '1px solid var(--border-subtle)',
+                          border: 'none',
                           cursor: url.trim() ? 'pointer' : 'not-allowed',
                           display: 'flex', alignItems: 'center', justify: 'center', gap: 8,
-                          transition: 'all 0.2s ease',
+                          transition: 'opacity 0.15s ease',
                           boxShadow: 'none',
                           fontFamily: 'inherit',
+                          opacity: url.trim() ? 1 : 0.5,
                         }}
                       >
                         <Cloud size={16} />

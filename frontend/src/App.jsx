@@ -124,6 +124,7 @@ function DashboardContent() {
             onActivateSuccess={activateSession} 
             currentDatasetId={currentDatasetId} 
             onDeleteActiveDataset={clearSession}
+            onUploadNew={clearSession}
           />
         </Layout>
       )
@@ -153,6 +154,7 @@ function DashboardContent() {
             onActivateSuccess={activateSession} 
             currentDatasetId={currentDatasetId} 
             onDeleteActiveDataset={clearSession}
+            onUploadNew={clearSession}
           />
         )
       case 'profile':

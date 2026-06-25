@@ -373,9 +373,9 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
             style={{
               width: 44,
               height: 44,
-              borderRadius: 'var(--radius-sm)',
-              background: input.trim() && !isLoading ? 'var(--color-paper)' : 'var(--color-slate)',
-              color: input.trim() && !isLoading ? 'var(--color-inkwell)' : 'var(--color-silver)',
+              borderRadius: 'var(--radius-full)',
+              background: input.trim() && !isLoading ? 'var(--color-ink)' : 'var(--color-mist)',
+              color: input.trim() && !isLoading ? 'var(--color-white)' : 'var(--color-dove)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
