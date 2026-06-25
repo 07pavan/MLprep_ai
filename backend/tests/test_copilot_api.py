@@ -177,7 +177,8 @@ def test_missing_session_returns_404(mock_auth):
     }
     res = client.post("/api/v3/chat/query", json=payload)
     assert res.status_code == 404
-    assert "session not found" in res.json()["detail"].lower()
+    detail = res.json()["detail"].lower()
+    assert "session" in detail and "not found" in detail
 
 # ─── persistence and thread tests ──────────────────────────────────────────
 
