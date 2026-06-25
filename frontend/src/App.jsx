@@ -115,9 +115,67 @@ function DashboardContent() {
     }
   }, [sessionId, isSuccess])
 
-  // ── No session → always show the Upload page (full-screen) ──────
-  // The dashboard is only accessible after a dataset is loaded.
+  // ── handleActivateSession (defined early so no-session block can use it) ──
+  const handleActivateSession = (sid, meta, dsId) => {
+    activateSession(sid, meta, dsId)
+    handlePageChange('chat')   // always go to chat after activating a dataset
+  }
+
+  // ── Smart no-session routing ─────────────────────────────────────
+  // Check if user already has datasets saved → go to registry, else upload
+  const [datasetCheck, setDatasetCheck] = useState('loading') // 'loading' | 'has_datasets' | 'empty'
+
+  useEffect(() => {
+    if (sessionId) return // already in session, skip check
+    setDatasetCheck('loading')
+    import('./services/mlApi').then(({ listDatasets }) => {
+      listDatasets()
+        .then(data => setDatasetCheck(data && data.length > 0 ? 'has_datasets' : 'empty'))
+        .catch(() => setDatasetCheck('empty'))
+    })
+  }, [sessionId])
+
   if (!sessionId) {
+    // While checking the API…
+    if (datasetCheck === 'loading') {
+      return (
+        <div style={{
+          minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexDirection: 'column', gap: 16, background: 'var(--bg-primary)',
+        }}>
+          <div style={{
+            width: 36, height: 36, borderRadius: '50%',
+            border: '3px solid rgba(163,166,175,0.2)',
+            borderTopColor: 'var(--color-ink)',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <span style={{ fontSize: '0.82rem', color: 'var(--color-graphite)', letterSpacing: '0.02em' }}>
+            Checking your datasets…
+          </span>
+        </div>
+      )
+    }
+
+    // Has previous datasets → show the registry so user can pick one
+    if (datasetCheck === 'has_datasets') {
+      return (
+        <Layout
+          activePage="datasets"
+          onPageChange={() => {}}
+          datasetMeta={null}
+          onClearSession={clearSession}
+        >
+          <DatasetManagement
+            onActivateSuccess={handleActivateSession}
+            currentDatasetId={currentDatasetId}
+            onDeleteActiveDataset={clearSession}
+            onUploadNew={() => setDatasetCheck('empty')}
+          />
+        </Layout>
+      )
+    }
+
+    // No datasets at all → show upload page
     return (
       <FileUpload
         onUpload={uploadDataset}
@@ -131,10 +189,6 @@ function DashboardContent() {
   }
 
   // ── Session active → show sidebar layout + page ──────────────────
-  const handleActivateSession = (sid, meta, dsId) => {
-    activateSession(sid, meta, dsId)
-    handlePageChange('chat')   // always go to chat after switching dataset
-  }
 
   const renderPage = () => {
     switch (activePage) {
@@ -147,8 +201,8 @@ function DashboardContent() {
           <DatasetManagement
             onActivateSuccess={handleActivateSession}
             currentDatasetId={currentDatasetId}
-            onDeleteActiveDataset={clearSession}
-            onUploadNew={clearSession}   // clearSession → drops to FileUpload
+            onDeleteActiveDataset={() => { clearSession(); setDatasetCheck('loading') }}
+            onUploadNew={() => { clearSession(); setDatasetCheck('empty') }}
           />
         )
       case 'profile':
