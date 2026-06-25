@@ -173,7 +173,21 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
     return () => document.removeEventListener('mousedown', handler)
   }, [sidebarOpen])
 
-  const activeLabel = ALL_NAV.find(i => i.id === activePage)?.label || 'MLPrep AI'
+  const visibleNavGroups = NAV_GROUPS.map(group => {
+    if (!datasetMeta) {
+      return {
+        ...group,
+        items: group.items.filter(item => item.id === 'datasets')
+      }
+    }
+    return group
+  }).filter(group => group.items.length > 0)
+
+  const visibleAllNav = datasetMeta 
+    ? ALL_NAV 
+    : ALL_NAV.filter(item => item.id === 'datasets')
+
+  const activeLabel = visibleAllNav.find(i => i.id === activePage)?.label || 'MLPrep AI'
 
   return (
     <>
@@ -367,7 +381,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
               gap: 0,
             }}
           >
-            {NAV_GROUPS.map((group, gi) => (
+            {visibleNavGroups.map((group, gi) => (
               <div key={gi} style={{ marginBottom: 4 }}>
                 {!collapsed && (
                   <div style={{
@@ -540,7 +554,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
 
           {/* Mobile nav */}
           <nav style={{ flex: 1, padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {NAV_GROUPS.map((group, gi) => (
+            {visibleNavGroups.map((group, gi) => (
               <div key={gi} style={{ marginBottom: 4 }}>
                 <div style={{
                   padding: '8px 8px 4px',
@@ -680,7 +694,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
           }}
         >
           {/* Show only top 5 nav items on mobile */}
-          {ALL_NAV.slice(0, 5).map(({ id, label, icon: Icon }) => (
+          {visibleAllNav.slice(0, 5).map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => onPageChange(id)}
