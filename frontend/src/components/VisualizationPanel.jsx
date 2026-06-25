@@ -319,7 +319,7 @@ export default function VisualizationPanel({ sessionId }) {
                       </div>
 
                       {/* Interactive Chart Vega Embed */}
-                      <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: 'var(--radius-md)', padding: 16, border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ background: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', padding: 16, border: '1px solid var(--border-subtle)' }}>
                         <Suspense fallback={
                           <div style={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Loader className="spinner" size={24} />

@@ -705,3 +705,24 @@ input, textarea { font-family: inherit; }
 .hover\:bg-\[rgba\(255\,255\,255\,0\.07\)\]:hover {
   background-color: var(--bg-glass-hover) !important;
 }
+
+/* ── Vega Chart SVG Overrides ─────────────────────────────────────── */
+.vega-embed svg text {
+  font-family: var(--font-sans) !important;
+}
+.vega-embed svg .role-title text {
+  fill: var(--text-primary) !important;
+}
+.vega-embed svg .role-axis-title text {
+  fill: var(--text-primary) !important;
+}
+.vega-embed svg .role-axis-label text {
+  fill: var(--text-secondary) !important;
+}
+.vega-embed svg .role-legend-title text {
+  fill: var(--text-primary) !important;
+}
+.vega-embed svg .role-legend-label text {
+  fill: var(--text-secondary) !important;
+}
+
