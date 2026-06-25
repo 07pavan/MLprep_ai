@@ -123,6 +123,7 @@ function DashboardContent() {
           <DatasetManagement 
             onActivateSuccess={activateSession} 
             currentDatasetId={currentDatasetId} 
+            onDeleteActiveDataset={clearSession}
           />
         </Layout>
       )
@@ -151,6 +152,7 @@ function DashboardContent() {
           <DatasetManagement 
             onActivateSuccess={activateSession} 
             currentDatasetId={currentDatasetId} 
+            onDeleteActiveDataset={clearSession}
           />
         )
       case 'profile':

@@ -27,6 +27,11 @@ class FirestoreDatasetService:
     def delete_dataset(self, dataset_id: str):
         self.db.collection("datasets").document(dataset_id).delete()
 
+    def delete_all_datasets(self):
+        docs = self.db.collection("datasets").stream()
+        for doc in docs:
+            doc.reference.delete()
+
 
 class PostgresDatasetService:
     """CRUD operations for dataset registry on PostgreSQL."""
@@ -169,6 +174,11 @@ class PostgresDatasetService:
             with conn.cursor() as cur:
                 cur.execute("DELETE FROM datasets WHERE dataset_id = %s", (dataset_id,))
 
+    def delete_all_datasets(self):
+        with self.pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM datasets")
+
 
 class InMemoryDatasetService:
     """Mock in-memory service for testing and development bypass."""
@@ -191,6 +201,9 @@ class InMemoryDatasetService:
     def delete_dataset(self, dataset_id: str):
         if dataset_id in self.store:
             del self.store[dataset_id]
+
+    def delete_all_datasets(self):
+        self.store.clear()
 
 
 # Singleton instance

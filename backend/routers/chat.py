@@ -76,7 +76,7 @@ async def chat(
     df_path = session_manager.get_data_path(user["uid"], req.sessionId)
 
     # ── Start trace ───────────────────────────────────────────────
-    trace_id = tracer.start_trace(req.sessionId, req.question)
+    trace_id = tracer.start_trace(req.sessionId, req.question, uid=user["uid"])
 
     # ── Build initial state ───────────────────────────────────────
     initial_state = {

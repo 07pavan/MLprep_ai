@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { listDatasets, activateDataset, deleteDataset } from '../services/mlApi'
 import { Trash2, Check, ExternalLink, Calendar, Database, Layers } from 'lucide-react'
 
-export default function DatasetManagement({ onActivateSuccess, currentDatasetId }) {
+export default function DatasetManagement({ onActivateSuccess, currentDatasetId, onDeleteActiveDataset }) {
   const [datasets, setDatasets] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -50,6 +50,9 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId 
     try {
       await deleteDataset(datasetId)
       setDatasets(datasets.filter(d => d.dataset_id !== datasetId))
+      if (datasetId === currentDatasetId && onDeleteActiveDataset) {
+        onDeleteActiveDataset()
+      }
     } catch (err) {
       alert(err.response?.data?.detail || err.message || 'Failed to delete dataset')
     } finally {

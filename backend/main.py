@@ -196,6 +196,74 @@ async def health():
     }
 
 
+# ─── Midnight Cleanup Scheduler ───────────────────────────────────────────────
+import asyncio
+from datetime import datetime, timedelta
+import shutil
+
+def run_midnight_cleanup():
+    """Wipes all user dataset files from physical storage and clears the dataset registry DB."""
+    logger.info("🧹 Starting scheduled midnight cleanup...")
+    
+    # 1. Clean up database registry entries
+    try:
+        from services.dataset_service import get_dataset_service
+        service = get_dataset_service()
+        if hasattr(service, "delete_all_datasets"):
+            service.delete_all_datasets()
+            logger.info("🗑️ Cleared all dataset registry metadata from database.")
+        else:
+            logger.warning("⚠️ Dataset service does not implement delete_all_datasets.")
+    except Exception as e:
+        logger.error("❌ Failed to clean up database registry metadata: %s", e, exc_info=True)
+        
+    # 2. Clean up physical storage files
+    try:
+        storage_path = Path(settings.STORAGE_DIR)
+        if storage_path.exists() and storage_path.is_dir():
+            for item in storage_path.iterdir():
+                # Preservation rule: Do NOT delete firebase-key.json
+                if item.name == "firebase-key.json":
+                    logger.debug("Preserving firebase-key.json in storage directory")
+                    continue
+                try:
+                    if item.is_dir():
+                        shutil.rmtree(item, ignore_errors=True)
+                        logger.info("Deleted physical session directory: %s", item)
+                    else:
+                        item.unlink(missing_ok=True)
+                        logger.info("Deleted physical file: %s", item)
+                except Exception as file_exc:
+                    logger.error("Failed to delete physical path %s: %s", item, file_exc)
+            logger.info("🧹 Finished scheduled midnight cleanup of physical storage files.")
+    except Exception as e:
+        logger.error("❌ Failed to clean up physical storage files: %s", e, exc_info=True)
+
+
+async def midnight_cleanup_scheduler():
+    """Async background task that triggers run_midnight_cleanup every night at 12:00 AM local time."""
+    logger.info("⏰ Midnight cleanup scheduler task started.")
+    while True:
+        try:
+            now = datetime.now()
+            # Calculate next midnight (tomorrow at 12:00 AM local time)
+            tomorrow = now.date() + timedelta(days=1)
+            next_midnight = datetime.combine(tomorrow, datetime.min.time())
+            
+            seconds_until_midnight = (next_midnight - now).total_seconds()
+            logger.info("⏰ Next midnight cleanup scheduled in %.2f seconds (at %s)", 
+                        seconds_until_midnight, next_midnight.isoformat())
+            
+            await asyncio.sleep(seconds_until_midnight)
+            run_midnight_cleanup()
+        except asyncio.CancelledError:
+            logger.info("⏰ Midnight cleanup scheduler task cancelled.")
+            break
+        except Exception as e:
+            logger.error("❌ Error in midnight cleanup scheduler loop: %s", e, exc_info=True)
+            await asyncio.sleep(60)
+
+
 # ─── Startup ──────────────────────────────────────────────────────────────────
 @app.on_event("startup")
 async def on_startup():
@@ -237,6 +305,10 @@ async def on_startup():
     logger.info("   Storage  : %s", storage.resolve())
     logger.info("   Docs     : http://localhost:8000/docs")
     logger.info("   CORS     : %s", settings.CORS_ORIGINS)
+
+    # Start background cleanup task
+    asyncio.create_task(midnight_cleanup_scheduler())
+
 
 
 # ─── Shutdown ─────────────────────────────────────────────────────────────────
