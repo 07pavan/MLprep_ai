@@ -61,7 +61,7 @@ function UserAvatar({ user, size = 32 }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontWeight: 700, fontSize: size * 0.35,
       color: '#fff', flexShrink: 0,
-      boxShadow: 'var(--shadow-subtle)',
+      boxShadow: 'none',
     }}>
       {user?.photoURL ? (
         <img src={user.photoURL} alt="" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
@@ -90,9 +90,9 @@ function NavItem({ item, isActive, onClick, collapsed }) {
         justifyContent: collapsed ? 'center' : 'flex-start',
         color: isActive ? 'var(--color-vermillion-signal)' : (hovered ? 'var(--text-primary)' : 'var(--text-secondary)'),
         background: isActive
-          ? 'rgba(228, 43, 12, 0.06)'
+          ? 'rgba(204, 145, 102, 0.08)'
           : (hovered ? 'var(--bg-glass-hover)' : 'transparent'),
-        border: isActive ? '1px solid rgba(228, 43, 12, 0.22)' : '1px solid transparent',
+        border: isActive ? '1px solid rgba(204, 145, 102, 0.22)' : '1px solid transparent',
         cursor: 'pointer',
         transition: 'all 0.18s ease',
         fontFamily: 'inherit',
@@ -129,8 +129,8 @@ function NavItem({ item, isActive, onClick, collapsed }) {
             <span style={{
               fontSize: '0.58rem', fontWeight: 700,
               padding: '2px 6px', borderRadius: 'var(--radius-sm)',
-              background: 'rgba(228, 43, 12, 0.1)',
-              border: '1px solid rgba(228, 43, 12, 0.2)',
+              background: 'rgba(204, 145, 102, 0.1)',
+              border: '1px solid rgba(204, 145, 102, 0.2)',
               color: 'var(--color-vermillion-signal)',
               letterSpacing: '0.04em',
             }}>
@@ -256,11 +256,11 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             minHeight: 64,
           }}>
             <div style={{
-              width: 36, height: 36, borderRadius: 'var(--radius-lg)',
+              width: 36, height: 36, borderRadius: 'var(--radius-sm)',
               background: 'var(--color-vermillion-signal)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 18, flexShrink: 0,
-              boxShadow: 'var(--shadow-subtle)',
+              boxShadow: 'none',
             }}>
               🧠
             </div>
@@ -269,11 +269,11 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
                     fontWeight: 600, fontSize: '1.1rem', letterSpacing: '-0.025em',
-                    color: 'var(--color-slate-900)',
+                    color: 'var(--color-paper)',
                   }}>
                     MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span>
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--color-slate-600)', marginTop: -1 }}>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--color-silver)', marginTop: -1 }}>
                     Data Intelligence Platform
                   </div>
                 </div>
@@ -283,7 +283,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                     width: 26, height: 26, borderRadius: 'var(--radius-md)',
                     background: 'var(--bg-glass-hover)',
                     border: '1px solid var(--border-subtle)',
-                    color: 'var(--color-slate-700)',
+                    color: 'var(--color-silver)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer', flexShrink: 0,
                     transition: 'all 0.2s ease',
@@ -300,8 +300,8 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 style={{
                   position: 'absolute', top: 18, right: -10,
                   width: 20, height: 20, borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(228, 43, 12, 0.15)',
-                  border: '1px solid rgba(228, 43, 12, 0.3)',
+                  background: 'rgba(204, 145, 102, 0.15)',
+                  border: '1px solid rgba(204, 145, 102, 0.3)',
                   color: 'var(--color-vermillion-signal)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', zIndex: 10,
@@ -317,8 +317,8 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             <div style={{
               margin: '12px 12px 4px',
               padding: '10px 13px',
-              background: 'var(--color-vellum)',
-              border: '1px solid var(--color-cloud)',
+              background: 'var(--color-slate)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-lg)',
               flexShrink: 0,
             }}>
@@ -344,8 +344,8 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 style={{
                   width: '100%', padding: '8px 12px',
                   borderRadius: 'var(--radius-md)',
-                  background: datasetMeta ? 'transparent' : 'rgba(228, 43, 12, 0.08)',
-                  border: `1px solid ${datasetMeta ? 'var(--color-cloud)' : 'rgba(228, 43, 12, 0.2)'}`,
+                  background: datasetMeta ? 'transparent' : 'rgba(204, 145, 102, 0.08)',
+                  border: `1px solid ${datasetMeta ? 'var(--border-subtle)' : 'rgba(204, 145, 102, 0.2)'}`,
                   color: datasetMeta ? 'var(--text-secondary)' : 'var(--color-vermillion-signal)',
                   fontSize: '0.78rem', fontWeight: 600,
                   display: 'flex', alignItems: 'center', gap: 7,
@@ -353,13 +353,13 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                   transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(228, 43, 12, 0.1)'
-                  e.currentTarget.style.borderColor = 'rgba(228, 43, 12, 0.25)'
+                  e.currentTarget.style.background = 'rgba(204, 145, 102, 0.1)'
+                  e.currentTarget.style.borderColor = 'rgba(204, 145, 102, 0.25)'
                   e.currentTarget.style.color = 'var(--color-vermillion-signal)'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.background = datasetMeta ? 'transparent' : 'rgba(228, 43, 12, 0.08)'
-                  e.currentTarget.style.borderColor = datasetMeta ? 'var(--color-cloud)' : 'rgba(228, 43, 12, 0.2)'
+                  e.currentTarget.style.background = datasetMeta ? 'transparent' : 'rgba(204, 145, 102, 0.08)'
+                  e.currentTarget.style.borderColor = datasetMeta ? 'var(--border-subtle)' : 'rgba(204, 145, 102, 0.2)'
                   e.currentTarget.style.color = datasetMeta ? 'var(--text-secondary)' : 'var(--color-vermillion-signal)'
                 }}
               >
@@ -432,7 +432,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 padding: collapsed ? '9px' : '9px 10px',
                 borderRadius: 'var(--radius-md)',
                 background: 'var(--bg-primary)',
-                border: '1px solid var(--color-cloud)',
+                border: '1px solid var(--border-subtle)',
                 color: 'var(--text-secondary)',
                 fontSize: '0.82rem', fontWeight: 500,
                 cursor: 'pointer', fontFamily: 'inherit',
@@ -450,8 +450,8 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 <span style={{
                   marginLeft: 'auto',
                   fontSize: '0.6rem', fontWeight: 700, padding: '2px 7px',
-                  borderRadius: 'var(--radius-sm)', background: 'rgba(228, 43, 12, 0.1)',
-                  border: '1px solid rgba(228, 43, 12, 0.25)',
+                  borderRadius: 'var(--radius-sm)', background: 'rgba(204, 145, 102, 0.1)',
+                  border: '1px solid rgba(204, 145, 102, 0.25)',
                   color: 'var(--color-vermillion-signal)',
                 }}>
                   <Zap size={9} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 2 }} />
@@ -492,13 +492,13 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                     style={{
                       width: 28, height: 28, borderRadius: 'var(--radius-md)',
                       background: 'transparent',
-                      border: '1px solid var(--color-cloud)',
+                      border: '1px solid var(--border-subtle)',
                       color: 'var(--text-secondary)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s ease',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(228, 43, 12, 0.08)'; e.currentTarget.style.borderColor = 'rgba(228, 43, 12, 0.2)'; e.currentTarget.style.color = 'var(--color-vermillion-signal)' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--color-cloud)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(204, 145, 102, 0.08)'; e.currentTarget.style.borderColor = 'rgba(204, 145, 102, 0.2)'; e.currentTarget.style.color = 'var(--color-vermillion-signal)' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
                   >
                     <LogOut size={13} />
                   </button>
@@ -517,7 +517,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             borderRight: '1px solid var(--border-subtle)',
             display: 'flex', flexDirection: 'column',
             transform: sidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
-            transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
+            transition: 'transform 0.33s cubic-bezier(0.4,0,0.2,1)',
             overflowY: 'auto',
           }}
         >
@@ -528,14 +528,14 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             borderBottom: '1px solid var(--border-subtle)',
           }}>
             <div style={{
-              width: 34, height: 34, borderRadius: 'var(--radius-md)',
+              width: 34, height: 34, borderRadius: 'var(--radius-sm)',
               background: 'var(--color-vermillion-signal)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 17,
             }}>🧠</div>
             <span style={{
               fontWeight: 600, fontSize: '1.05rem',
-              color: 'var(--color-slate-900)',
+              color: 'var(--color-paper)',
             }}>MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span></span>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -584,7 +584,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             <button onClick={() => setIsConfigOpen(true)} style={{
               display: 'flex', alignItems: 'center', gap: 9,
               padding: '9px 10px', borderRadius: 'var(--radius-md)', width: '100%',
-              background: 'var(--bg-primary)', border: '1px solid var(--color-cloud)',
+              background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)',
               color: 'var(--text-secondary)', fontSize: '0.82rem', fontWeight: 500,
               cursor: 'pointer', fontFamily: 'inherit', marginBottom: 8,
             }}>
@@ -596,7 +596,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.displayName || 'User'}</div>
                 <div style={{ fontSize: '0.67rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
               </div>
-              <button onClick={logOut} style={{ width: 26, height: 26, borderRadius: 'var(--radius-md)', background: 'rgba(228, 43, 12, 0.08)', border: '1px solid rgba(228, 43, 12, 0.2)', color: 'var(--color-vermillion-signal)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <button onClick={logOut} style={{ width: 26, height: 26, borderRadius: 'var(--radius-md)', background: 'rgba(204, 145, 102, 0.08)', border: '1px solid rgba(204, 145, 102, 0.2)', color: 'var(--color-vermillion-signal)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                 <LogOut size={12} />
               </button>
             </div>
@@ -628,8 +628,8 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
           {datasetMeta && (
             <span style={{
               marginLeft: 'auto', padding: '3px 10px', borderRadius: 'var(--radius-md)',
-              background: 'var(--color-vellum)', border: '1px solid var(--color-cloud)',
-              fontSize: '0.68rem', color: 'var(--color-slate-700)', fontWeight: 600,
+              background: 'var(--color-slate)', border: '1px solid var(--border-subtle)',
+              fontSize: '0.68rem', color: 'var(--color-bone)', fontWeight: 600,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               maxWidth: '40vw',
             }}>
@@ -656,8 +656,8 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '10px 24px',
-              background: 'rgba(228, 43, 12, 0.05)',
-              borderBottom: '1px solid rgba(228, 43, 12, 0.15)',
+              background: 'rgba(204, 145, 102, 0.05)',
+              borderBottom: '1px solid var(--border-subtle)',
               fontSize: '0.8rem', color: 'var(--color-vermillion-signal)',
             }}>
               <AlertTriangle size={14} style={{ flexShrink: 0 }} />

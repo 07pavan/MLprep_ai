@@ -24,25 +24,25 @@ export default function VegaChart({ spec, source = 'auto', attempts = 0 }) {
       config: {
         background: 'transparent',
         axis: {
-          labelColor: '#364153',
-          titleColor: '#101828',
-          gridColor: 'rgba(0, 0, 0, 0.05)',
-          domainColor: 'rgba(0, 0, 0, 0.1)',
+          labelColor: '#acafb9',
+          titleColor: '#e2e3e9',
+          gridColor: 'rgba(46, 48, 56, 0.3)',
+          domainColor: 'rgba(46, 48, 56, 0.5)',
         },
         legend: {
-          labelColor: '#364153',
-          titleColor: '#101828',
+          labelColor: '#acafb9',
+          titleColor: '#e2e3e9',
         },
         title: {
-          color: '#101828',
-          fontSize: 14,
-          font: 'Outfit',
+          color: '#e2e3e9',
+          fontSize: 15,
+          font: 'Cormorant Garamond, serif',
         },
         view: {
           stroke: 'transparent',
         },
         range: {
-          category: ['#101828', '#7928CA', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6'],
+          category: ['#cc9166', '#9194a1', '#acafb9', '#e2e3e9', '#5e616e', '#777a88', '#cdcdcd'],
         },
       },
     }
