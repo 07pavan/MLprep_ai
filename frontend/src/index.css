@@ -633,6 +633,16 @@ input, textarea { font-family: inherit; }
   .clean-options-grid { grid-template-columns: 1fr; }
   .suggestions-grid { grid-template-columns: 1fr; }
   .message-bubble { max-width: 90%; }
+  
+  .chat-input-bar {
+    position: sticky !important;
+    bottom: 64px !important;
+    margin: 0 -24px -24px !important;
+    width: calc(100% + 48px) !important;
+    z-index: 40 !important;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.04) !important;
+    border-bottom: none !important;
+  }
 }
 
 @media (min-width: 769px) and (max-width: 1280px) {

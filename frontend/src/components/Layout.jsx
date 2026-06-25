@@ -150,7 +150,15 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
   const { user, logOut } = useAuth()
   const sidebarRef = useRef(null)
 
-  const sidebarWidth = collapsed ? 64 : 260
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  const sidebarWidth = isMobile ? 0 : (collapsed ? 64 : 260)
 
   useEffect(() => { setSidebarOpen(false) }, [activePage])
 
@@ -622,6 +630,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
           style={{
             flex: 1,
             marginLeft: sidebarWidth,
+            paddingTop: isMobile ? 56 : 0,
             minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',

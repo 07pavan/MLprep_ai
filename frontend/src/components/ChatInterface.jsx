@@ -294,53 +294,98 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
       </div>
 
       {/* Input bar */}
-      <div className="chat-input-bar">
-        {/* Persona selector (left side) */}
-        <PersonaSelector value={persona} onChange={setPersona} />
+      <div className="chat-input-bar" style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        padding: '12px 16px',
+        borderTop: '1px solid var(--border-subtle)',
+        background: 'var(--bg-surface)',
+      }}>
+        {/* Control Row */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          width: '100%',
+          justifyContent: 'space-between',
+        }}>
+          <PersonaSelector value={persona} onChange={setPersona} />
 
-        {/* Developer Mode toggle */}
-        <button 
-          className="btn-ghost"
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 6, 
-            fontSize: '0.8rem', 
-            padding: '4px 10px',
-            borderRadius: 8,
-            border: debugMode ? '1px solid var(--accent-1)' : '1px solid var(--border-subtle)',
-            background: debugMode ? 'rgba(255,0,127,0.12)' : 'transparent',
-            color: debugMode ? 'var(--text-primary)' : 'var(--text-secondary)'
-          }}
-          onClick={() => setDebugMode(!debugMode)}
-          title="Toggle developer mode to inspect executed code"
-        >
-          <Code size={14} style={{ color: debugMode ? 'var(--accent-1)' : 'inherit' }} />
-          <span>Dev Mode</span>
-        </button>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button 
+              className="btn-ghost"
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 6, 
+                fontSize: '0.78rem', 
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-sm)',
+                border: debugMode ? '1px solid var(--color-vermillion-signal)' : '1px solid var(--border-subtle)',
+                background: debugMode ? 'rgba(228, 43, 12, 0.08)' : 'transparent',
+                color: debugMode ? 'var(--text-primary)' : 'var(--text-secondary)'
+              }}
+              onClick={() => setDebugMode(!debugMode)}
+              title="Toggle developer mode to inspect executed code"
+            >
+              <Code size={14} style={{ color: debugMode ? 'var(--color-vermillion-signal)' : 'inherit' }} />
+              <span>Dev Mode</span>
+            </button>
 
-        {/* Clear history icon */}
-        {messages.length > 0 && (
-          <button className="btn-icon" onClick={clearHistory} title="Clear history">
-            <Trash2 size={16} />
+            {messages.length > 0 && (
+              <button className="btn-icon" onClick={clearHistory} title="Clear history" style={{ width: 32, height: 32 }}>
+                <Trash2 size={15} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Input Textbox & Send Button Row */}
+        <div style={{
+          display: 'flex',
+          gap: 8,
+          width: '100%',
+          alignItems: 'flex-end',
+        }}>
+          <textarea
+            className="input-field"
+            placeholder="Ask a question about your data…"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            rows={1}
+            style={{
+              flex: 1,
+              borderRadius: 'var(--radius-md)',
+              minHeight: 44,
+              maxHeight: 120,
+              resize: 'none',
+              border: '1px solid var(--color-cloud)',
+              padding: '12px 14px',
+              fontSize: '0.9rem',
+            }}
+          />
+          <button
+            className="chat-send-btn"
+            onClick={() => handleSend()}
+            disabled={!input.trim() || isLoading}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-vermillion-signal)',
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed',
+            }}
+          >
+            <Send size={18} />
           </button>
-        )}
-
-        <textarea
-          className="input-field"
-          placeholder="Ask a question about your data…"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          rows={1}
-        />
-        <button
-          className="chat-send-btn"
-          onClick={() => handleSend()}
-          disabled={!input.trim() || isLoading}
-        >
-          <Send size={18} />
-        </button>
+        </div>
       </div>
     </div>
   )
