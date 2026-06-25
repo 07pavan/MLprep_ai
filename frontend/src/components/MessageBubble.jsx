@@ -4,12 +4,12 @@ import DataTable from './DataTable'
 import VegaChart from './VegaChart'
 import InsightCard from './InsightCard'
 
-// Intent colour map (for v2 compatibility)
+// Intent colour map
 const INTENT_COLORS = {
-  analysis_only:              { bg: 'transparent', fg: '#acafb9', border: '#464853', label: 'Analysis' },
-  analysis_and_visualization: { bg: 'transparent', fg: '#acafb9', border: '#464853', label: 'Visualization' },
-  insights:                   { bg: 'transparent', fg: '#acafb9', border: '#464853', label: 'Insights' },
-  cleaning_report:            { bg: 'transparent', fg: '#cc9166', border: '#cc9166', label: 'Cleaning' },
+  analysis_only:              { bg: 'var(--color-fog)', fg: 'var(--color-graphite)', border: 'rgba(163,166,175,0.35)', label: 'Analysis' },
+  analysis_and_visualization: { bg: 'var(--color-fog)', fg: 'var(--color-graphite)', border: 'rgba(163,166,175,0.35)', label: 'Visualization' },
+  insights:                   { bg: 'var(--color-fog)', fg: 'var(--color-graphite)', border: 'rgba(163,166,175,0.35)', label: 'Insights' },
+  cleaning_report:            { bg: 'var(--color-apricot)', fg: 'var(--color-rust)', border: 'var(--color-apricot-mid)', label: 'Cleaning' },
 }
 
 function IntentBadge({ intent }) {

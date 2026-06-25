@@ -8,14 +8,13 @@ function FeaturePill({ icon, label }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 6,
       padding: '6px 14px',
-      borderRadius: 'var(--radius-sm)',
-      background: 'var(--color-slate)',
-      border: '1px solid var(--color-iron)',
+      borderRadius: 'var(--radius-full)',
+      background: 'var(--color-fog)',
+      border: '1px solid rgba(163, 166, 175, 0.35)',
       fontSize: '0.74rem',
-      color: 'var(--color-bone)',
+      color: 'var(--color-graphite)',
       fontWeight: 500,
       whiteSpace: 'nowrap',
-      boxShadow: 'none',
     }}>
       <span>{icon}</span>
       <span>{label}</span>
