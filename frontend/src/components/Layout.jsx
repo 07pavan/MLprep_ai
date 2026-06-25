@@ -3,7 +3,7 @@ import {
   MessageSquare, BarChart2, Sparkles, HelpCircle,
   Wrench, Database, LogOut, Activity, ShieldCheck, Brain,
   Folder, Wand2, AreaChart, BookOpen, Sliders, AlertTriangle,
-  ChevronRight, Menu, X, Upload, Plus, Zap
+  ChevronRight, Menu, X, Upload, Plus, Zap, ArrowLeft
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import LLMConfigModal from './LLMConfigModal'
@@ -145,7 +145,7 @@ function NavItem({ item, isActive, onClick, collapsed }) {
   )
 }
 
-export default function Layout({ children, activePage, onPageChange, datasetMeta, onClearSession }) {
+export default function Layout({ children, activePage, onPageChange, datasetMeta, onClearSession, canGoBack, onGoBack }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [isConfigOpen, setIsConfigOpen] = useState(false)
@@ -674,6 +674,36 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
               overflowX: 'hidden',
             }}
           >
+            {/* Back button strip — shown on every page except chat */}
+            {canGoBack && activePage !== 'chat' && (
+              <div style={{ marginBottom: 16 }}>
+                <button
+                  onClick={onGoBack}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 7,
+                    padding: '6px 14px',
+                    borderRadius: 'var(--radius-full)',
+                    background: 'var(--color-fog)',
+                    border: '1px solid rgba(163, 166, 175, 0.4)',
+                    color: 'var(--color-graphite)',
+                    fontSize: '0.8rem', fontWeight: 600,
+                    cursor: 'pointer', fontFamily: 'inherit',
+                    transition: 'all 0.15s ease',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'var(--color-mist)'
+                    e.currentTarget.style.color = 'var(--color-ink)'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'var(--color-fog)'
+                    e.currentTarget.style.color = 'var(--color-graphite)'
+                  }}
+                >
+                  <ArrowLeft size={14} />
+                  Back
+                </button>
+              </div>
+            )}
             {children}
           </div>
         </div>

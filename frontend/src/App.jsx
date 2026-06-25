@@ -95,15 +95,34 @@ function DashboardContent() {
   }
 
   const [activePage, setActivePage] = useState(getInitialPage)
+  const [historyStack, setHistoryStack] = useState([])   // navigation back-stack
 
   const handlePageChange = (page) => {
+    setHistoryStack(prev => [...prev, activePage])         // push current → history
     setActivePage(page)
     const path = page === 'chat' ? '/' : `/${page}`
     window.history.pushState(null, '', path)
   }
 
+  const goBack = () => {
+    setHistoryStack(prev => {
+      if (prev.length === 0) return prev
+      const last = prev[prev.length - 1]
+      const next = prev.slice(0, -1)
+      setActivePage(last)
+      const path = last === 'chat' ? '/' : `/${last}`
+      window.history.pushState(null, '', path)
+      return next
+    })
+  }
+
+  const canGoBack = historyStack.length > 0
+
   useEffect(() => {
-    const handlePopState = () => setActivePage(getInitialPage())
+    const handlePopState = () => {
+      setActivePage(getInitialPage())
+      setHistoryStack([])    // reset stack on browser back/forward
+    }
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
@@ -203,7 +222,6 @@ function DashboardContent() {
             currentDatasetId={currentDatasetId}
             onDeleteActiveDataset={() => { clearSession(); setDatasetCheck('loading') }}
             onUploadNew={() => { clearSession(); setDatasetCheck('empty') }}
-            onBack={() => handlePageChange('chat')}
           />
         )
       case 'profile':
@@ -242,6 +260,8 @@ function DashboardContent() {
       onPageChange={handlePageChange}
       datasetMeta={datasetMeta}
       onClearSession={clearSession}
+      canGoBack={canGoBack}
+      onGoBack={goBack}
     >
       {renderPage()}
     </Layout>
