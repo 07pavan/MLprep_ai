@@ -203,6 +203,7 @@ function DashboardContent() {
             currentDatasetId={currentDatasetId}
             onDeleteActiveDataset={() => { clearSession(); setDatasetCheck('loading') }}
             onUploadNew={() => { clearSession(); setDatasetCheck('empty') }}
+            onBack={() => handlePageChange('chat')}
           />
         )
       case 'profile':

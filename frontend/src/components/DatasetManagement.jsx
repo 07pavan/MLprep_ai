@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { listDatasets, activateDataset, deleteDataset } from '../services/mlApi'
-import { Trash2, Check, ExternalLink, Calendar, Database, Layers, Upload, Plus } from 'lucide-react'
+import { Trash2, Check, ExternalLink, Calendar, Database, Layers, Upload, Plus, ArrowLeft } from 'lucide-react'
 
-export default function DatasetManagement({ onActivateSuccess, currentDatasetId, onDeleteActiveDataset, onUploadNew }) {
+export default function DatasetManagement({ onActivateSuccess, currentDatasetId, onDeleteActiveDataset, onUploadNew, onBack }) {
   const [datasets, setDatasets] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -95,6 +95,29 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId,
     <div style={{ animation: 'fadeSlideUp 0.3s ease-out' }}>
       {/* Page header */}
       <div className="overview-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          {onBack && (
+            <button
+              onClick={onBack}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px',
+                borderRadius: 'var(--radius-full)',
+                background: 'var(--color-fog)',
+                border: '1px solid rgba(163, 166, 175, 0.4)',
+                color: 'var(--color-graphite)',
+                fontSize: '0.8rem', fontWeight: 600,
+                cursor: 'pointer', transition: 'all 0.15s ease',
+                fontFamily: 'inherit',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-mist)'; e.currentTarget.style.color = 'var(--color-ink)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-fog)'; e.currentTarget.style.color = 'var(--color-graphite)' }}
+            >
+              <ArrowLeft size={14} />
+              Back to Dashboard
+            </button>
+          )}
+        </div>
         <h1><span className="gradient-text">Dataset Registry</span></h1>
         <p>Manage uploaded and processed datasets, review versions, and toggle active working sessions.</p>
       </div>
