@@ -90,9 +90,9 @@ export default function AuthPage() {
         @keyframes fadeSlideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         .auth-card-enter { animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .auth-input { transition: border-color 0.15s ease-in-out; }
-        .auth-input:focus { outline: none; border-color: var(--color-ember-gold) !important; }
+        .auth-input:focus { outline: none; border-color: var(--color-ink) !important; box-shadow: var(--shadow-input) !important; }
         .tab-pill { transition: all 0.15s ease-in-out; }
-        .tab-pill:hover { color: var(--color-paper) !important; }
+        .tab-pill:hover { color: var(--color-ink) !important; }
       `}</style>
 
       <div style={{
@@ -116,21 +116,22 @@ export default function AuthPage() {
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
             <div style={{
               width: 56, height: 56,
-              borderRadius: 'var(--radius-sm)',
-              background: 'var(--color-vermillion-signal)',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--color-apricot)',
+              border: '1.5px solid var(--color-apricot-mid)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 26,
               margin: '0 auto 16px',
-              boxShadow: 'none',
             }}>
               🧠
             </div>
             <h1 style={{
-              fontSize: '2rem', fontWeight: 600, letterSpacing: '-0.025em',
-              color: 'var(--color-paper)',
+              fontSize: '2rem', fontWeight: 600, letterSpacing: '-0.02em',
+              color: 'var(--color-ink)',
               marginBottom: 8,
+              fontFamily: 'var(--font-serif)',
             }}>
-              MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span>
+              MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span>
             </h1>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Your AI-powered data analyst & ML preparation suite
@@ -146,11 +147,11 @@ export default function AuthPage() {
 
           {/* Card */}
           <div style={{
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border-subtle)',
+            background: 'var(--color-white)',
+            border: '1px solid rgba(163, 166, 175, 0.25)',
             borderRadius: 'var(--radius-lg)',
             padding: '36px 32px',
-            boxShadow: 'none',
+            boxShadow: 'var(--shadow-subtle)',
           }}>
 
             {/* Dev mode banner */}
@@ -158,15 +159,15 @@ export default function AuthPage() {
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8,
                 padding: '10px 14px',
-                background: 'var(--color-slate)',
-                border: '1px solid var(--color-iron)',
-                borderRadius: 'var(--radius-md)',
+                background: 'var(--color-sky)',
+                border: '1px solid var(--color-sky-mid)',
+                borderRadius: 'var(--radius-sm)',
                 marginBottom: 20,
                 fontSize: '0.76rem',
-                color: 'var(--color-bone)',
+                color: 'var(--color-blue)',
                 fontWeight: 500,
               }}>
-                <Sparkles size={13} style={{ color: 'var(--color-vermillion-signal)' }} />
+                <Sparkles size={13} style={{ color: 'var(--color-blue)' }} />
                 <span>Dev mode — any credentials will work</span>
               </div>
             )}
@@ -174,9 +175,9 @@ export default function AuthPage() {
             {/* Tab switcher */}
             <div style={{
               display: 'flex',
-              background: 'var(--color-inkwell)',
-              border: '1px solid var(--color-iron)',
-              borderRadius: 'var(--radius-md)',
+              background: 'var(--color-fog)',
+              border: '1px solid rgba(163, 166, 175, 0.35)',
+              borderRadius: 'var(--radius-full)',
               padding: 4,
               marginBottom: 24,
             }}>
@@ -190,11 +191,11 @@ export default function AuthPage() {
                   onClick={() => { setIsSignUp(key); setError('') }}
                   style={{
                     flex: 1, padding: '9px 12px',
-                    borderRadius: 'var(--radius-md)',
+                    borderRadius: 'var(--radius-full)',
                     fontSize: '0.83rem', fontWeight: 600,
-                    color: isSignUp === key ? '#ffffff' : 'var(--text-muted)',
+                    color: isSignUp === key ? '#ffffff' : 'var(--color-graphite)',
                     background: isSignUp === key
-                      ? 'var(--color-vermillion-signal)'
+                      ? 'var(--color-ink)'
                       : 'transparent',
                     border: 'none',
                     cursor: 'pointer',
@@ -210,10 +211,10 @@ export default function AuthPage() {
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: 10,
                 padding: '12px 14px',
-                background: 'rgba(204, 145, 102, 0.05)',
-                border: '1px solid rgba(204, 145, 102, 0.2)',
-                borderRadius: 'var(--radius-md)', marginBottom: 20,
-                fontSize: '0.8rem', color: 'var(--color-vermillion-signal)', lineHeight: 1.4,
+                background: 'rgba(192, 57, 43, 0.05)',
+                border: '1px solid rgba(192, 57, 43, 0.2)',
+                borderRadius: 'var(--radius-sm)', marginBottom: 20,
+                fontSize: '0.8rem', color: 'var(--error)', lineHeight: 1.4,
               }}>
                 <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
                 <span>{error}</span>
@@ -225,13 +226,13 @@ export default function AuthPage() {
 
               {/* Email */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-silver)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-graphite)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                   Email Address
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Mail size={15} style={{
                     position: 'absolute', left: 14, top: '50%',
-                    transform: 'translateY(-50%)', color: 'var(--color-mist)',
+                    transform: 'translateY(-50%)', color: 'var(--color-dove)',
                     pointerEvents: 'none',
                   }} />
                   <input
@@ -250,7 +251,7 @@ export default function AuthPage() {
 
               {/* Password */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-silver)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-graphite)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                   Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -289,7 +290,7 @@ export default function AuthPage() {
               {/* Confirm Password */}
               {isSignUp && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-silver)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-graphite)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                     Confirm Password
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -329,7 +330,7 @@ export default function AuthPage() {
                   <div style={{
                     width: 18, height: 18, borderRadius: '50%',
                     border: '2px solid rgba(255,255,255,0.3)',
-                    borderTopColor: 'var(--color-inkwell)',
+                    borderTopColor: 'rgba(255,255,255,0.9)',
                     animation: 'spin 0.7s linear infinite',
                   }} />
                 ) : (
@@ -343,11 +344,11 @@ export default function AuthPage() {
 
             {/* Divider */}
             <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0' }}>
-              <div style={{ flex: 1, height: 1, background: 'var(--color-iron)' }} />
-              <span style={{ padding: '0 14px', fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <div style={{ flex: 1, height: 1, background: 'rgba(163, 166, 175, 0.4)' }} />
+              <span style={{ padding: '0 14px', fontSize: '0.7rem', color: 'var(--color-graphite)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 or
               </span>
-              <div style={{ flex: 1, height: 1, background: 'var(--color-iron)' }} />
+              <div style={{ flex: 1, height: 1, background: 'rgba(163, 166, 175, 0.4)' }} />
             </div>
 
             {/* Google Sign In */}
@@ -374,20 +375,20 @@ export default function AuthPage() {
             {/* Footer note */}
             <p style={{
               textAlign: 'center', marginTop: 24,
-              fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.5,
+              fontSize: '0.72rem', color: 'var(--color-graphite)', lineHeight: 1.5,
             }}>
               By continuing, you agree to our{' '}
-              <span style={{ color: 'var(--color-vermillion-signal)', cursor: 'pointer', fontWeight: 500 }}>Terms</span>
+              <span style={{ color: 'var(--color-rust)', cursor: 'pointer', fontWeight: 500 }}>Terms</span>
               {' & '}
-              <span style={{ color: 'var(--color-vermillion-signal)', cursor: 'pointer', fontWeight: 500 }}>Privacy Policy</span>
+              <span style={{ color: 'var(--color-rust)', cursor: 'pointer', fontWeight: 500 }}>Privacy Policy</span>
             </p>
           </div>
 
           {/* Bottom tagline */}
           <div style={{ textAlign: 'center', marginTop: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
             {['No data stored externally', 'Free Groq AI included', 'Open source'].map((t, i) => (
-              <span key={i} style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ color: 'var(--color-vermillion-signal)', fontWeight: 'bold' }}>✓</span> {t}
+              <span key={i} style={{ fontSize: '0.7rem', color: 'var(--color-graphite)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ color: 'var(--color-rust)', fontWeight: 'bold' }}>✓</span> {t}
               </span>
             ))}
           </div>

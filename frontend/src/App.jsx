@@ -214,28 +214,29 @@ function AppShell() {
       }}>
         <div style={{
           width: 56, height: 56,
-          borderRadius: 'var(--radius-lg)',
-          background: 'var(--color-vermillion-signal)',
+          borderRadius: 'var(--radius-full)',
+          background: 'var(--color-apricot)',
+          border: '1px solid var(--color-apricot-mid)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 26,
-          boxShadow: 'var(--shadow-subtle)',
         }}>🧠</div>
         <div style={{
           width: 32, height: 32, borderRadius: '50%',
-          border: '3px solid var(--color-cloud)',
-          borderTopColor: 'var(--color-vermillion-signal)',
+          border: '3px solid rgba(163, 166, 175, 0.25)',
+          borderTopColor: 'var(--color-ink)',
           animation: 'spin 0.8s linear infinite',
         }} />
         <div style={{ textAlign: 'center' }}>
           <div style={{
             fontSize: '1.2rem', fontWeight: 600,
-            color: 'var(--color-slate-900)',
+            color: 'var(--color-ink)',
             marginBottom: 4,
-            letterSpacing: '-0.01em',
+            letterSpacing: '-0.02em',
+            fontFamily: 'var(--font-serif)',
           }}>
-            MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span>
+            MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>
+          <div style={{ color: 'var(--color-graphite)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>
             Initializing…
           </div>
         </div>

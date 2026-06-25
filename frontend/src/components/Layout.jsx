@@ -57,10 +57,11 @@ function UserAvatar({ user, size = 32 }) {
     <div style={{
       width: size, height: size,
       borderRadius: '50%',
-      background: 'var(--color-vermillion-signal)',
+      background: 'var(--color-apricot)',
+      border: '1.5px solid var(--color-apricot-mid)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontWeight: 700, fontSize: size * 0.35,
-      color: '#fff', flexShrink: 0,
+      color: 'var(--color-rust)', flexShrink: 0,
       boxShadow: 'none',
     }}>
       {user?.photoURL ? (
@@ -88,11 +89,12 @@ function NavItem({ item, isActive, onClick, collapsed }) {
         borderRadius: 'var(--radius-md)',
         width: '100%',
         justifyContent: collapsed ? 'center' : 'flex-start',
-        color: isActive ? 'var(--color-vermillion-signal)' : (hovered ? 'var(--text-primary)' : 'var(--text-secondary)'),
+        color: isActive ? 'var(--color-ink)' : (hovered ? 'var(--color-ink)' : 'var(--color-graphite)'),
         background: isActive
-          ? 'rgba(204, 145, 102, 0.08)'
-          : (hovered ? 'var(--bg-glass-hover)' : 'transparent'),
-        border: isActive ? '1px solid rgba(204, 145, 102, 0.22)' : '1px solid transparent',
+          ? 'var(--color-white)'
+          : (hovered ? 'var(--color-white)' : 'transparent'),
+        border: isActive ? '1px solid rgba(163, 166, 175, 0.3)' : '1px solid transparent',
+        boxShadow: isActive ? 'var(--shadow-card)' : 'none',
         cursor: 'pointer',
         transition: 'all 0.18s ease',
         fontFamily: 'inherit',
@@ -109,7 +111,7 @@ function NavItem({ item, isActive, onClick, collapsed }) {
         <div style={{
           position: 'absolute', left: 0, top: '20%', bottom: '20%',
           width: 3, borderRadius: 3,
-          background: 'var(--color-vermillion-signal)',
+          background: 'var(--color-rust)',
         }} />
       )}
 
@@ -117,8 +119,8 @@ function NavItem({ item, isActive, onClick, collapsed }) {
         size={17}
         style={{
           flexShrink: 0,
-          color: isActive ? 'var(--color-vermillion-signal)' : 'inherit',
-          opacity: isActive ? 1 : 0.75,
+          color: isActive ? 'var(--color-rust)' : 'inherit',
+          opacity: isActive ? 1 : 0.7,
         }}
       />
 
@@ -128,10 +130,10 @@ function NavItem({ item, isActive, onClick, collapsed }) {
           {hot && (
             <span style={{
               fontSize: '0.58rem', fontWeight: 700,
-              padding: '2px 6px', borderRadius: 'var(--radius-sm)',
-              background: 'rgba(204, 145, 102, 0.1)',
-              border: '1px solid rgba(204, 145, 102, 0.2)',
-              color: 'var(--color-vermillion-signal)',
+              padding: '2px 6px', borderRadius: 'var(--radius-full)',
+              background: 'var(--color-apricot)',
+              border: '1px solid var(--color-apricot-mid)',
+              color: 'var(--color-rust)',
               letterSpacing: '0.04em',
             }}>
               AI
@@ -197,7 +199,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
         .main-page-content { animation: slideInLeft 0.25s cubic-bezier(0.16,1,0.3,1) forwards; }
         .sidebar-scroll::-webkit-scrollbar { width: 3px; }
         .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--color-cloud); border-radius: 3px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--color-dove); border-radius: 3px; }
         @media (max-width: 768px) {
           .desktop-sidebar { display: none !important; }
           .mobile-topbar { display: flex !important; }
@@ -256,8 +258,8 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             minHeight: 64,
           }}>
             <div style={{
-              width: 36, height: 36, borderRadius: 'var(--radius-sm)',
-              background: 'var(--color-vermillion-signal)',
+              width: 36, height: 36, borderRadius: 'var(--radius-full)',
+              background: 'var(--color-ink)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 18, flexShrink: 0,
               boxShadow: 'none',
@@ -268,22 +270,23 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
               <>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontWeight: 600, fontSize: '1.1rem', letterSpacing: '-0.025em',
-                    color: 'var(--color-paper)',
+                    fontWeight: 700, fontSize: '1.05rem', letterSpacing: '-0.025em',
+                    color: 'var(--color-ink)',
+                    fontFamily: 'var(--font-serif)',
                   }}>
-                    MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span>
+                    MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span>
                   </div>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--color-silver)', marginTop: -1 }}>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--color-graphite)', marginTop: -1 }}>
                     Data Intelligence Platform
                   </div>
                 </div>
                 <button
                   onClick={() => setCollapsed(true)}
                   style={{
-                    width: 26, height: 26, borderRadius: 'var(--radius-md)',
-                    background: 'var(--bg-glass-hover)',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--color-silver)',
+                    width: 26, height: 26, borderRadius: 'var(--radius-full)',
+                    background: 'var(--color-mist)',
+                    border: '1px solid rgba(163, 166, 175, 0.4)',
+                    color: 'var(--color-graphite)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer', flexShrink: 0,
                     transition: 'all 0.2s ease',
@@ -299,10 +302,10 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 onClick={() => setCollapsed(false)}
                 style={{
                   position: 'absolute', top: 18, right: -10,
-                  width: 20, height: 20, borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(204, 145, 102, 0.15)',
-                  border: '1px solid rgba(204, 145, 102, 0.3)',
-                  color: 'var(--color-vermillion-signal)',
+                  width: 20, height: 20, borderRadius: 'var(--radius-full)',
+                  background: 'var(--color-apricot)',
+                  border: '1px solid var(--color-apricot-mid)',
+                  color: 'var(--color-rust)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', zIndex: 10,
                 }}
@@ -317,10 +320,11 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             <div style={{
               margin: '12px 12px 4px',
               padding: '10px 13px',
-              background: 'var(--color-slate)',
-              border: '1px solid var(--border-subtle)',
+              background: 'var(--color-white)',
+              border: '1px solid rgba(163, 166, 175, 0.3)',
               borderRadius: 'var(--radius-lg)',
               flexShrink: 0,
+              boxShadow: 'var(--shadow-card)',
             }}>
               <div style={{
                 fontSize: '0.8rem', fontWeight: 600,
@@ -342,26 +346,18 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
               <button
                 onClick={onClearSession}
                 style={{
-                  width: '100%', padding: '8px 12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: datasetMeta ? 'transparent' : 'rgba(204, 145, 102, 0.08)',
-                  border: `1px solid ${datasetMeta ? 'var(--border-subtle)' : 'rgba(204, 145, 102, 0.2)'}`,
-                  color: datasetMeta ? 'var(--text-secondary)' : 'var(--color-vermillion-signal)',
+                  width: '100%', padding: '9px 14px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--color-ink)',
+                  border: 'none',
+                  color: 'var(--color-white)',
                   fontSize: '0.78rem', fontWeight: 600,
                   display: 'flex', alignItems: 'center', gap: 7,
                   cursor: 'pointer', fontFamily: 'inherit',
-                  transition: 'all 0.2s ease',
+                  transition: 'opacity 0.15s ease',
                 }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(204, 145, 102, 0.1)'
-                  e.currentTarget.style.borderColor = 'rgba(204, 145, 102, 0.25)'
-                  e.currentTarget.style.color = 'var(--color-vermillion-signal)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = datasetMeta ? 'transparent' : 'rgba(204, 145, 102, 0.08)'
-                  e.currentTarget.style.borderColor = datasetMeta ? 'var(--border-subtle)' : 'rgba(204, 145, 102, 0.2)'
-                  e.currentTarget.style.color = datasetMeta ? 'var(--text-secondary)' : 'var(--color-vermillion-signal)'
-                }}
+                onMouseEnter={e => { e.currentTarget.style.opacity = '0.8' }}
+                onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
               >
                 {datasetMeta ? <><Upload size={13} /> Load New Dataset</> : <><Plus size={13} /> Upload Dataset</>}
               </button>
@@ -430,18 +426,18 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 display: 'flex', alignItems: 'center',
                 gap: collapsed ? 0 : 9,
                 padding: collapsed ? '9px' : '9px 10px',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-primary)',
-                border: '1px solid var(--border-subtle)',
-                color: 'var(--text-secondary)',
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--color-mist)',
+                border: '1px solid rgba(163, 166, 175, 0.35)',
+                color: 'var(--color-ash)',
                 fontSize: '0.82rem', fontWeight: 500,
                 cursor: 'pointer', fontFamily: 'inherit',
                 width: '100%',
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 transition: 'all 0.18s ease',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-glass-hover)'; e.currentTarget.style.color = 'var(--text-primary)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-primary)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-white)'; e.currentTarget.style.color = 'var(--color-ink)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-mist)'; e.currentTarget.style.color = 'var(--color-ash)' }}
               title={collapsed ? 'AI Settings' : undefined}
             >
               <Sliders size={15} style={{ flexShrink: 0, opacity: 0.8 }} />
@@ -450,9 +446,10 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                 <span style={{
                   marginLeft: 'auto',
                   fontSize: '0.6rem', fontWeight: 700, padding: '2px 7px',
-                  borderRadius: 'var(--radius-sm)', background: 'rgba(204, 145, 102, 0.1)',
-                  border: '1px solid rgba(204, 145, 102, 0.25)',
-                  color: 'var(--color-vermillion-signal)',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--color-sky)',
+                  border: '1px solid var(--color-sky-mid)',
+                  color: 'var(--color-blue)',
                 }}>
                   <Zap size={9} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 2 }} />
                   LLM
@@ -490,15 +487,15 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                     onClick={logOut}
                     title="Log Out"
                     style={{
-                      width: 28, height: 28, borderRadius: 'var(--radius-md)',
-                      background: 'transparent',
-                      border: '1px solid var(--border-subtle)',
-                      color: 'var(--text-secondary)',
+                      width: 28, height: 28, borderRadius: 'var(--radius-full)',
+                      background: 'var(--color-mist)',
+                      border: '1px solid rgba(163, 166, 175, 0.35)',
+                      color: 'var(--color-graphite)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       cursor: 'pointer', flexShrink: 0, transition: 'all 0.2s ease',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(204, 145, 102, 0.08)'; e.currentTarget.style.borderColor = 'rgba(204, 145, 102, 0.2)'; e.currentTarget.style.color = 'var(--color-vermillion-signal)' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-apricot)'; e.currentTarget.style.borderColor = 'var(--color-apricot-mid)'; e.currentTarget.style.color = 'var(--color-rust)' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'var(--color-mist)'; e.currentTarget.style.borderColor = 'rgba(163, 166, 175, 0.35)'; e.currentTarget.style.color = 'var(--color-graphite)' }}
                   >
                     <LogOut size={13} />
                   </button>
@@ -528,22 +525,23 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             borderBottom: '1px solid var(--border-subtle)',
           }}>
             <div style={{
-              width: 34, height: 34, borderRadius: 'var(--radius-sm)',
-              background: 'var(--color-vermillion-signal)',
+              width: 34, height: 34, borderRadius: 'var(--radius-full)',
+              background: 'var(--color-ink)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 17,
             }}>🧠</div>
             <span style={{
-              fontWeight: 600, fontSize: '1.05rem',
-              color: 'var(--color-paper)',
-            }}>MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span></span>
+              fontWeight: 700, fontSize: '1.05rem',
+              color: 'var(--color-ink)',
+              fontFamily: 'var(--font-serif)',
+            }}>MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span></span>
             <button
               onClick={() => setSidebarOpen(false)}
               style={{
-                marginLeft: 'auto', width: 28, height: 28, borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-glass-hover)',
-                border: '1px solid var(--border-subtle)',
-                color: 'var(--text-secondary)',
+                marginLeft: 'auto', width: 28, height: 28, borderRadius: 'var(--radius-full)',
+                background: 'var(--color-mist)',
+                border: '1px solid rgba(163, 166, 175, 0.35)',
+                color: 'var(--color-graphite)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer',
               }}
@@ -583,9 +581,9 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
           <div style={{ padding: '12px', borderTop: '1px solid var(--border-subtle)' }}>
             <button onClick={() => setIsConfigOpen(true)} style={{
               display: 'flex', alignItems: 'center', gap: 9,
-              padding: '9px 10px', borderRadius: 'var(--radius-md)', width: '100%',
-              background: 'var(--bg-primary)', border: '1px solid var(--border-subtle)',
-              color: 'var(--text-secondary)', fontSize: '0.82rem', fontWeight: 500,
+              padding: '9px 10px', borderRadius: 'var(--radius-sm)', width: '100%',
+              background: 'var(--color-mist)', border: '1px solid rgba(163, 166, 175, 0.35)',
+              color: 'var(--color-ash)', fontSize: '0.82rem', fontWeight: 500,
               cursor: 'pointer', fontFamily: 'inherit', marginBottom: 8,
             }}>
               <Sliders size={15} /> AI Settings
@@ -593,10 +591,10 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '4px 6px' }}>
               <UserAvatar user={user} size={30} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.displayName || 'User'}</div>
-                <div style={{ fontSize: '0.67rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
+                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.displayName || 'User'}</div>
+                <div style={{ fontSize: '0.67rem', color: 'var(--color-graphite)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email}</div>
               </div>
-              <button onClick={logOut} style={{ width: 26, height: 26, borderRadius: 'var(--radius-md)', background: 'rgba(204, 145, 102, 0.08)', border: '1px solid rgba(204, 145, 102, 0.2)', color: 'var(--color-vermillion-signal)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <button onClick={logOut} style={{ width: 26, height: 26, borderRadius: 'var(--radius-full)', background: 'var(--color-apricot)', border: '1px solid var(--color-apricot-mid)', color: 'var(--color-rust)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
                 <LogOut size={12} />
               </button>
             </div>
@@ -618,18 +616,18 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
         >
           <button
             onClick={() => setSidebarOpen(true)}
-            style={{ color: 'var(--text-primary)', padding: 6, borderRadius: 'var(--radius-md)', background: 'var(--bg-glass-hover)', border: '1px solid var(--border-subtle)', cursor: 'pointer' }}
+            style={{ color: 'var(--color-ink)', padding: 6, borderRadius: 'var(--radius-sm)', background: 'var(--color-mist)', border: '1px solid rgba(163, 166, 175, 0.35)', cursor: 'pointer' }}
           >
             <Menu size={19} />
           </button>
-          <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+          <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--color-ink)', fontFamily: 'var(--font-serif)' }}>
             {activeLabel}
           </span>
           {datasetMeta && (
             <span style={{
-              marginLeft: 'auto', padding: '3px 10px', borderRadius: 'var(--radius-md)',
-              background: 'var(--color-slate)', border: '1px solid var(--border-subtle)',
-              fontSize: '0.68rem', color: 'var(--color-bone)', fontWeight: 600,
+              marginLeft: 'auto', padding: '3px 12px', borderRadius: 'var(--radius-full)',
+              background: 'var(--color-apricot)', border: '1px solid var(--color-apricot-mid)',
+              fontSize: '0.68rem', color: 'var(--color-rust)', fontWeight: 600,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               maxWidth: '40vw',
             }}>
@@ -656,9 +654,9 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             <div style={{
               display: 'flex', alignItems: 'center', gap: 10,
               padding: '10px 24px',
-              background: 'rgba(204, 145, 102, 0.05)',
-              borderBottom: '1px solid var(--border-subtle)',
-              fontSize: '0.8rem', color: 'var(--color-vermillion-signal)',
+              background: 'var(--color-apricot)',
+              borderBottom: '1px solid var(--color-apricot-mid)',
+              fontSize: '0.8rem', color: 'var(--color-rust)',
             }}>
               <AlertTriangle size={14} style={{ flexShrink: 0 }} />
               <span>{datasetMeta.warning}</span>
@@ -700,14 +698,14 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
               onClick={() => onPageChange(id)}
               style={{
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                padding: '6px 10px', borderRadius: 'var(--radius-md)',
-                color: activePage === id ? 'var(--color-vermillion-signal)' : 'var(--text-secondary)',
+                padding: '6px 10px', borderRadius: 'var(--radius-sm)',
+                color: activePage === id ? 'var(--color-rust)' : 'var(--color-graphite)',
                 fontSize: '0.6rem', fontWeight: 600,
                 cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'inherit',
                 transition: 'all 0.18s ease',
               }}
             >
-              <Icon size={20} style={{ color: activePage === id ? 'var(--color-vermillion-signal)' : 'inherit', opacity: activePage === id ? 1 : 0.6 }} />
+              <Icon size={20} style={{ color: activePage === id ? 'var(--color-rust)' : 'inherit', opacity: activePage === id ? 1 : 0.6 }} />
               <span>{label}</span>
             </button>
           ))}

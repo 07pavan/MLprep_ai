@@ -146,29 +146,41 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId,
                 <div className="flex items-center gap-3 flex-shrink-0">
                   {/* ML Score indicator */}
                   {dataset.ml_readiness_score !== null && (
-                    <div className="px-3 py-1.5 bg-[var(--color-carbon)] border border-[var(--border-subtle)] flex flex-col items-center justify-center min-w-[70px]" style={{ borderRadius: 'var(--radius-sm)' }}>
-                      <span className="text-[10px] uppercase font-semibold text-[var(--text-secondary)] tracking-wider">ML Score</span>
-                      <span className="text-sm font-semibold text-[var(--text-primary)] tabular-nums">{dataset.ml_readiness_score}</span>
+                    <div style={{
+                      padding: '6px 14px',
+                      background: 'var(--color-fog)',
+                      border: '1px solid rgba(163, 166, 175, 0.35)',
+                      borderRadius: 'var(--radius-sm)',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      minWidth: 70,
+                    }}>
+                      <span style={{ fontSize: '0.6rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--color-graphite)', letterSpacing: '0.06em' }}>ML Score</span>
+                      <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-ink)', fontVariantNumeric: 'tabular-nums' }}>{dataset.ml_readiness_score}</span>
                     </div>
                   )}
 
                   <button
                     onClick={() => handleSelect(dataset.dataset_id)}
                     disabled={isActive || isWorking}
-                    className="px-4 py-2 text-xs font-semibold transition-all duration-150 flex items-center gap-1.5"
                     style={{
-                      borderRadius: 'var(--radius-sm)',
-                      background: isActive 
-                        ? 'rgba(204, 145, 102, 0.08)' 
-                        : 'var(--color-paper)',
-                      color: isActive 
-                        ? 'var(--color-ember-gold)' 
-                        : 'var(--color-inkwell)',
+                      padding: '8px 16px',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '0.78rem', fontWeight: 600,
+                      background: isActive
+                        ? 'var(--color-apricot)'
+                        : 'var(--color-ink)',
+                      color: isActive
+                        ? 'var(--color-rust)'
+                        : 'var(--color-white)',
                       border: isActive
-                        ? '1px solid rgba(204, 145, 102, 0.25)'
+                        ? '1px solid var(--color-apricot-mid)'
                         : 'none',
-                      cursor: isActive ? 'default' : 'pointer'
+                      cursor: isActive ? 'default' : 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      transition: 'opacity 0.15s ease',
                     }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.opacity = '0.8' }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
                   >
                     {isActive ? (
                       <>Selected</>

@@ -15,7 +15,13 @@ const CATEGORY_TABS = [
 export default function DataQuality({ sessionId }) {
   if (!sessionId) {
     return (
-      <div className="p-8 text-center text-[#8E9AAF] text-sm bg-[rgba(255,255,255,0.02)] rounded-lg border border-[rgba(255,255,255,0.06)] max-w-lg mx-auto my-12 animate-fade-in">
+      <div style={{
+        padding: 32, textAlign: 'center', color: 'var(--color-graphite)', fontSize: '0.88rem',
+        background: 'var(--color-white)', borderRadius: 'var(--radius-lg)',
+        border: '1px solid rgba(163, 166, 175, 0.25)',
+        maxWidth: 480, margin: '48px auto',
+        boxShadow: 'var(--shadow-card)',
+      }}>
         No active dataset. Please upload a dataset file or select one from the Datasets page.
       </div>
     )
@@ -53,9 +59,15 @@ export default function DataQuality({ sessionId }) {
 
   if (error) {
     return (
-      <div className="p-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-center max-w-lg mx-auto my-8">
-        <h3 className="text-[var(--text-primary)] font-bold mb-2">Inspection Failed</h3>
-        <p className="text-[var(--text-secondary)] text-sm">{error}</p>
+      <div style={{
+        padding: 24, borderRadius: 'var(--radius-lg)',
+        border: '1px solid rgba(163, 166, 175, 0.25)',
+        background: 'var(--color-white)',
+        textAlign: 'center', maxWidth: 480, margin: '32px auto',
+        boxShadow: 'var(--shadow-card)',
+      }}>
+        <h3 style={{ color: 'var(--color-ink)', fontWeight: 700, marginBottom: 8 }}>Inspection Failed</h3>
+        <p style={{ color: 'var(--color-ash)', fontSize: '0.875rem' }}>{error}</p>
       </div>
     )
   }
@@ -83,58 +95,77 @@ export default function DataQuality({ sessionId }) {
       </div>
 
       {total_issues === 0 ? (
-        <div className="p-8 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col items-center text-center max-w-xl mx-auto my-8" style={{ borderRadius: 'var(--radius-lg)' }}>
-          <div className="p-4 rounded-full bg-[rgba(204,145,102,0.08)] text-[var(--color-ember-gold)] mb-4">
+        <div style={{
+          padding: 32, borderRadius: 'var(--radius-lg)',
+          background: 'var(--color-white)',
+          border: '1px solid rgba(163, 166, 175, 0.25)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
+          maxWidth: 520, margin: '32px auto',
+          boxShadow: 'var(--shadow-card)',
+        }}>
+          <div style={{
+            padding: 16, borderRadius: 'var(--radius-full)',
+            background: 'var(--color-apricot)', color: 'var(--color-rust)', marginBottom: 16,
+          }}>
             <CheckCircle2 size={36} />
           </div>
-          <h3 className="text-[var(--text-primary)] font-semibold text-lg mb-2">No Issues Detected!</h3>
-          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
+          <h3 style={{ color: 'var(--color-ink)', fontWeight: 600, fontSize: '1.1rem', marginBottom: 8 }}>No Issues Detected!</h3>
+          <p style={{ color: 'var(--color-ash)', fontSize: '0.875rem', lineHeight: 1.6, maxWidth: 360 }}>
             Your dataset is clean and ready for analysis. No missing values, duplicate rows, outlier issues, or type mismatches were found.
           </p>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Summary Banner */}
-          <div className="p-6 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex items-center gap-4" style={{ borderRadius: 'var(--radius-lg)' }}>
-            <div className="p-3 rounded-lg bg-[rgba(204,145,102,0.08)] text-[var(--color-ember-gold)]">
+          <div style={{
+            padding: 24, borderRadius: 'var(--radius-lg)',
+            background: 'var(--color-white)',
+            border: '1px solid rgba(163, 166, 175, 0.25)',
+            display: 'flex', alignItems: 'center', gap: 16,
+            boxShadow: 'var(--shadow-card)',
+          }}>
+            <div style={{
+              padding: 12, borderRadius: 'var(--radius-sm)',
+              background: 'var(--color-apricot)', color: 'var(--color-rust)',
+            }}>
               <ShieldAlert size={24} />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-[var(--text-primary)]">Quality Scan Completed</h3>
-              <p className="text-sm text-[var(--text-secondary)]">
-                Found <span className="text-[var(--color-ember-gold)] font-semibold">{total_issues}</span> potential quality issues requiring review.
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-ink)' }}>Quality Scan Completed</h3>
+              <p style={{ fontSize: '0.84rem', color: 'var(--color-ash)' }}>
+                Found <span style={{ color: 'var(--color-rust)', fontWeight: 600 }}>{total_issues}</span> potential quality issues requiring review.
               </p>
             </div>
           </div>
 
           {/* Tab Selection */}
-          <div className="flex gap-2 border-b border-[var(--border-subtle)] overflow-x-auto pb-1">
+          <div style={{ display: 'flex', gap: 4, borderBottom: '1px solid rgba(163, 166, 175, 0.3)', overflowX: 'auto', paddingBottom: 1 }}>
             {CATEGORY_TABS.map(({ id, label }) => {
               const count = counts[id] || 0
-              if (id !== 'all' && count === 0) return null // Hide tab if no issues
+              if (id !== 'all' && count === 0) return null
 
               const isActive = id === activeTab
               return (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className="px-4 py-2 text-sm font-medium border-b-2 transition-all duration-150 whitespace-nowrap flex items-center gap-2"
                   style={{
-                    borderColor: isActive ? 'var(--color-ember-gold)' : 'transparent',
-                    color: isActive ? 'var(--color-ember-gold)' : 'var(--text-secondary)',
-                    background: 'none',
-                    fontWeight: isActive ? 600 : 500
+                    padding: '8px 16px',
+                    fontSize: '0.84rem', fontWeight: isActive ? 600 : 500,
+                    borderBottom: isActive ? '2px solid var(--color-rust)' : '2px solid transparent',
+                    color: isActive ? 'var(--color-rust)' : 'var(--color-graphite)',
+                    background: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    whiteSpace: 'nowrap', transition: 'color 0.15s ease',
                   }}
                 >
                   {label}
-                  <span 
-                    className="px-1.5 py-0.2 text-[10px] font-semibold"
-                    style={{
-                      borderRadius: 'var(--radius-full)',
-                      background: isActive ? 'rgba(204, 145, 102, 0.12)' : 'rgba(255, 255, 255, 0.06)',
-                      color: isActive ? 'var(--color-ember-gold)' : 'var(--text-secondary)'
-                    }}
-                  >
+                  <span style={{
+                    padding: '1px 7px', borderRadius: 'var(--radius-full)',
+                    background: isActive ? 'var(--color-apricot)' : 'var(--color-mist)',
+                    color: isActive ? 'var(--color-rust)' : 'var(--color-graphite)',
+                    fontSize: '0.68rem', fontWeight: 700,
+                  }}>
                     {count}
                   </span>
                 </button>
@@ -143,13 +174,19 @@ export default function DataQuality({ sessionId }) {
           </div>
 
           {/* Issues List */}
-          <div className="grid grid-cols-1 gap-4">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 14 }}>
             {filteredIssues.length > 0 ? (
               filteredIssues.map((issue, idx) => (
                 <QualityIssueCard key={idx} issue={issue} />
               ))
             ) : (
-              <div className="p-6 text-center text-[#8E9AAF] text-sm bg-[rgba(255,255,255,0.01)] rounded-lg border border-[rgba(255,255,255,0.03)]">
+              <div style={{
+                padding: 24, textAlign: 'center',
+                color: 'var(--color-graphite)', fontSize: '0.84rem',
+                background: 'var(--color-fog)',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid rgba(163, 166, 175, 0.25)',
+              }}>
                 No issues found for this category.
               </div>
             )}

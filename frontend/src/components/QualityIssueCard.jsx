@@ -2,10 +2,22 @@ import React from 'react'
 import { AlertCircle, AlertTriangle, Info, ShieldAlert } from 'lucide-react'
 
 const SEVERITY_COLORS = {
-  critical: { bg: 'bg-[rgba(204,145,102,0.06)]', border: 'border-[rgba(204,145,102,0.2)]', text: 'text-[var(--color-ember-gold)]', icon: ShieldAlert },
-  high: { bg: 'bg-[rgba(204,145,102,0.06)]', border: 'border-[rgba(204,145,102,0.2)]', text: 'text-[var(--color-ember-gold)]', icon: AlertCircle },
-  medium: { bg: 'bg-[rgba(255,255,255,0.02)]', border: 'border-[var(--border-subtle)]', text: 'text-[var(--color-silver)]', icon: AlertTriangle },
-  low: { bg: 'bg-[rgba(255,255,255,0.02)]', border: 'border-[var(--border-subtle)]', text: 'text-[var(--color-silver)]', icon: Info },
+  critical: {
+    bg: '#fbe1d1', border: 'rgba(93, 42, 26, 0.25)', text: '#5d2a1a',
+    icon: ShieldAlert, iconBg: 'rgba(93, 42, 26, 0.1)',
+  },
+  high: {
+    bg: '#fbe1d1', border: 'rgba(93, 42, 26, 0.2)', text: '#5d2a1a',
+    icon: AlertCircle, iconBg: 'rgba(93, 42, 26, 0.08)',
+  },
+  medium: {
+    bg: '#d3e3fc', border: 'rgba(74, 122, 200, 0.25)', text: '#4a7ac8',
+    icon: AlertTriangle, iconBg: 'rgba(74, 122, 200, 0.1)',
+  },
+  low: {
+    bg: '#f7f7f8', border: 'rgba(163, 166, 175, 0.4)', text: '#777b86',
+    icon: Info, iconBg: 'rgba(119, 123, 134, 0.08)',
+  },
 }
 
 const ISSUE_TYPE_LABELS = {
@@ -22,43 +34,83 @@ export default function QualityIssueCard({ issue }) {
   const Icon = config.icon
 
   return (
-    <div 
-      className={`p-5 border ${config.border} ${config.bg} flex gap-4 transition-all duration-200`}
-      style={{ borderRadius: 'var(--radius-lg)', boxShadow: 'none' }}
+    <div
+      style={{
+        padding: 20,
+        borderRadius: 'var(--radius-lg)',
+        background: config.bg,
+        border: `1px solid ${config.border}`,
+        display: 'flex', gap: 16,
+        transition: 'box-shadow 0.2s ease',
+        boxShadow: 'var(--shadow-card)',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = 'var(--shadow-subtle)' }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'var(--shadow-card)' }}
     >
-      <div className={`flex-shrink-0 ${config.text} mt-0.5`}>
-        <Icon size={22} />
+      {/* Icon */}
+      <div style={{
+        flexShrink: 0, marginTop: 2,
+        width: 38, height: 38, borderRadius: 'var(--radius-sm)',
+        background: config.iconBg,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: config.text,
+      }}>
+        <Icon size={20} />
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap mb-1">
-          <h4 className="text-sm font-semibold text-[var(--text-primary)] truncate">
+
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Title row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+          <h4 style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--color-ink)', margin: 0 }}>
             {ISSUE_TYPE_LABELS[type] || type}
           </h4>
+
           {column && (
-            <span 
-              className="px-2 py-0.5 text-xs font-mono"
-              style={{
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--color-slate)',
-                color: 'var(--color-pearl)',
-                border: '1px solid var(--border-subtle)'
-              }}
-            >
+            <span style={{
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-sm)',
+              background: 'rgba(255,255,255,0.6)',
+              color: 'var(--color-ash)',
+              border: '1px solid rgba(163, 166, 175, 0.35)',
+              fontSize: '0.72rem', fontFamily: 'var(--font-mono)',
+            }}>
               {column}
             </span>
           )}
-          <span 
-            className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${config.bg} ${config.text} border ${config.border}`}
-            style={{ borderRadius: 'var(--radius-full)' }}
-          >
+
+          <span style={{
+            padding: '2px 10px',
+            borderRadius: 'var(--radius-full)',
+            background: 'rgba(255,255,255,0.5)',
+            border: `1px solid ${config.border}`,
+            color: config.text,
+            fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em',
+          }}>
             {severity}
           </span>
         </div>
-        <p className="text-sm text-[var(--text-secondary)] mb-3">{details}</p>
+
+        <p style={{ fontSize: '0.84rem', color: 'var(--color-ash)', marginBottom: recommendation ? 12 : 0, lineHeight: 1.6 }}>
+          {details}
+        </p>
+
         {recommendation && (
-          <div className="p-3 bg-[var(--color-carbon)] border border-[var(--border-subtle)]" style={{ borderRadius: 'var(--radius-sm)' }}>
-            <span className="text-xs font-semibold text-[var(--color-ember-gold)] block mb-1 uppercase tracking-wider">Recommendation</span>
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">{recommendation}</p>
+          <div style={{
+            padding: '10px 14px',
+            borderRadius: 'var(--radius-sm)',
+            background: 'rgba(255,255,255,0.65)',
+            border: '1px solid rgba(163, 166, 175, 0.3)',
+          }}>
+            <span style={{
+              fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase',
+              letterSpacing: '0.06em', color: 'var(--color-rust)', display: 'block', marginBottom: 4,
+            }}>
+              Recommendation
+            </span>
+            <p style={{ fontSize: '0.8rem', color: 'var(--color-ash)', lineHeight: 1.55, margin: 0 }}>
+              {recommendation}
+            </p>
           </div>
         )}
       </div>
