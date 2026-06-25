@@ -323,7 +323,7 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
                 padding: '4px 10px',
                 borderRadius: 'var(--radius-sm)',
                 border: debugMode ? '1px solid var(--color-vermillion-signal)' : '1px solid var(--border-subtle)',
-                background: debugMode ? 'rgba(228, 43, 12, 0.08)' : 'transparent',
+                background: debugMode ? 'rgba(204, 145, 102, 0.08)' : 'transparent',
                 color: debugMode ? 'var(--text-primary)' : 'var(--text-secondary)'
               }}
               onClick={() => setDebugMode(!debugMode)}
@@ -357,11 +357,11 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
             rows={1}
             style={{
               flex: 1,
-              borderRadius: 'var(--radius-md)',
+              borderRadius: 'var(--radius-sm)',
               minHeight: 44,
               maxHeight: 120,
               resize: 'none',
-              border: '1px solid var(--color-cloud)',
+              border: '1px solid var(--border-subtle)',
               padding: '12px 14px',
               fontSize: '0.9rem',
             }}
@@ -373,9 +373,9 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
             style={{
               width: 44,
               height: 44,
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--color-vermillion-signal)',
-              color: '#fff',
+              borderRadius: 'var(--radius-sm)',
+              background: input.trim() && !isLoading ? 'var(--color-paper)' : 'var(--color-slate)',
+              color: input.trim() && !isLoading ? 'var(--color-inkwell)' : 'var(--color-silver)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

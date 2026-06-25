@@ -53,9 +53,9 @@ export default function DataQuality({ sessionId }) {
 
   if (error) {
     return (
-      <div className="p-6 rounded-xl border border-red-500/25 bg-red-500/10 text-center max-w-lg mx-auto my-8">
-        <h3 className="text-red-500 font-bold mb-2">Inspection Failed</h3>
-        <p className="text-[#8E9AAF] text-sm">{error}</p>
+      <div className="p-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-center max-w-lg mx-auto my-8">
+        <h3 className="text-[var(--text-primary)] font-bold mb-2">Inspection Failed</h3>
+        <p className="text-[var(--text-secondary)] text-sm">{error}</p>
       </div>
     )
   }
@@ -83,52 +83,58 @@ export default function DataQuality({ sessionId }) {
       </div>
 
       {total_issues === 0 ? (
-        <div className="p-8 rounded-xl border border-emerald-500/20 bg-emerald-500/5 flex flex-col items-center text-center max-w-xl mx-auto my-8">
-          <div className="p-4 rounded-full bg-emerald-500/10 text-emerald-500 mb-4">
+        <div className="p-8 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col items-center text-center max-w-xl mx-auto my-8" style={{ borderRadius: 'var(--radius-lg)' }}>
+          <div className="p-4 rounded-full bg-[rgba(204,145,102,0.08)] text-[var(--color-ember-gold)] mb-4">
             <CheckCircle2 size={36} />
           </div>
-          <h3 className="text-[#F0F0F8] font-bold text-lg mb-2">No Issues Detected!</h3>
-          <p className="text-[#8E9AAF] text-sm leading-relaxed">
+          <h3 className="text-[var(--text-primary)] font-semibold text-lg mb-2">No Issues Detected!</h3>
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
             Your dataset is clean and ready for analysis. No missing values, duplicate rows, outlier issues, or type mismatches were found.
           </p>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Summary Banner */}
-          <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-red-500/10 text-red-500">
+          <div className="p-6 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex items-center gap-4" style={{ borderRadius: 'var(--radius-lg)' }}>
+            <div className="p-3 rounded-lg bg-[rgba(204,145,102,0.08)] text-[var(--color-ember-gold)]">
               <ShieldAlert size={24} />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#F0F0F8]">Quality Scan Completed</h3>
-              <p className="text-sm text-[#8E9AAF]">
-                Found <span className="text-red-400 font-semibold">{total_issues}</span> potential quality issues requiring review.
+              <h3 className="text-base font-semibold text-[var(--text-primary)]">Quality Scan Completed</h3>
+              <p className="text-sm text-[var(--text-secondary)]">
+                Found <span className="text-[var(--color-ember-gold)] font-semibold">{total_issues}</span> potential quality issues requiring review.
               </p>
             </div>
           </div>
 
           {/* Tab Selection */}
-          <div className="flex gap-2 border-b border-[rgba(255,255,255,0.06)] overflow-x-auto pb-1">
+          <div className="flex gap-2 border-b border-[var(--border-subtle)] overflow-x-auto pb-1">
             {CATEGORY_TABS.map(({ id, label }) => {
               const count = counts[id] || 0
               if (id !== 'all' && count === 0) return null // Hide tab if no issues
 
+              const isActive = id === activeTab
               return (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
-                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-all duration-150 whitespace-nowrap flex items-center gap-2 ${
-                    id === activeTab
-                      ? 'border-black text-black font-semibold'
-                      : 'border-transparent text-[#8E9AAF] hover:text-[#F0F0F8]'
-                  }`}
+                  className="px-4 py-2 text-sm font-medium border-b-2 transition-all duration-150 whitespace-nowrap flex items-center gap-2"
+                  style={{
+                    borderColor: isActive ? 'var(--color-ember-gold)' : 'transparent',
+                    color: isActive ? 'var(--color-ember-gold)' : 'var(--text-secondary)',
+                    background: 'none',
+                    fontWeight: isActive ? 600 : 500
+                  }}
                 >
                   {label}
-                  <span className={`px-1.5 py-0.2 text-[10px] font-bold rounded-full ${
-                    id === activeTab
-                      ? 'bg-black/10 text-black'
-                      : 'bg-[rgba(255,255,255,0.06)] text-[#8E9AAF]'
-                  }`}>
+                  <span 
+                    className="px-1.5 py-0.2 text-[10px] font-semibold"
+                    style={{
+                      borderRadius: 'var(--radius-full)',
+                      background: isActive ? 'rgba(204, 145, 102, 0.12)' : 'rgba(255, 255, 255, 0.06)',
+                      color: isActive ? 'var(--color-ember-gold)' : 'var(--text-secondary)'
+                    }}
+                  >
                     {count}
                   </span>
                 </button>

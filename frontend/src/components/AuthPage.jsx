@@ -8,14 +8,14 @@ function FeaturePill({ icon, label }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 6,
       padding: '6px 14px',
-      borderRadius: 'var(--radius-md)',
-      background: 'var(--color-paper)',
-      border: '1px solid var(--color-cloud)',
+      borderRadius: 'var(--radius-sm)',
+      background: 'var(--color-slate)',
+      border: '1px solid var(--color-iron)',
       fontSize: '0.74rem',
-      color: 'var(--color-slate-700)',
+      color: 'var(--color-bone)',
       fontWeight: 500,
       whiteSpace: 'nowrap',
-      boxShadow: 'var(--shadow-subtle)',
+      boxShadow: 'none',
     }}>
       <span>{icon}</span>
       <span>{label}</span>
@@ -90,9 +90,9 @@ export default function AuthPage() {
         @keyframes fadeSlideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
         .auth-card-enter { animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .auth-input { transition: border-color 0.15s ease-in-out; }
-        .auth-input:focus { outline: none; border-color: var(--color-slate-900) !important; }
+        .auth-input:focus { outline: none; border-color: var(--color-ember-gold) !important; }
         .tab-pill { transition: all 0.15s ease-in-out; }
-        .tab-pill:hover { color: var(--color-slate-900) !important; }
+        .tab-pill:hover { color: var(--color-paper) !important; }
       `}</style>
 
       <div style={{
@@ -116,18 +116,18 @@ export default function AuthPage() {
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
             <div style={{
               width: 56, height: 56,
-              borderRadius: 'var(--radius-lg)',
+              borderRadius: 'var(--radius-sm)',
               background: 'var(--color-vermillion-signal)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 26,
               margin: '0 auto 16px',
-              boxShadow: 'var(--shadow-subtle)',
+              boxShadow: 'none',
             }}>
               🧠
             </div>
             <h1 style={{
               fontSize: '2rem', fontWeight: 600, letterSpacing: '-0.025em',
-              color: 'var(--color-slate-900)',
+              color: 'var(--color-paper)',
               marginBottom: 8,
             }}>
               MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span>
@@ -150,7 +150,7 @@ export default function AuthPage() {
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-lg)',
             padding: '36px 32px',
-            boxShadow: 'var(--shadow-card)',
+            boxShadow: 'none',
           }}>
 
             {/* Dev mode banner */}
@@ -158,12 +158,12 @@ export default function AuthPage() {
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8,
                 padding: '10px 14px',
-                background: 'rgba(54, 65, 83, 0.04)',
-                border: '1px solid var(--color-cloud)',
+                background: 'var(--color-slate)',
+                border: '1px solid var(--color-iron)',
                 borderRadius: 'var(--radius-md)',
                 marginBottom: 20,
                 fontSize: '0.76rem',
-                color: 'var(--color-slate-700)',
+                color: 'var(--color-bone)',
                 fontWeight: 500,
               }}>
                 <Sparkles size={13} style={{ color: 'var(--color-vermillion-signal)' }} />
@@ -174,8 +174,8 @@ export default function AuthPage() {
             {/* Tab switcher */}
             <div style={{
               display: 'flex',
-              background: 'var(--color-vellum)',
-              border: '1px solid var(--color-cloud)',
+              background: 'var(--color-inkwell)',
+              border: '1px solid var(--color-iron)',
               borderRadius: 'var(--radius-md)',
               padding: 4,
               marginBottom: 24,
@@ -210,8 +210,8 @@ export default function AuthPage() {
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: 10,
                 padding: '12px 14px',
-                background: 'rgba(228, 43, 12, 0.05)',
-                border: '1px solid rgba(228, 43, 12, 0.2)',
+                background: 'rgba(204, 145, 102, 0.05)',
+                border: '1px solid rgba(204, 145, 102, 0.2)',
                 borderRadius: 'var(--radius-md)', marginBottom: 20,
                 fontSize: '0.8rem', color: 'var(--color-vermillion-signal)', lineHeight: 1.4,
               }}>
@@ -225,7 +225,7 @@ export default function AuthPage() {
 
               {/* Email */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-slate-700)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-silver)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                   Email Address
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -250,7 +250,7 @@ export default function AuthPage() {
 
               {/* Password */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-slate-700)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-silver)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                   Password
                 </label>
                 <div style={{ position: 'relative' }}>
@@ -289,7 +289,7 @@ export default function AuthPage() {
               {/* Confirm Password */}
               {isSignUp && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-slate-700)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-silver)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                     Confirm Password
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -329,7 +329,7 @@ export default function AuthPage() {
                   <div style={{
                     width: 18, height: 18, borderRadius: '50%',
                     border: '2px solid rgba(255,255,255,0.3)',
-                    borderTopColor: '#fff',
+                    borderTopColor: 'var(--color-inkwell)',
                     animation: 'spin 0.7s linear infinite',
                   }} />
                 ) : (
@@ -343,11 +343,11 @@ export default function AuthPage() {
 
             {/* Divider */}
             <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0' }}>
-              <div style={{ flex: 1, height: 1, background: 'var(--color-cloud)' }} />
+              <div style={{ flex: 1, height: 1, background: 'var(--color-iron)' }} />
               <span style={{ padding: '0 14px', fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 or
               </span>
-              <div style={{ flex: 1, height: 1, background: 'var(--color-cloud)' }} />
+              <div style={{ flex: 1, height: 1, background: 'var(--color-iron)' }} />
             </div>
 
             {/* Google Sign In */}

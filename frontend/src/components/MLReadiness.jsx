@@ -43,9 +43,9 @@ export default function MLReadiness({ sessionId }) {
 
   if (error) {
     return (
-      <div className="p-6 rounded-xl border border-red-500/25 bg-red-500/10 text-center max-w-lg mx-auto my-8">
-        <h3 className="text-red-500 font-bold mb-2">Evaluation Failed</h3>
-        <p className="text-[#8E9AAF] text-sm">{error}</p>
+      <div className="p-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-center max-w-lg mx-auto my-8">
+        <h3 className="text-[var(--text-primary)] font-bold mb-2">Evaluation Failed</h3>
+        <p className="text-[var(--text-secondary)] text-sm">{error}</p>
       </div>
     )
   }
@@ -72,15 +72,15 @@ export default function MLReadiness({ sessionId }) {
           
           {/* Strengths Card */}
           {strengths && strengths.length > 0 && (
-            <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
-              <h3 className="text-base font-bold text-[#F0F0F8] mb-4 flex items-center gap-2">
-                <CheckCircle2 className="text-emerald-500" size={20} />
+            <div className="p-6 border border-[var(--border-subtle)] bg-[var(--bg-surface)]" style={{ borderRadius: 'var(--radius-lg)' }}>
+              <h3 className="text-base font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                <CheckCircle2 className="text-[var(--color-ember-gold)]" size={20} />
                 Dataset Strengths
               </h3>
               <ul className="space-y-3 pl-0 list-none m-0">
                 {strengths.map((str, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5 text-sm text-[#8E9AAF]">
-                    <span className="text-emerald-500 font-bold mt-0.5">✓</span>
+                  <li key={idx} className="flex items-start gap-2.5 text-sm text-[var(--text-secondary)]">
+                    <span className="text-[var(--color-ember-gold)] font-bold mt-0.5">✓</span>
                     <span className="leading-relaxed">{str}</span>
                   </li>
                 ))}
@@ -90,15 +90,15 @@ export default function MLReadiness({ sessionId }) {
 
           {/* Problems Card */}
           {problems && problems.length > 0 && (
-            <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
-              <h3 className="text-base font-bold text-[#F0F0F8] mb-4 flex items-center gap-2">
-                <AlertTriangle className="text-yellow-500" size={20} />
+            <div className="p-6 border border-[var(--border-subtle)] bg-[var(--bg-surface)]" style={{ borderRadius: 'var(--radius-lg)' }}>
+              <h3 className="text-base font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                <AlertTriangle className="text-[var(--color-silver)]" size={20} />
                 Data Impediments
               </h3>
               <ul className="space-y-3 pl-0 list-none m-0">
                 {problems.map((prob, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5 text-sm text-[#8E9AAF]">
-                    <span className="text-yellow-500 font-bold mt-0.5">⚠</span>
+                  <li key={idx} className="flex items-start gap-2.5 text-sm text-[var(--text-secondary)]">
+                    <span className="text-[var(--color-silver)] font-bold mt-0.5">⚠</span>
                     <span className="leading-relaxed">{prob}</span>
                   </li>
                 ))}
@@ -108,15 +108,22 @@ export default function MLReadiness({ sessionId }) {
 
           {/* Recommendations checklist */}
           {recommendations && recommendations.length > 0 && (
-            <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
-              <h3 className="text-base font-bold text-[#F0F0F8] mb-4 flex items-center gap-2">
-                <ListOrdered className="text-black" size={20} />
+            <div className="p-6 border border-[var(--border-subtle)] bg-[var(--bg-surface)]" style={{ borderRadius: 'var(--radius-lg)' }}>
+              <h3 className="text-base font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                <ListOrdered className="text-[var(--color-ember-gold)]" size={20} />
                 Recommended Actions
               </h3>
               <ol className="space-y-4 pl-0 list-none m-0">
                 {recommendations.map((rec, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-[#8E9AAF]">
-                    <div className="w-5 h-5 rounded-full bg-black/10 border border-black/25 text-black text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 font-mono">
+                  <li key={idx} className="flex items-start gap-3 text-sm text-[var(--text-secondary)]">
+                    <div 
+                      className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 font-mono"
+                      style={{
+                        background: 'rgba(204, 145, 102, 0.12)',
+                        border: '1px solid var(--border-glow)',
+                        color: 'var(--color-ember-gold)'
+                      }}
+                    >
                       {idx + 1}
                     </div>
                     <span className="leading-relaxed pt-0.5">{rec}</span>

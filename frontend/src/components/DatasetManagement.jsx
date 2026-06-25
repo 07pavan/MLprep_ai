@@ -71,10 +71,10 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId,
 
   if (error) {
     return (
-      <div className="p-6 rounded-xl border border-red-500/25 bg-red-500/10 text-center max-w-lg mx-auto my-8 animate-fade-in">
-        <h3 className="text-red-500 font-bold mb-2">Error Loading Registry</h3>
-        <p className="text-[#8E9AAF] text-sm">{error}</p>
-        <button onClick={fetchDatasets} className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg text-xs font-semibold hover:bg-red-600 transition-colors">
+      <div className="p-6 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-center max-w-lg mx-auto my-8 animate-fade-in">
+        <h3 className="text-[var(--text-primary)] font-bold mb-2">Error Loading Registry</h3>
+        <p className="text-[var(--text-secondary)] text-sm">{error}</p>
+        <button onClick={fetchDatasets} className="mt-4 px-4 py-2 bg-[var(--color-paper)] text-[var(--color-inkwell)] font-semibold text-xs hover:opacity-90 transition-opacity" style={{ borderRadius: 'var(--radius-sm)' }}>
           Retry
         </button>
       </div>
@@ -89,12 +89,12 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId,
       </div>
 
       {datasets.length === 0 ? (
-        <div className="p-12 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] flex flex-col items-center text-center max-w-xl mx-auto my-8">
-          <div className="p-4 rounded-full bg-[rgba(255,255,255,0.03)] text-[#8E9AAF] mb-4">
+        <div className="p-12 border border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col items-center text-center max-w-xl mx-auto my-8" style={{ borderRadius: 'var(--radius-lg)' }}>
+          <div className="p-4 rounded-full bg-[var(--color-slate)] text-[var(--color-pearl)] mb-4">
             <Database size={36} />
           </div>
-          <h3 className="text-[#F0F0F8] font-bold text-lg mb-2">Registry is empty</h3>
-          <p className="text-[#8E9AAF] text-sm leading-relaxed mb-6">
+          <h3 className="text-[var(--text-primary)] font-semibold text-lg mb-2">Registry is empty</h3>
+          <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-6">
             You haven't registered any datasets yet. Upload a dataset file to create your first registry entry.
           </p>
         </div>
@@ -111,30 +111,32 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId,
             return (
               <div 
                 key={dataset.dataset_id} 
-                className={`p-6 rounded-xl border transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6 ${
-                  isActive 
-                    ? 'border-black bg-black/5 shadow-[0_0_15px_rgba(0,0,0,0.05)]' 
-                    : 'border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.04)]'
-                }`}
+                className={`p-6 border transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-6`}
+                style={{
+                  borderRadius: 'var(--radius-lg)',
+                  borderColor: isActive ? 'var(--color-ember-gold)' : 'var(--border-subtle)',
+                  background: isActive ? 'var(--color-slate)' : 'var(--bg-surface)',
+                  boxShadow: 'none'
+                }}
               >
                 <div className="space-y-2 min-w-0 flex-1">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <h3 className="text-base font-bold text-[#F0F0F8] truncate">{dataset.dataset_name}</h3>
-                    <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-black/10 text-black border border-black/20">
+                    <h3 className="text-base font-semibold text-[var(--text-primary)] truncate">{dataset.dataset_name}</h3>
+                    <span className="px-2 py-0.5 text-[10px] font-semibold uppercase bg-[var(--color-slate)] text-[var(--color-pearl)] border border-[var(--border-subtle)]" style={{ borderRadius: 'var(--radius-sm)' }}>
                       {dataset.source}
                     </span>
-                    <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-[rgba(255,255,255,0.06)] text-[#8E9AAF]">
+                    <span className="px-2 py-0.5 text-[10px] font-mono bg-[var(--color-inkwell)] text-[var(--color-pearl)]" style={{ borderRadius: 'var(--radius-sm)' }}>
                       v{dataset.dataset_version}
                     </span>
                     {isActive && (
-                      <span className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1">
+                      <span className="px-2 py-0.5 text-[10px] font-semibold uppercase bg-[rgba(204,145,102,0.08)] text-[var(--color-ember-gold)] border border-[rgba(204,145,102,0.2)] flex items-center gap-1" style={{ borderRadius: 'var(--radius-sm)' }}>
                         <Check size={10} /> Active
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-6 text-xs text-[#8E9AAF] flex-wrap">
-                    <span className="flex items-center gap-1"><Layers size={14} /> {dataset.row_count.toLocaleString()} rows × {dataset.column_count} cols</span>
+                  <div className="flex items-center gap-6 text-xs text-[var(--text-secondary)] flex-wrap">
+                    <span className="flex items-center gap-1 tabular-nums"><Layers size={14} /> {dataset.row_count.toLocaleString()} rows × {dataset.column_count} cols</span>
                     <span>Format: <span className="font-mono">{dataset.original_file_type}</span></span>
                     <span>Size: {dataset.memory_usage} MB</span>
                     <span className="flex items-center gap-1"><Calendar size={14} /> {dateStr}</span>
@@ -144,25 +146,34 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId,
                 <div className="flex items-center gap-3 flex-shrink-0">
                   {/* ML Score indicator */}
                   {dataset.ml_readiness_score !== null && (
-                    <div className="px-3 py-1.5 rounded-lg bg-[rgba(0,0,0,0.2)] border border-[rgba(255,255,255,0.04)] flex flex-col items-center justify-center min-w-[70px]">
-                      <span className="text-[10px] uppercase font-bold text-[#8E9AAF] tracking-wider">ML Score</span>
-                      <span className="text-sm font-extrabold text-[#F0F0F8]">{dataset.ml_readiness_score}</span>
+                    <div className="px-3 py-1.5 bg-[var(--color-carbon)] border border-[var(--border-subtle)] flex flex-col items-center justify-center min-w-[70px]" style={{ borderRadius: 'var(--radius-sm)' }}>
+                      <span className="text-[10px] uppercase font-semibold text-[var(--text-secondary)] tracking-wider">ML Score</span>
+                      <span className="text-sm font-semibold text-[var(--text-primary)] tabular-nums">{dataset.ml_readiness_score}</span>
                     </div>
                   )}
 
                   <button
                     onClick={() => handleSelect(dataset.dataset_id)}
                     disabled={isActive || isWorking}
-                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-150 flex items-center gap-1.5 ${
-                      isActive
-                        ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-default'
-                        : 'bg-black hover:bg-black/90 text-white shadow-md cursor-pointer disabled:opacity-50'
-                    }`}
+                    className="px-4 py-2 text-xs font-semibold transition-all duration-150 flex items-center gap-1.5"
+                    style={{
+                      borderRadius: 'var(--radius-sm)',
+                      background: isActive 
+                        ? 'rgba(204, 145, 102, 0.08)' 
+                        : 'var(--color-paper)',
+                      color: isActive 
+                        ? 'var(--color-ember-gold)' 
+                        : 'var(--color-inkwell)',
+                      border: isActive
+                        ? '1px solid rgba(204, 145, 102, 0.25)'
+                        : 'none',
+                      cursor: isActive ? 'default' : 'pointer'
+                    }}
                   >
                     {isActive ? (
                       <>Selected</>
                     ) : isWorking ? (
-                      <div className="spinner" style={{ width: 12, height: 12, borderWidth: 2 }} />
+                      <div className="spinner-inline" style={{ width: 12, height: 12 }} />
                     ) : (
                       <>
                         <ExternalLink size={12} /> Select
@@ -173,7 +184,8 @@ export default function DatasetManagement({ onActivateSuccess, currentDatasetId,
                   <button
                     onClick={(e) => handleDelete(dataset.dataset_id, e)}
                     disabled={isWorking}
-                    className="p-2.5 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-150 disabled:opacity-50 cursor-pointer"
+                    className="p-2 border border-[var(--border-subtle)] text-[var(--color-silver)] hover:bg-[var(--bg-glass-hover)] hover:text-[var(--color-paper)] transition-all duration-150 disabled:opacity-50 cursor-pointer"
+                    style={{ borderRadius: 'var(--radius-sm)' }}
                     title="Delete dataset"
                   >
                     <Trash2 size={14} />

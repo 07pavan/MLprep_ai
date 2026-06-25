@@ -6,20 +6,20 @@ import InsightCard from './InsightCard'
 
 // Intent colour map (for v2 compatibility)
 const INTENT_COLORS = {
-  analysis_only:              { bg: 'rgba(59, 130, 246, 0.08)', fg: '#2563eb', label: 'Analysis' },
-  analysis_and_visualization: { bg: 'rgba(168, 85, 247, 0.08)', fg: '#7c3aed', label: 'Visualization' },
-  insights:                   { bg: 'rgba(16, 185, 129, 0.08)', fg: '#059669', label: 'Insights' },
-  cleaning_report:            { bg: 'rgba(228, 43, 12, 0.06)', fg: 'var(--color-vermillion-signal)', label: 'Cleaning' },
+  analysis_only:              { bg: 'transparent', fg: '#acafb9', border: '#464853', label: 'Analysis' },
+  analysis_and_visualization: { bg: 'transparent', fg: '#acafb9', border: '#464853', label: 'Visualization' },
+  insights:                   { bg: 'transparent', fg: '#acafb9', border: '#464853', label: 'Insights' },
+  cleaning_report:            { bg: 'transparent', fg: '#cc9166', border: '#cc9166', label: 'Cleaning' },
 }
 
 function IntentBadge({ intent }) {
   if (!intent || !INTENT_COLORS[intent]) return null
-  const { bg, fg, label } = INTENT_COLORS[intent]
+  const { bg, fg, border, label } = INTENT_COLORS[intent]
   return (
     <span style={{
-      display: 'inline-block', padding: '1.5px 8px', borderRadius: 'var(--radius-sm)',
-      background: bg, color: fg, border: `1px solid ${fg}33`,
-      fontSize: '0.68rem', fontWeight: 600, marginBottom: 10,
+      display: 'inline-block', padding: '2px 10px', borderRadius: 'var(--radius-full)',
+      background: bg, color: fg, border: `1px solid ${border}`,
+      fontSize: '11px', fontWeight: 500, marginBottom: 10,
     }}>
       {label}
     </span>
