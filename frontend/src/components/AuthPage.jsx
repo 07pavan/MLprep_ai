@@ -1,62 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, AlertCircle, ChevronRight } from 'lucide-react'
-
-/* ── Animated floating orbs background ─────────────────────────── */
-function FloatingOrbs() {
-  return (
-    <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
-      {/* Large amber orb top-right */}
-      <div style={{
-        position: 'absolute', top: '-120px', right: '-80px',
-        width: 500, height: 500,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(217,119,6,0.12) 0%, rgba(217,119,6,0.04) 50%, transparent 70%)',
-        animation: 'orbFloat1 8s ease-in-out infinite',
-      }} />
-      {/* Medium orb bottom-left */}
-      <div style={{
-        position: 'absolute', bottom: '-80px', left: '-60px',
-        width: 380, height: 380,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(245,158,11,0.08) 0%, rgba(245,158,11,0.02) 50%, transparent 70%)',
-        animation: 'orbFloat2 10s ease-in-out infinite',
-      }} />
-      {/* Small orb center */}
-      <div style={{
-        position: 'absolute', top: '40%', left: '15%',
-        width: 200, height: 200,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(180,83,9,0.07) 0%, transparent 70%)',
-        animation: 'orbFloat3 6s ease-in-out infinite',
-      }} />
-      {/* Grid overlay */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px)
-        `,
-        backgroundSize: '48px 48px',
-        maskImage: 'radial-gradient(ellipse at center, black 20%, transparent 80%)',
-      }} />
-    </div>
-  )
-}
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, AlertCircle } from 'lucide-react'
 
 /* ── Feature pill ───────────────────────────────────────────────── */
 function FeaturePill({ icon, label }) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 6,
-      padding: '5px 12px',
-      borderRadius: 999,
-      background: 'rgba(217,119,6,0.08)',
-      border: '1px solid rgba(217,119,6,0.18)',
-      fontSize: '0.72rem',
-      color: 'var(--accent-2)',
+      padding: '6px 14px',
+      borderRadius: 'var(--radius-md)',
+      background: 'var(--color-paper)',
+      border: '1px solid var(--color-cloud)',
+      fontSize: '0.74rem',
+      color: 'var(--color-slate-700)',
       fontWeight: 500,
       whiteSpace: 'nowrap',
+      boxShadow: 'var(--shadow-subtle)',
     }}>
       <span>{icon}</span>
       <span>{label}</span>
@@ -126,35 +85,24 @@ export default function AuthPage() {
 
   return (
     <>
-      {/* CSS animations */}
+      {/* CSS overrides */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
-        @keyframes orbFloat1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-20px,30px) scale(1.05)} }
-        @keyframes orbFloat2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,-20px) scale(1.08)} }
-        @keyframes orbFloat3 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(20px,15px)} }
-        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
-        .auth-card-enter { animation: fadeSlideUp 0.6s cubic-bezier(0.16,1,0.3,1) forwards; }
-        .auth-input:focus { outline: none; border-color: rgba(217,119,6,0.5) !important; box-shadow: 0 0 0 3px rgba(217,119,6,0.08) !important; }
-        .auth-input { transition: all 0.2s ease; }
-        .auth-btn-primary { transition: all 0.2s ease; }
-        .auth-btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(217,119,6,0.3) !important; }
-        .auth-btn-primary:active:not(:disabled) { transform: translateY(0px); }
-        .auth-google-btn:hover:not(:disabled) { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.12) !important; }
-        .tab-pill { transition: all 0.2s ease; }
-        .tab-pill:hover { color: var(--text-primary) !important; }
+        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        .auth-card-enter { animation: fadeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .auth-input { transition: border-color 0.15s ease-in-out; }
+        .auth-input:focus { outline: none; border-color: var(--color-slate-900) !important; }
+        .tab-pill { transition: all 0.15s ease-in-out; }
+        .tab-pill:hover { color: var(--color-slate-900) !important; }
       `}</style>
 
-      <FloatingOrbs />
-
       <div style={{
-        position: 'relative', zIndex: 1,
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px 16px',
+        padding: '32px 16px',
         background: 'var(--bg-primary)',
+        fontFamily: 'var(--font-sans)',
       }}>
         <div
           className="auth-card-enter"
@@ -167,33 +115,29 @@ export default function AuthPage() {
           {/* Logo + Brand */}
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
             <div style={{
-              width: 64, height: 64,
-              borderRadius: 20,
-              background: 'linear-gradient(135deg, #D97706, #F59E0B)',
+              width: 56, height: 56,
+              borderRadius: 'var(--radius-lg)',
+              background: 'var(--color-vermillion-signal)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 28,
+              fontSize: 26,
               margin: '0 auto 16px',
-              boxShadow: '0 8px 32px rgba(217,119,6,0.35), 0 0 0 1px rgba(217,119,6,0.2)',
+              boxShadow: 'var(--shadow-subtle)',
             }}>
               🧠
             </div>
             <h1 style={{
-              fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em',
-              background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #F59E0B 100%)',
-              backgroundSize: '200% auto',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              animation: 'shimmer 3s linear infinite',
+              fontSize: '2rem', fontWeight: 600, letterSpacing: '-0.025em',
+              color: 'var(--color-slate-900)',
               marginBottom: 8,
             }}>
-              MLPrep AI
+              MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span>
             </h1>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Your AI-powered data analyst & ML preparation suite
             </p>
 
             {/* Feature pills */}
-            <div style={{ display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap', marginTop: 14 }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 16 }}>
               <FeaturePill icon="📊" label="Smart Analysis" />
               <FeaturePill icon="🤖" label="AI Copilot" />
               <FeaturePill icon="⚡" label="Instant Insights" />
@@ -202,27 +146,27 @@ export default function AuthPage() {
 
           {/* Card */}
           <div style={{
-            background: 'rgba(20,19,16,0.8)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            borderRadius: 20,
-            padding: '32px 28px',
-            boxShadow: '0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-lg)',
+            padding: '36px 32px',
+            boxShadow: 'var(--shadow-card)',
           }}>
 
             {/* Dev mode banner */}
             {isMock && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8,
-                padding: '8px 14px',
-                background: 'rgba(59,130,246,0.08)',
-                border: '1px solid rgba(59,130,246,0.2)',
-                borderRadius: 10,
+                padding: '10px 14px',
+                background: 'rgba(54, 65, 83, 0.04)',
+                border: '1px solid var(--color-cloud)',
+                borderRadius: 'var(--radius-md)',
                 marginBottom: 20,
-                fontSize: '0.74rem',
-                color: '#60a5fa',
+                fontSize: '0.76rem',
+                color: 'var(--color-slate-700)',
+                fontWeight: 500,
               }}>
-                <Sparkles size={13} />
+                <Sparkles size={13} style={{ color: 'var(--color-vermillion-signal)' }} />
                 <span>Dev mode — any credentials will work</span>
               </div>
             )}
@@ -230,9 +174,9 @@ export default function AuthPage() {
             {/* Tab switcher */}
             <div style={{
               display: 'flex',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: 12,
+              background: 'var(--color-vellum)',
+              border: '1px solid var(--color-cloud)',
+              borderRadius: 'var(--radius-md)',
               padding: 4,
               marginBottom: 24,
             }}>
@@ -246,15 +190,14 @@ export default function AuthPage() {
                   onClick={() => { setIsSignUp(key); setError('') }}
                   style={{
                     flex: 1, padding: '9px 12px',
-                    borderRadius: 9,
+                    borderRadius: 'var(--radius-md)',
                     fontSize: '0.83rem', fontWeight: 600,
-                    color: isSignUp === key ? 'var(--text-primary)' : 'var(--text-muted)',
+                    color: isSignUp === key ? '#ffffff' : 'var(--text-muted)',
                     background: isSignUp === key
-                      ? 'linear-gradient(135deg, rgba(217,119,6,0.2), rgba(245,158,11,0.12))'
+                      ? 'var(--color-vermillion-signal)'
                       : 'transparent',
-                    border: isSignUp === key ? '1px solid rgba(217,119,6,0.25)' : '1px solid transparent',
+                    border: 'none',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
                   }}
                 >
                   {label}
@@ -267,10 +210,10 @@ export default function AuthPage() {
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: 10,
                 padding: '12px 14px',
-                background: 'rgba(239,68,68,0.08)',
-                border: '1px solid rgba(239,68,68,0.25)',
-                borderRadius: 10, marginBottom: 20,
-                fontSize: '0.8rem', color: '#fca5a5', lineHeight: 1.4,
+                background: 'rgba(228, 43, 12, 0.05)',
+                border: '1px solid rgba(228, 43, 12, 0.2)',
+                borderRadius: 'var(--radius-md)', marginBottom: 20,
+                fontSize: '0.8rem', color: 'var(--color-vermillion-signal)', lineHeight: 1.4,
               }}>
                 <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
                 <span>{error}</span>
@@ -282,28 +225,24 @@ export default function AuthPage() {
 
               {/* Email */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-slate-700)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                   Email Address
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Mail size={15} style={{
                     position: 'absolute', left: 14, top: '50%',
-                    transform: 'translateY(-50%)', color: 'var(--text-muted)',
+                    transform: 'translateY(-50%)', color: 'var(--color-mist)',
                     pointerEvents: 'none',
                   }} />
                   <input
-                    className="auth-input"
+                    className="auth-input input-field"
                     type="email"
                     placeholder="you@company.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     disabled={loading}
                     style={{
-                      width: '100%', padding: '11px 14px 11px 40px',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: 10, color: 'var(--text-primary)',
-                      fontSize: '0.88rem',
+                      paddingLeft: 40,
                     }}
                   />
                 </div>
@@ -311,28 +250,25 @@ export default function AuthPage() {
 
               {/* Password */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-slate-700)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                   Password
                 </label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={15} style={{
                     position: 'absolute', left: 14, top: '50%',
-                    transform: 'translateY(-50%)', color: 'var(--text-muted)',
+                    transform: 'translateY(-50%)', color: 'var(--color-mist)',
                     pointerEvents: 'none',
                   }} />
                   <input
-                    className="auth-input"
+                    className="auth-input input-field"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     disabled={loading}
                     style={{
-                      width: '100%', padding: '11px 42px 11px 40px',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: 10, color: 'var(--text-primary)',
-                      fontSize: '0.88rem',
+                      paddingLeft: 40,
+                      paddingRight: 40,
                     }}
                   />
                   <button
@@ -341,7 +277,7 @@ export default function AuthPage() {
                     style={{
                       position: 'absolute', right: 12, top: '50%',
                       transform: 'translateY(-50%)',
-                      color: 'var(--text-muted)', background: 'none', border: 'none',
+                      color: 'var(--color-mist)', background: 'none', border: 'none',
                       cursor: 'pointer', padding: 4,
                     }}
                   >
@@ -353,28 +289,24 @@ export default function AuthPage() {
               {/* Confirm Password */}
               {isSignUp && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-slate-700)', letterSpacing: '0.025em', textTransform: 'uppercase' }}>
                     Confirm Password
                   </label>
                   <div style={{ position: 'relative' }}>
                     <Lock size={15} style={{
                       position: 'absolute', left: 14, top: '50%',
-                      transform: 'translateY(-50%)', color: 'var(--text-muted)',
+                      transform: 'translateY(-50%)', color: 'var(--color-mist)',
                       pointerEvents: 'none',
                     }} />
                     <input
-                      className="auth-input"
+                      className="auth-input input-field"
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
                       disabled={loading}
                       style={{
-                        width: '100%', padding: '11px 14px 11px 40px',
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        borderRadius: 10, color: 'var(--text-primary)',
-                        fontSize: '0.88rem',
+                        paddingLeft: 40,
                       }}
                     />
                   </div>
@@ -384,21 +316,13 @@ export default function AuthPage() {
               {/* Submit */}
               <button
                 type="submit"
-                className="auth-btn-primary"
+                className="btn-primary"
                 disabled={loading}
                 style={{
                   marginTop: 4,
-                  padding: '13px',
-                  borderRadius: 12,
-                  background: 'linear-gradient(135deg, #D97706, #F59E0B)',
-                  color: '#fff',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  border: 'none',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   opacity: loading ? 0.7 : 1,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  boxShadow: '0 4px 16px rgba(217,119,6,0.2)',
                 }}
               >
                 {loading ? (
@@ -418,30 +342,24 @@ export default function AuthPage() {
             </form>
 
             {/* Divider */}
-            <div style={{ display: 'flex', alignItems: 'center', margin: '20px 0' }}>
-              <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+            <div style={{ display: 'flex', alignItems: 'center', margin: '24px 0' }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--color-cloud)' }} />
               <span style={{ padding: '0 14px', fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 or
               </span>
-              <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.06)' }} />
+              <div style={{ flex: 1, height: 1, background: 'var(--color-cloud)' }} />
             </div>
 
             {/* Google Sign In */}
             <button
               onClick={handleGoogleSignIn}
-              className="auth-google-btn"
+              className="btn-secondary"
               disabled={loading}
               style={{
-                width: '100%', padding: '12px',
-                borderRadius: 12,
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: 'var(--text-primary)',
-                fontSize: '0.88rem', fontWeight: 600,
+                width: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.6 : 1,
-                transition: 'all 0.2s ease',
               }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24">
@@ -455,21 +373,21 @@ export default function AuthPage() {
 
             {/* Footer note */}
             <p style={{
-              textAlign: 'center', marginTop: 20,
+              textAlign: 'center', marginTop: 24,
               fontSize: '0.72rem', color: 'var(--text-muted)', lineHeight: 1.5,
             }}>
               By continuing, you agree to our{' '}
-              <span style={{ color: 'var(--accent-2)', cursor: 'pointer' }}>Terms</span>
+              <span style={{ color: 'var(--color-vermillion-signal)', cursor: 'pointer', fontWeight: 500 }}>Terms</span>
               {' & '}
-              <span style={{ color: 'var(--accent-2)', cursor: 'pointer' }}>Privacy Policy</span>
+              <span style={{ color: 'var(--color-vermillion-signal)', cursor: 'pointer', fontWeight: 500 }}>Privacy Policy</span>
             </p>
           </div>
 
           {/* Bottom tagline */}
-          <div style={{ textAlign: 'center', marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+          <div style={{ textAlign: 'center', marginTop: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
             {['No data stored externally', 'Free Groq AI included', 'Open source'].map((t, i) => (
-              <span key={i} style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ color: 'var(--accent-1)' }}>✓</span> {t}
+              <span key={i} style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ color: 'var(--color-vermillion-signal)', fontWeight: 'bold' }}>✓</span> {t}
               </span>
             ))}
           </div>

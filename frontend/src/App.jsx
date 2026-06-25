@@ -211,28 +211,31 @@ function AppShell() {
         gap: 20,
       }}>
         <div style={{
-          width: 64, height: 64,
-          borderRadius: 20,
-          background: 'linear-gradient(135deg, #D97706, #F59E0B)',
+          width: 56, height: 56,
+          borderRadius: 'var(--radius-lg)',
+          background: 'var(--color-vermillion-signal)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 28,
-          boxShadow: '0 8px 32px rgba(217,119,6,0.35)',
-          animation: 'pulseGlow 2s ease-in-out infinite',
+          fontSize: 26,
+          boxShadow: 'var(--shadow-subtle)',
         }}>🧠</div>
         <div style={{
-          width: 36, height: 36, borderRadius: '50%',
-          border: '3px solid rgba(217,119,6,0.15)',
-          borderTopColor: '#F59E0B',
+          width: 32, height: 32, borderRadius: '50%',
+          border: '3px solid var(--color-cloud)',
+          borderTopColor: 'var(--color-vermillion-signal)',
           animation: 'spin 0.8s linear infinite',
         }} />
         <div style={{ textAlign: 'center' }}>
           <div style={{
-            fontSize: '1.1rem', fontWeight: 700,
-            background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+            fontSize: '1.2rem', fontWeight: 600,
+            color: 'var(--color-slate-900)',
             marginBottom: 4,
-          }}>MLPrep AI</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Initializing…</div>
+            letterSpacing: '-0.01em',
+          }}>
+            MLPrep AI<span style={{ color: 'var(--color-vermillion-signal)' }}>*</span>
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>
+            Initializing…
+          </div>
         </div>
       </div>
     )

@@ -25,20 +25,20 @@ function KaggleGuide() {
   return (
     <div style={{
       marginTop: 14,
-      background: 'rgba(251,191,36,0.05)',
-      border: '1px solid rgba(251,191,36,0.2)',
-      borderRadius: 14,
+      background: 'rgba(228, 43, 12, 0.02)',
+      border: '1px solid rgba(228, 43, 12, 0.15)',
+      borderRadius: 'var(--radius-md)',
       overflow: 'hidden',
     }}>
       {/* Header */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
         padding: '10px 14px',
-        borderBottom: '1px solid rgba(251,191,36,0.12)',
-        background: 'rgba(251,191,36,0.07)',
+        borderBottom: '1px solid rgba(228, 43, 12, 0.1)',
+        background: 'rgba(228, 43, 12, 0.05)',
       }}>
         <span style={{ fontSize: '1rem' }}>🐾</span>
-        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#FCD34D' }}>
+        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-vermillion-signal)' }}>
           How to copy the correct Kaggle dataset link
         </span>
       </div>
@@ -52,17 +52,17 @@ function KaggleGuide() {
         ].map(({ step, text, link, href }) => (
           <div key={step} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
             <div style={{
-              width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-              background: 'rgba(251,191,36,0.15)',
-              border: '1px solid rgba(251,191,36,0.3)',
+              width: 20, height: 20, borderRadius: 'var(--radius-sm)', flexShrink: 0,
+              background: 'rgba(228, 43, 12, 0.08)',
+              border: '1px solid rgba(228, 43, 12, 0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.65rem', fontWeight: 800, color: '#FCD34D',
+              fontSize: '0.65rem', fontWeight: 800, color: 'var(--color-vermillion-signal)',
             }}>{step}</div>
             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5, paddingTop: 1 }}>
               {text}{' '}
               {link && (
                 <a href={href} target="_blank" rel="noopener noreferrer"
-                  style={{ color: '#FCD34D', textDecoration: 'none', fontWeight: 600 }}>
+                  style={{ color: 'var(--color-vermillion-signal)', textDecoration: 'none', fontWeight: 600 }}>
                   {link} ↗
                 </a>
               )}
@@ -73,28 +73,28 @@ function KaggleGuide() {
         {/* Correct format */}
         <div style={{
           marginTop: 4,
-          background: 'rgba(0,0,0,0.3)',
-          borderRadius: 8,
+          background: 'var(--color-vellum)',
+          borderRadius: 'var(--radius-md)',
           padding: '10px 12px',
-          border: '1px solid rgba(255,255,255,0.05)',
+          border: '1px solid var(--color-cloud)',
         }}>
-          <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: 5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', marginBottom: 5, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             ✅ Correct URL format
           </p>
           <code style={{
             fontSize: '0.75rem',
-            color: '#86EFAC',
+            color: 'var(--text-primary)',
             fontFamily: 'monospace',
             wordBreak: 'break-all',
             lineHeight: 1.5,
           }}>
-            https://www.kaggle.com/datasets/<span style={{ color: '#FCD34D' }}>username</span>/<span style={{ color: '#FCD34D' }}>dataset-name</span>
+            https://www.kaggle.com/datasets/<span style={{ color: 'var(--color-vermillion-signal)' }}>username</span>/<span style={{ color: 'var(--color-vermillion-signal)' }}>dataset-name</span>
           </code>
         </div>
 
         {/* Common mistakes */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-          <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <p style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             ❌ Common mistakes to avoid
           </p>
           {[
@@ -103,8 +103,8 @@ function KaggleGuide() {
             'kaggle.com/datasets/username/dataset/download (extra paths)',
           ].map(m => (
             <div key={m} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ color: '#FCA5A5', fontSize: '0.7rem' }}>✕</span>
-              <code style={{ fontSize: '0.7rem', color: '#FCA5A5', fontFamily: 'monospace' }}>{m}</code>
+              <span style={{ color: 'var(--color-vermillion-signal)', fontSize: '0.7rem' }}>✕</span>
+              <code style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>{m}</code>
             </div>
           ))}
         </div>
@@ -139,13 +139,15 @@ function QuickStat({ icon, value, label }) {
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
       padding: '14px 20px',
-      background: 'rgba(217,119,6,0.05)',
-      border: '1px solid rgba(217,119,6,0.12)',
-      borderRadius: 14, flex: 1, minWidth: 0,
+      background: 'var(--bg-surface)',
+      border: '1px solid var(--color-cloud)',
+      borderRadius: 'var(--radius-md)',
+      boxShadow: 'var(--shadow-subtle)',
+      flex: 1, minWidth: 0,
     }}>
       <span style={{ fontSize: '1.3rem' }}>{icon}</span>
-      <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{value}</span>
-      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textAlign: 'center' }}>{label}</span>
+      <span style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)' }}>{value}</span>
+      <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', textAlign: 'center' }}>{label}</span>
     </div>
   )
 }
@@ -158,21 +160,21 @@ function SampleChip({ url, label, emoji, onImport }) {
       style={{
         display: 'flex', alignItems: 'center', gap: 6,
         padding: '6px 12px',
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        borderRadius: 999,
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--color-cloud)',
+        borderRadius: 'var(--radius-md)',
         fontSize: '0.74rem', color: 'var(--text-secondary)',
         cursor: 'pointer', transition: 'all 0.2s ease',
         fontFamily: 'inherit',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background = 'rgba(217,119,6,0.1)'
-        e.currentTarget.style.borderColor = 'rgba(217,119,6,0.25)'
-        e.currentTarget.style.color = 'var(--accent-2)'
+        e.currentTarget.style.background = 'rgba(228, 43, 12, 0.05)'
+        e.currentTarget.style.borderColor = 'rgba(228, 43, 12, 0.25)'
+        e.currentTarget.style.color = 'var(--color-vermillion-signal)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+        e.currentTarget.style.background = 'var(--bg-surface)'
+        e.currentTarget.style.borderColor = 'var(--color-cloud)'
         e.currentTarget.style.color = 'var(--text-secondary)'
       }}
     >
@@ -236,34 +238,20 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
     <>
       <style>{`
         @keyframes fadeSlideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes pulseGlow { 0%,100%{box-shadow:0 0 20px rgba(217,119,6,0.15)} 50%{box-shadow:0 0 40px rgba(217,119,6,0.3)} }
+        @keyframes pulseGlow { 0%,100%{box-shadow:0 0 10px rgba(228,43,12,0.1)} 50%{box-shadow:0 0 20px rgba(228,43,12,0.2)} }
         @keyframes spin { to{transform:rotate(360deg)} }
-        @keyframes progressShimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
         .upload-page-new { animation: fadeSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
         .drop-zone-active { 
-          border-color: rgba(217,119,6,0.6) !important;
-          background: rgba(217,119,6,0.06) !important;
+          border-color: var(--color-vermillion-signal) !important;
+          background: rgba(228, 43, 12, 0.04) !important;
           animation: pulseGlow 1.5s ease-in-out infinite;
         }
         .upload-tab-btn { transition: all 0.2s ease; }
-        .upload-tab-btn:hover { color: var(--text-primary) !important; }
+        .upload-tab-btn:hover { color: var(--color-vermillion-signal) !important; }
       `}</style>
 
       {/* Background */}
-      <div style={{ position: 'fixed', inset: 0, background: 'var(--bg-primary)', zIndex: 0 }}>
-        <div style={{
-          position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
-          width: 800, height: 400,
-          background: 'radial-gradient(ellipse at top, rgba(217,119,6,0.08) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)`,
-          backgroundSize: '56px 56px',
-          maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 0%, transparent 100%)',
-        }} />
-      </div>
+      <div style={{ position: 'fixed', inset: 0, background: 'var(--bg-primary)', zIndex: 0 }} />
 
       <div style={{
         position: 'relative', zIndex: 1,
@@ -282,11 +270,11 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '6px 16px',
-              background: 'rgba(217,119,6,0.08)',
-              border: '1px solid rgba(217,119,6,0.2)',
-              borderRadius: 999,
-              fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-2)',
+              padding: '6px 14px',
+              background: 'rgba(228, 43, 12, 0.06)',
+              border: '1px solid rgba(228, 43, 12, 0.15)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-vermillion-signal)',
               marginBottom: 16,
             }}>
               <Zap size={12} /> Step 1 of 1 — Load your dataset
@@ -296,11 +284,7 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
               color: 'var(--text-primary)', marginBottom: 10,
             }}>
               Upload Your{' '}
-              <span style={{
-                background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
+              <span style={{ color: 'var(--color-vermillion-signal)' }}>
                 Dataset
               </span>
             </h1>
@@ -318,18 +302,17 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
 
           {/* Main card */}
           <div style={{
-            background: 'rgba(20,19,16,0.85)',
-            backdropFilter: 'blur(24px)',
-            border: '1px solid rgba(255,255,255,0.06)',
-            borderRadius: 20,
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--color-cloud)',
+            borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.5)',
+            boxShadow: 'var(--shadow-subtle)',
           }}>
             {/* Tab bar */}
             <div style={{
               display: 'flex',
-              borderBottom: '1px solid rgba(255,255,255,0.05)',
-              background: 'rgba(0,0,0,0.2)',
+              borderBottom: '1px solid var(--border-subtle)',
+              background: 'var(--bg-glass-hover)',
             }}>
               {[
                 { key: 'file', icon: <Upload size={14} />, label: 'Upload File' },
@@ -343,9 +326,9 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                     flex: 1, padding: '14px 16px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
                     fontSize: '0.83rem', fontWeight: 600,
-                    color: activeTab === key ? 'var(--accent-2)' : 'var(--text-muted)',
+                    color: activeTab === key ? 'var(--color-vermillion-signal)' : 'var(--text-secondary)',
                     background: 'none', border: 'none', cursor: 'pointer',
-                    borderBottom: activeTab === key ? '2px solid var(--accent-1)' : '2px solid transparent',
+                    borderBottom: activeTab === key ? '2px solid var(--color-vermillion-signal)' : '2px solid transparent',
                     transition: 'all 0.2s ease',
                     fontFamily: 'inherit',
                   }}
@@ -364,12 +347,12 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                     {...getRootProps()}
                     className={isDragActive ? 'drop-zone-active' : ''}
                     style={{
-                      border: '2px dashed rgba(255,255,255,0.1)',
-                      borderRadius: 16,
+                      border: '2px dashed var(--color-cloud)',
+                      borderRadius: 'var(--radius-md)',
                       padding: '40px 24px',
                       textAlign: 'center',
                       cursor: isUploading ? 'default' : 'pointer',
-                      background: isDragActive ? 'rgba(217,119,6,0.05)' : 'rgba(255,255,255,0.02)',
+                      background: isDragActive ? 'rgba(228, 43, 12, 0.03)' : 'var(--bg-glass-hover)',
                       transition: 'all 0.25s ease',
                     }}
                   >
@@ -380,21 +363,18 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                         {/* Spinner ring */}
                         <div style={{
                           width: 52, height: 52, borderRadius: '50%',
-                          border: '3px solid rgba(217,119,6,0.15)',
-                          borderTopColor: 'var(--accent-1)',
+                          border: '3px solid rgba(228, 43, 12, 0.15)',
+                          borderTopColor: 'var(--color-vermillion-signal)',
                           animation: 'spin 0.9s linear infinite',
                         }} />
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
                           {uploadPhase}
                         </div>
                         {uploadProgress > 0 && uploadProgress < 100 && !isImportingUrl && (
-                          <div style={{ width: '70%', height: 5, borderRadius: 99, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                          <div style={{ width: '70%', height: 6, borderRadius: 'var(--radius-sm)', background: 'var(--color-vellum)', border: '1px solid var(--border-subtle)', overflow: 'hidden' }}>
                             <div style={{
                               height: '100%', width: `${uploadProgress}%`,
-                              background: 'linear-gradient(90deg, #D97706, #F59E0B, #D97706)',
-                              backgroundSize: '200% auto',
-                              animation: 'progressShimmer 1.5s linear infinite',
-                              borderRadius: 99,
+                              background: 'var(--color-vermillion-signal)',
                               transition: 'width 0.3s ease',
                             }} />
                           </div>
@@ -403,20 +383,20 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                         <div style={{
-                          width: 60, height: 60, borderRadius: 16,
+                          width: 60, height: 60, borderRadius: 'var(--radius-md)',
                           background: isDragActive
-                            ? 'linear-gradient(135deg, rgba(217,119,6,0.3), rgba(245,158,11,0.2))'
-                            : 'rgba(217,119,6,0.1)',
-                          border: `1px solid ${isDragActive ? 'rgba(217,119,6,0.4)' : 'rgba(217,119,6,0.15)'}`,
+                            ? 'rgba(228, 43, 12, 0.12)'
+                            : 'rgba(228, 43, 12, 0.06)',
+                          border: `1px solid rgba(228, 43, 12, ${isDragActive ? 0.35 : 0.18})`,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           transition: 'all 0.25s ease',
                         }}>
-                          <Upload size={24} style={{ color: isDragActive ? 'var(--accent-2)' : 'var(--accent-1)' }} />
+                          <Upload size={24} style={{ color: 'var(--color-vermillion-signal)' }} />
                         </div>
                         <div>
                           <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontWeight: 600, marginBottom: 4 }}>
                             {isDragActive ? '✨ Drop your file here' : (
-                              <><strong style={{ color: 'var(--accent-2)' }}>Click to browse</strong> or drag & drop</>
+                              <><strong style={{ color: 'var(--color-vermillion-signal)' }}>Click to browse</strong> or drag & drop</>
                             )}
                           </p>
                           <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
@@ -428,11 +408,11 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                           {FORMATS.map(f => (
                             <span key={f} style={{
                               padding: '3px 10px',
-                              background: 'rgba(255,255,255,0.04)',
-                              border: '1px solid rgba(255,255,255,0.08)',
-                              borderRadius: 999,
-                              fontSize: '0.7rem', fontWeight: 600,
-                              color: 'var(--text-muted)',
+                              background: 'var(--color-vellum)',
+                              border: '1px solid var(--color-cloud)',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '0.68rem', fontWeight: 600,
+                              color: 'var(--text-secondary)',
                               letterSpacing: '0.04em',
                             }}>{f}</span>
                           ))}
@@ -470,19 +450,19 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                           disabled={isUploading}
                           style={{
                             width: '100%', padding: '12px 14px 12px 40px',
-                            background: 'rgba(255,255,255,0.04)',
+                            background: 'var(--bg-glass-hover)',
                             border: `1px solid ${
                               getKaggleUrlStatus(url) === 'invalid'
-                                ? 'rgba(251,191,36,0.45)'
+                                ? 'var(--color-vermillion-signal)'
                                 : getKaggleUrlStatus(url) === 'valid'
-                                  ? 'rgba(52,211,153,0.45)'
-                                  : 'rgba(255,255,255,0.08)'
+                                  ? '#10b981'
+                                  : 'var(--color-cloud)'
                             }`,
-                            borderRadius: 12, color: 'var(--text-primary)',
+                            borderRadius: 'var(--radius-md)', color: 'var(--text-primary)',
                             fontSize: '0.88rem', fontFamily: 'inherit',
                             outline: 'none', boxSizing: 'border-box',
                           }}
-                          onFocus={e => { e.target.style.boxShadow = '0 0 0 3px rgba(217,119,6,0.08)' }}
+                          onFocus={e => { e.target.style.boxShadow = '0 0 0 3px rgba(228, 43, 12, 0.08)' }}
                           onBlur={e => { e.target.style.boxShadow = 'none' }}
                         />
                         {url && (
@@ -500,7 +480,7 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                       {getKaggleUrlStatus(url) === 'valid' && (
                         <div style={{
                           marginTop: 8, display: 'flex', alignItems: 'center', gap: 6,
-                          fontSize: '0.75rem', color: '#34d399',
+                          fontSize: '0.75rem', color: 'var(--success)',
                         }}>
                           <CheckCircle size={13} />
                           Kaggle dataset URL looks correct — ready to import!
@@ -522,8 +502,8 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '20px 0' }}>
                         <div style={{
                           width: 44, height: 44, borderRadius: '50%',
-                          border: '3px solid rgba(217,119,6,0.15)',
-                          borderTopColor: 'var(--accent-1)',
+                          border: '3px solid rgba(228, 43, 12, 0.15)',
+                          borderTopColor: 'var(--color-vermillion-signal)',
                           animation: 'spin 0.9s linear infinite',
                         }} />
                         <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>{uploadPhase}</span>
@@ -534,17 +514,17 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                         disabled={!url.trim() || isUploading}
                         style={{
                           padding: '13px',
-                          borderRadius: 12,
+                          borderRadius: 'var(--radius-md)',
                           background: url.trim()
-                            ? 'linear-gradient(135deg, #D97706, #F59E0B)'
-                            : 'rgba(255,255,255,0.05)',
+                            ? 'var(--color-vermillion-signal)'
+                            : 'var(--color-vellum)',
                           color: url.trim() ? '#fff' : 'var(--text-muted)',
                           fontWeight: 700, fontSize: '0.9rem',
-                          border: url.trim() ? 'none' : '1px solid rgba(255,255,255,0.06)',
+                          border: url.trim() ? 'none' : '1px solid var(--color-cloud)',
                           cursor: url.trim() ? 'pointer' : 'not-allowed',
                           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                           transition: 'all 0.2s ease',
-                          boxShadow: url.trim() ? '0 4px 16px rgba(217,119,6,0.2)' : 'none',
+                          boxShadow: url.trim() ? '0 4px 16px rgba(228, 43, 12, 0.15)' : 'none',
                           fontFamily: 'inherit',
                         }}
                       >
@@ -557,8 +537,8 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
 
                   {/* Sample datasets */}
                   {!isUploading && (
-                    <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                      <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
+                      <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                         Try a sample dataset
                       </p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -598,10 +578,10 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                   marginTop: 16,
                   display: 'flex', alignItems: 'flex-start', gap: 10,
                   padding: '12px 14px',
-                  background: 'rgba(239,68,68,0.08)',
-                  border: '1px solid rgba(239,68,68,0.25)',
-                  borderRadius: 12,
-                  fontSize: '0.8rem', color: '#fca5a5', lineHeight: 1.4,
+                  background: 'rgba(228, 43, 12, 0.05)',
+                  border: '1px solid rgba(228, 43, 12, 0.2)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.8rem', color: 'var(--color-vermillion-signal)', lineHeight: 1.4,
                 }}>
                   <AlertCircle size={15} style={{ flexShrink: 0, marginTop: 1 }} />
                   <span>{error}</span>
@@ -614,10 +594,10 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                   marginTop: 16,
                   display: 'flex', alignItems: 'center', gap: 10,
                   padding: '12px 16px',
-                  background: 'rgba(16,185,129,0.08)',
-                  border: '1px solid rgba(16,185,129,0.25)',
-                  borderRadius: 12,
-                  fontSize: '0.84rem', color: '#34d399', fontWeight: 500,
+                  background: 'rgba(16, 185, 129, 0.06)',
+                  border: '1px solid rgba(16, 185, 129, 0.22)',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: '0.84rem', color: 'var(--success)', fontWeight: 500,
                 }}>
                   <CheckCircle size={17} />
                   <span>Dataset loaded! Opening your workspace…</span>

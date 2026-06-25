@@ -6,10 +6,10 @@ import InsightCard from './InsightCard'
 
 // Intent colour map (for v2 compatibility)
 const INTENT_COLORS = {
-  analysis_only:              { bg: '#3b82f622', fg: '#60a5fa', label: 'Analysis' },
-  analysis_and_visualization: { bg: '#a855f722', fg: '#c084fc', label: 'Visualization' },
-  insights:                   { bg: '#22c55e22', fg: '#4ade80', label: 'Insights' },
-  cleaning_report:            { bg: '#f59e0b22', fg: '#fbbf24', label: 'Cleaning' },
+  analysis_only:              { bg: 'rgba(59, 130, 246, 0.08)', fg: '#2563eb', label: 'Analysis' },
+  analysis_and_visualization: { bg: 'rgba(168, 85, 247, 0.08)', fg: '#7c3aed', label: 'Visualization' },
+  insights:                   { bg: 'rgba(16, 185, 129, 0.08)', fg: '#059669', label: 'Insights' },
+  cleaning_report:            { bg: 'rgba(228, 43, 12, 0.06)', fg: 'var(--color-vermillion-signal)', label: 'Cleaning' },
 }
 
 function IntentBadge({ intent }) {
@@ -17,8 +17,8 @@ function IntentBadge({ intent }) {
   const { bg, fg, label } = INTENT_COLORS[intent]
   return (
     <span style={{
-      display: 'inline-block', padding: '1px 8px', borderRadius: 8,
-      background: bg, color: fg, border: `1px solid ${fg}44`,
+      display: 'inline-block', padding: '1.5px 8px', borderRadius: 'var(--radius-sm)',
+      background: bg, color: fg, border: `1px solid ${fg}33`,
       fontSize: '0.68rem', fontWeight: 600, marginBottom: 10,
     }}>
       {label}
@@ -131,8 +131,8 @@ export default function MessageBubble({ message }) {
                 <span style={{
                   background: execution_type === 'DETERMINISTIC' ? 'rgba(16,185,129,0.08)' : 'rgba(59,130,246,0.08)',
                   color: execution_type === 'DETERMINISTIC' ? 'var(--success)' : 'var(--info)',
-                  padding: '2px 6px',
-                  borderRadius: 4,
+                  padding: '2.5px 7px',
+                  borderRadius: 'var(--radius-sm)',
                   fontWeight: 600,
                   border: execution_type === 'DETERMINISTIC' ? '1px solid rgba(16,185,129,0.15)' : '1px solid rgba(59,130,246,0.15)'
                 }}>
