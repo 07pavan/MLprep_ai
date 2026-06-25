@@ -237,24 +237,26 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '6px 14px',
-              background: 'rgba(204, 145, 102, 0.06)',
-              border: '1px solid rgba(204, 145, 102, 0.15)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.72rem', fontWeight: 600, color: 'var(--color-vermillion-signal)',
+              background: 'var(--color-apricot)',
+              border: '1px solid var(--color-apricot-mid)',
+              borderRadius: 'var(--radius-full)',
+              fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-rust)',
               marginBottom: 16,
+              letterSpacing: '0.02em',
             }}>
               <Zap size={12} /> Step 1 of 1 — Load your dataset
             </div>
             <h1 style={{
-              fontSize: '2.2rem', fontWeight: 800, letterSpacing: '-0.03em',
-              color: 'var(--text-primary)', marginBottom: 10,
+              fontSize: '2.2rem', fontWeight: 700, letterSpacing: '-0.03em',
+              color: 'var(--color-ink)', marginBottom: 10,
+              fontFamily: 'var(--font-serif)',
             }}>
               Upload Your{' '}
-              <span style={{ color: 'var(--color-vermillion-signal)' }}>
+              <span style={{ color: 'var(--color-rust)' }}>
                 Dataset
               </span>
             </h1>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '0.9rem', color: 'var(--color-graphite)', lineHeight: 1.6 }}>
               Upload a file or import from a URL to start analyzing with AI
             </p>
           </div>
@@ -268,11 +270,11 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
 
           {/* Main card */}
           <div style={{
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border-subtle)',
+            background: 'var(--color-white)',
+            border: '1px solid rgba(163, 166, 175, 0.25)',
             borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
-            boxShadow: 'none',
+            boxShadow: 'var(--shadow-subtle)',
           }}>
             {/* Tab bar */}
             <div style={{

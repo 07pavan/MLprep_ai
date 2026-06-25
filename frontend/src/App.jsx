@@ -75,7 +75,7 @@ function DashboardContent() {
     sessionId, datasetMeta, currentDatasetId,
     isUploading, uploadProgress, uploadError, isSuccess,
     uploadDataset, importDataset, activateSession, clearSession,
-  } = useSession(user?.uid)   // ← scoped to this user's UID
+  } = useSession(user?.uid)
 
   const getInitialPage = () => {
     const path = window.location.pathname
@@ -103,32 +103,21 @@ function DashboardContent() {
   }
 
   useEffect(() => {
-    const handlePopState = () => {
-      setActivePage(getInitialPage())
-    }
+    const handlePopState = () => setActivePage(getInitialPage())
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
-  // No dataset session → show upload page unless visiting datasets page
-  if (!sessionId) {
-    if (activePage === 'datasets') {
-      return (
-        <Layout
-          activePage={activePage}
-          onPageChange={handlePageChange}
-          datasetMeta={null}
-          onClearSession={clearSession}
-        >
-          <DatasetManagement 
-            onActivateSuccess={activateSession} 
-            currentDatasetId={currentDatasetId} 
-            onDeleteActiveDataset={clearSession}
-            onUploadNew={clearSession}
-          />
-        </Layout>
-      )
+  // ── After upload/import success → auto-navigate to chat ──────────
+  useEffect(() => {
+    if (sessionId && isSuccess) {
+      handlePageChange('chat')
     }
+  }, [sessionId, isSuccess])
+
+  // ── No session → always show the Upload page (full-screen) ──────
+  // The dashboard is only accessible after a dataset is loaded.
+  if (!sessionId) {
     return (
       <FileUpload
         onUpload={uploadDataset}
@@ -141,7 +130,12 @@ function DashboardContent() {
     )
   }
 
-  // With session → show layout + page
+  // ── Session active → show sidebar layout + page ──────────────────
+  const handleActivateSession = (sid, meta, dsId) => {
+    activateSession(sid, meta, dsId)
+    handlePageChange('chat')   // always go to chat after switching dataset
+  }
+
   const renderPage = () => {
     switch (activePage) {
       case 'chat':
@@ -150,11 +144,11 @@ function DashboardContent() {
         return <OverviewPage datasetMeta={datasetMeta} />
       case 'datasets':
         return (
-          <DatasetManagement 
-            onActivateSuccess={activateSession} 
-            currentDatasetId={currentDatasetId} 
+          <DatasetManagement
+            onActivateSuccess={handleActivateSession}
+            currentDatasetId={currentDatasetId}
             onDeleteActiveDataset={clearSession}
-            onUploadNew={clearSession}
+            onUploadNew={clearSession}   // clearSession → drops to FileUpload
           />
         )
       case 'profile':
