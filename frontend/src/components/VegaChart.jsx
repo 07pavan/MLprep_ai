@@ -42,7 +42,7 @@ export default function VegaChart({ spec, source = 'auto', attempts = 0 }) {
           stroke: 'transparent',
         },
         range: {
-          category: ['#FF007F', '#7928CA', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6'],
+          category: ['#101828', '#7928CA', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6'],
         },
       },
     }

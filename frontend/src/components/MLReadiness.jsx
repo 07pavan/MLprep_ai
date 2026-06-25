@@ -110,13 +110,13 @@ export default function MLReadiness({ sessionId }) {
           {recommendations && recommendations.length > 0 && (
             <div className="p-6 rounded-xl border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
               <h3 className="text-base font-bold text-[#F0F0F8] mb-4 flex items-center gap-2">
-                <ListOrdered className="text-[#FF007F]" size={20} />
+                <ListOrdered className="text-black" size={20} />
                 Recommended Actions
               </h3>
               <ol className="space-y-4 pl-0 list-none m-0">
                 {recommendations.map((rec, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-sm text-[#8E9AAF]">
-                    <div className="w-5 h-5 rounded-full bg-[#FF007F]/10 border border-[#FF007F]/25 text-[#FF007F] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 font-mono">
+                    <div className="w-5 h-5 rounded-full bg-black/10 border border-black/25 text-black text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5 font-mono">
                       {idx + 1}
                     </div>
                     <span className="leading-relaxed pt-0.5">{rec}</span>

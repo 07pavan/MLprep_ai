@@ -43,7 +43,7 @@ export default function QualityIssueCard({ issue }) {
         <p className="text-sm text-[#8E9AAF] mb-3">{details}</p>
         {recommendation && (
           <div className="p-3 rounded-lg bg-[rgba(0,0,0,0.2)] border border-[rgba(255,255,255,0.04)]">
-            <span className="text-xs font-bold text-[#FF007F] block mb-1 uppercase tracking-wider">Recommendation</span>
+            <span className="text-xs font-bold text-black block mb-1 uppercase tracking-wider">Recommendation</span>
             <p className="text-xs text-[#8E9AAF] leading-relaxed">{recommendation}</p>
           </div>
         )}

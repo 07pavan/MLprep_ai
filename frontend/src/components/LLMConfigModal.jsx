@@ -97,7 +97,7 @@ export default function LLMConfigModal({ isOpen, onClose }) {
         </button>
 
         <div className="flex items-center gap-2 mb-4">
-          <Sliders size={20} className="text-[#FF007F]" />
+          <Sliders size={20} className="text-black" />
           <h2 className="text-lg font-bold text-[#F0F0F8]">AI Provider Configuration</h2>
         </div>
 
@@ -119,7 +119,7 @@ export default function LLMConfigModal({ isOpen, onClose }) {
                   setLimits(null)
                 }
               }}
-              className="w-full bg-[#141520] border border-[rgba(255,255,255,0.06)] rounded-lg p-2.5 text-[#F0F0F8] text-sm focus:outline-none focus:border-[#FF007F] transition-colors"
+              className="w-full bg-[#141520] border border-[rgba(255,255,255,0.06)] rounded-lg p-2.5 text-[#F0F0F8] text-sm focus:outline-none focus:border-black transition-colors"
             >
               <option value="default">System Default (Groq Server Key)</option>
               <option value="groq">Custom Groq API Key</option>
@@ -138,7 +138,7 @@ export default function LLMConfigModal({ isOpen, onClose }) {
                     placeholder={provider === 'groq' ? 'gsk_...' : 'sk-or-...'}
                     value={key}
                     onChange={(e) => setKey(e.target.value)}
-                    className="w-full bg-[#141520] border border-[rgba(255,255,255,0.06)] rounded-lg p-2.5 pr-10 text-[#F0F0F8] text-sm font-mono focus:outline-none focus:border-[#FF007F] transition-colors"
+                    className="w-full bg-[#141520] border border-[rgba(255,255,255,0.06)] rounded-lg p-2.5 pr-10 text-[#F0F0F8] text-sm font-mono focus:outline-none focus:border-black transition-colors"
                   />
                   <button
                     type="button"
@@ -160,7 +160,7 @@ export default function LLMConfigModal({ isOpen, onClose }) {
                   placeholder={provider === 'groq' ? 'llama-3.3-70b-versatile' : 'meta-llama/llama-3.3-70b-instruct'}
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="w-full bg-[#141520] border border-[rgba(255,255,255,0.06)] rounded-lg p-2.5 text-[#F0F0F8] text-sm font-mono focus:outline-none focus:border-[#FF007F] transition-colors"
+                  className="w-full bg-[#141520] border border-[rgba(255,255,255,0.06)] rounded-lg p-2.5 text-[#F0F0F8] text-sm font-mono focus:outline-none focus:border-black transition-colors"
                 />
               </div>
             </>
@@ -175,7 +175,7 @@ export default function LLMConfigModal({ isOpen, onClose }) {
                   type="button"
                   onClick={() => fetchLimits(key)}
                   disabled={loadingLimits}
-                  className="p-1 rounded-md hover:bg-white/5 text-[#8E9AAF] hover:text-[#FF007F] transition-colors flex items-center gap-1 disabled:opacity-50"
+                  className="p-1 rounded-md hover:bg-white/5 text-[#8E9AAF] hover:text-black transition-colors flex items-center gap-1 disabled:opacity-50"
                   title="Check rate limits"
                 >
                   <RefreshCw size={12} className={loadingLimits ? 'animate-spin' : ''} />
@@ -193,7 +193,7 @@ export default function LLMConfigModal({ isOpen, onClose }) {
                   </div>
                   <div className="space-y-0.5">
                     <span className="text-[10px] text-[#8E9AAF] block">Request Reset In</span>
-                    <span className="text-sm font-extrabold text-[#FF007F]">
+                    <span className="text-sm font-extrabold text-black">
                       {limits.reset_requests || 'N/A'}
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export default function LLMConfigModal({ isOpen, onClose }) {
           <button
             onClick={handleSave}
             disabled={provider !== 'default' && !key.trim()}
-            className="px-4 py-2 rounded-lg bg-[#FF007F] hover:bg-[#FF007F]/90 text-white text-xs font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 flex-grow cursor-pointer shadow-lg"
+            className="px-4 py-2 rounded-lg bg-black hover:bg-black/90 text-white text-xs font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 flex-grow cursor-pointer shadow-lg"
           >
             {saveStatus ? (
               <>

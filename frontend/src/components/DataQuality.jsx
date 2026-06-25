@@ -119,14 +119,14 @@ export default function DataQuality({ sessionId }) {
                   onClick={() => setActiveTab(id)}
                   className={`px-4 py-2 text-sm font-medium border-b-2 transition-all duration-150 whitespace-nowrap flex items-center gap-2 ${
                     id === activeTab
-                      ? 'border-[#FF007F] text-[#F0F0F8]'
+                      ? 'border-black text-black font-semibold'
                       : 'border-transparent text-[#8E9AAF] hover:text-[#F0F0F8]'
                   }`}
                 >
                   {label}
                   <span className={`px-1.5 py-0.2 text-[10px] font-bold rounded-full ${
                     id === activeTab
-                      ? 'bg-[#FF007F]/25 text-[#FF007F]'
+                      ? 'bg-black/10 text-black'
                       : 'bg-[rgba(255,255,255,0.06)] text-[#8E9AAF]'
                   }`}>
                     {count}

@@ -9,7 +9,7 @@ export default function StatCard({ title, value, icon: Icon, description }) {
         {description && <p className="text-xs text-[#8E9AAF] mt-1 opacity-70 truncate">{description}</p>}
       </div>
       {Icon && (
-        <div className="p-3 rounded-lg bg-[rgba(255,255,255,0.03)] text-[#FF007F] flex-shrink-0">
+        <div className="p-3 rounded-lg bg-[rgba(255,255,255,0.03)] text-black flex-shrink-0">
           <Icon size={20} />
         </div>
       )}
