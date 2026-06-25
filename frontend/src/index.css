@@ -726,3 +726,24 @@ input, textarea { font-family: inherit; }
   fill: var(--text-secondary) !important;
 }
 
+/* ── Global Contrast Safeguards ───────────────────────────────────── */
+h1:not(.gradient-text), 
+h2:not(.gradient-text), 
+h3:not(.gradient-text), 
+h4:not(.gradient-text),
+h5, h6 {
+  color: var(--text-primary) !important;
+}
+table {
+  color: var(--text-primary) !important;
+}
+th {
+  color: var(--text-secondary) !important;
+  border-bottom-color: var(--border-subtle) !important;
+}
+td {
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--border-subtle) !important;
+}
+
+
