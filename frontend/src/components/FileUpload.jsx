@@ -152,36 +152,7 @@ function QuickStat({ icon, value, label }) {
   )
 }
 
-/* ── Sample dataset chip ────────────────────────────────────────── */
-function SampleChip({ url, label, emoji, onImport }) {
-  return (
-    <button
-      onClick={() => onImport(url)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        padding: '6px 12px',
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--color-cloud)',
-        borderRadius: 'var(--radius-md)',
-        fontSize: '0.74rem', color: 'var(--text-secondary)',
-        cursor: 'pointer', transition: 'all 0.2s ease',
-        fontFamily: 'inherit',
-      }}
-      onMouseEnter={e => {
-        e.currentTarget.style.background = 'rgba(228, 43, 12, 0.05)'
-        e.currentTarget.style.borderColor = 'rgba(228, 43, 12, 0.25)'
-        e.currentTarget.style.color = 'var(--color-vermillion-signal)'
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.background = 'var(--bg-surface)'
-        e.currentTarget.style.borderColor = 'var(--color-cloud)'
-        e.currentTarget.style.color = 'var(--text-secondary)'
-      }}
-    >
-      {emoji} {label}
-    </button>
-  )
-}
+
 
 export default function FileUpload({ onUpload, onImportURL, isUploading, uploadProgress = 0, uploadError, isSuccess }) {
   const [rejected, setRejected] = useState(null)
@@ -205,12 +176,7 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
     if (onImportURL) await onImportURL(targetUrl)
   }
 
-  const handleSampleImport = (sampleUrl) => {
-    setUrl(sampleUrl)
-    setActiveTab('url')
-    setIsImportingUrl(true)
-    if (onImportURL) onImportURL(sampleUrl)
-  }
+
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     multiple: false,
@@ -535,40 +501,7 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
                     )}
                   </form>
 
-                  {/* Sample datasets */}
-                  {!isUploading && (
-                    <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border-subtle)' }}>
-                      <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                        Try a sample dataset
-                      </p>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                        <SampleChip
-                          emoji="🚢"
-                          label="Titanic"
-                          url="https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
-                          onImport={handleSampleImport}
-                        />
-                        <SampleChip
-                          emoji="🌸"
-                          label="Iris"
-                          url="https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
-                          onImport={handleSampleImport}
-                        />
-                        <SampleChip
-                          emoji="🏠"
-                          label="Housing"
-                          url="https://raw.githubusercontent.com/ageron/handson-ml/master/datasets/housing/housing.csv"
-                          onImport={handleSampleImport}
-                        />
-                        <SampleChip
-                          emoji="💊"
-                          label="Diabetes"
-                          url="https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.csv"
-                          onImport={handleSampleImport}
-                        />
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               )}
 
