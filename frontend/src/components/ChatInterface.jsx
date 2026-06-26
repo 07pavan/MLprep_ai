@@ -204,7 +204,14 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
       lastAgentMsg.error.includes('re-upload'))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      width: '100%',
+      minHeight: 0,
+      overflow: 'hidden',
+    }}>
       {/* Memory banner */}
       {messages.length > 0 && threadId && (
         <div className="memory-banner">
@@ -220,26 +227,28 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
       )}
 
       {/* Chat feed */}
-      <div ref={feedRef} className="chat-feed" style={{ flex: 1, overflowY: 'auto' }}>
+      <div ref={feedRef} className="chat-feed" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minHeight: 0, width: '100%' }}>
         {messages.length === 0 ? (
           /* Hero / empty state */
           <div className="chat-hero">
-            <h1 className="chat-hero-title">
-              <span className="gradient-text">Ask anything about your data</span>
-            </h1>
-            <p className="chat-hero-subtitle">
-              I can analyze and summarize your dataset using natural language. Try a question below.
-            </p>
-            <div className="suggestions-grid">
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  className="suggestion-chip"
-                  onClick={() => handleSend(s)}
-                >
-                  {s}
-                </button>
-              ))}
+            <div className="chat-hero-inner">
+              <h1 className="chat-hero-title">
+                <span className="gradient-text">Ask anything about your data</span>
+              </h1>
+              <p className="chat-hero-subtitle">
+                I can analyze and summarize your dataset using natural language. Try a question below.
+              </p>
+              <div className="suggestions-grid">
+                {suggestions.map((s, i) => (
+                  <button
+                    key={i}
+                    className="suggestion-chip"
+                    onClick={() => handleSend(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         ) : (

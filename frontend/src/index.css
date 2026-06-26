@@ -678,32 +678,45 @@ h4, h5, h6 {
 
 /* ── Hero (empty chat state) ────────────────────────────────────── */
 .chat-hero {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 20px;
   animation: fadeIn 0.5s ease;
-  width: 100%; box-sizing: border-box; overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+  /* Prevent hero from creating own scroll, let chat-feed scroll */
+  flex-shrink: 0;
+}
+/* Inner content wrapper caps width and centers on desktop */
+.chat-hero-inner {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
 }
 .chat-hero-title {
   font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  font-size: clamp(1.5rem, 5vw, 2.4rem);
   font-weight: 400;
   margin-bottom: 10px;
   color: var(--color-ink);
   letter-spacing: -0.02em;
+  /* Ensure long words break on tiny screens */
+  overflow-wrap: break-word;
   word-break: break-word;
-  width: 100%;
+  hyphens: auto;
+  padding: 0 4px;
 }
 .chat-hero-subtitle {
   color: var(--color-graphite);
   font-size: 0.9rem;
   margin-bottom: 28px;
-  max-width: 440px;
-  width: 100%;
   line-height: 1.6;
-  padding: 0 8px;
-  box-sizing: border-box;
+  overflow-wrap: break-word;
   word-break: break-word;
+  padding: 0 4px;
 }
 
 /* ── Overview Page ──────────────────────────────────────────────── */
@@ -745,6 +758,7 @@ h4, h5, h6 {
 
 /* ── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  /* Legacy sidebar classes (not used in new Layout but kept for safety) */
   .sidebar { transform: translateX(-100%); }
   .sidebar.open { transform: translateX(0); }
   .sidebar-overlay.visible { display: block; }
@@ -754,13 +768,34 @@ h4, h5, h6 {
   .bottom-nav { display: flex; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .clean-options-grid { grid-template-columns: 1fr; }
-  .suggestions-grid { grid-template-columns: 1fr; }
+
+  /* Chat suggestion chips — always single column on mobile */
+  .suggestions-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Message bubbles fill more of the screen on mobile */
   .message-bubble { max-width: 92%; }
 
-  .chat-hero { padding: 24px 12px; }
-  .chat-hero-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
-  .chat-hero-subtitle { font-size: 0.84rem; margin-bottom: 20px; }
+  /* Hero: compact padding, smaller font, properly capped width */
+  .chat-hero {
+    padding: 24px 16px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+  .chat-hero-inner {
+    width: 100%;
+    max-width: 100%;
+  }
+  .chat-hero-title {
+    font-size: clamp(1.3rem, 7vw, 1.75rem);
+  }
+  .chat-hero-subtitle {
+    font-size: 0.84rem;
+    margin-bottom: 20px;
+  }
 
+  /* Input bar: stays at bottom, full width, no margin tricks */
   .chat-input-bar {
     position: sticky !important;
     bottom: 0 !important;
@@ -768,6 +803,7 @@ h4, h5, h6 {
     width: 100% !important;
     z-index: 40 !important;
     box-sizing: border-box !important;
+    padding: 10px 12px !important;
   }
 }
 

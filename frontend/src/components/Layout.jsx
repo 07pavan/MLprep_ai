@@ -640,6 +640,9 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             display: 'flex',
             flexDirection: 'column',
             transition: 'margin-left 0.25s cubic-bezier(0.4,0,0.2,1)',
+            width: `calc(100vw - ${sidebarWidth}px)`,
+            maxWidth: '100%',
+            overflow: 'hidden',
           }}
         >
           {/* Warning banner */}
@@ -662,9 +665,21 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             className="main-page-content"
             style={{
               flex: 1,
-              padding: '24px',
+              padding: activePage === 'chat' ? '0' : '24px',
               maxWidth: '100%',
               overflowX: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              // Chat must fill remaining height (viewport - topbar - bottomnav)
+              ...(activePage === 'chat' && isMobile ? {
+                height: `calc(100dvh - 56px - 64px)`,
+                minHeight: 0,
+                overflow: 'hidden',
+              } : activePage === 'chat' ? {
+                height: 'calc(100vh)',
+                minHeight: 0,
+                overflow: 'hidden',
+              } : {}),
             }}
           >
             {/* Back button strip — shown on every page except chat */}
