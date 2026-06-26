@@ -204,7 +204,7 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
       lastAgentMsg.error.includes('re-upload'))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, width: '100%', boxSizing: 'border-box', overflow: 'hidden' }}>
       {/* Memory banner */}
       {messages.length > 0 && threadId && (
         <div className="memory-banner">
@@ -281,16 +281,21 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
         gap: 8,
         padding: '8px 12px',
         overflowX: 'auto',
+        overflowY: 'hidden',
         borderTop: '1px solid var(--border-subtle)',
         background: 'rgba(10,10,15,0.4)',
         whiteSpace: 'nowrap',
         scrollbarWidth: 'none',
+        flexShrink: 0,
+        width: '100%',
+        boxSizing: 'border-box',
+        WebkitOverflowScrolling: 'touch',
       }}>
-        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Show dataset summary")}>📊 Summary</button>
-        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("count rows")}>🔢 Count Rows</button>
-        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Show missing values")}>🔍 Missing Values</button>
-        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Find correlations")}>📈 Correlations</button>
-        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer' }} onClick={() => handleSend("Find outliers in data")}>🚨 Outliers</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }} onClick={() => handleSend("Show dataset summary")}>📊 Summary</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }} onClick={() => handleSend("count rows")}>🔢 Count Rows</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }} onClick={() => handleSend("Show missing values")}>🔍 Missing Values</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }} onClick={() => handleSend("Find correlations")}>📈 Correlations</button>
+        <button className="suggestion-chip" style={{ fontSize: '0.78rem', padding: '6px 12px', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap' }} onClick={() => handleSend("Find outliers in data")}>🚨 Outliers</button>
       </div>
 
       {/* Input bar */}
@@ -301,6 +306,9 @@ export default function ChatInterface({ sessionId, datasetMeta, onClearSession }
         padding: '12px 16px',
         borderTop: '1px solid var(--border-subtle)',
         background: 'var(--bg-surface)',
+        flexShrink: 0,
+        width: '100%',
+        boxSizing: 'border-box',
       }}>
         {/* Control Row */}
         <div style={{
