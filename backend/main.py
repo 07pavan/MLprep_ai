@@ -160,6 +160,7 @@ app.include_router(rate_limit_router)
 
 # ─── Health check ─────────────────────────────────────────────────────────────
 @app.get("/health", tags=["System"])
+@app.head("/health", tags=["System"])
 async def health():
     """Extended health check with LLM and configuration diagnostics."""
     from utils.llm_factory import get_llm
