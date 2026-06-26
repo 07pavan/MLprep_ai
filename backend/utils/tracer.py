@@ -145,6 +145,14 @@ class Tracer:
             
             return len(cleared_ids)
 
+    def clear_all(self) -> int:
+        """Wipe all stored traces for all users. Returns count cleared."""
+        with self._lock:
+            count = len(self._traces)
+            self._traces.clear()
+            self._order.clear()
+            return count
+
 
 # Helpers
 def _extract_intent(events: list[dict]) -> str:

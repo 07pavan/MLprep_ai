@@ -96,6 +96,8 @@ function DashboardContent() {
 
   const [activePage, setActivePage] = useState(getInitialPage)
   const [historyStack, setHistoryStack] = useState([])   // navigation back-stack
+  const [hasManuallyCleared, setHasManuallyCleared] = useState(false)
+  const [hasRegistry, setHasRegistry] = useState(false)
 
   const handlePageChange = (page) => {
     setHistoryStack(prev => [...prev, activePage])         // push current → history
@@ -105,18 +107,22 @@ function DashboardContent() {
   }
 
   const goBack = () => {
-    setHistoryStack(prev => {
-      if (prev.length === 0) return prev
-      const last = prev[prev.length - 1]
-      const next = prev.slice(0, -1)
-      setActivePage(last)
-      const path = last === 'chat' ? '/' : `/${last}`
-      window.history.pushState(null, '', path)
-      return next
-    })
+    if (historyStack.length > 0) {
+      setHistoryStack(prev => {
+        const last = prev[prev.length - 1]
+        const next = prev.slice(0, -1)
+        setActivePage(last)
+        const path = last === 'chat' ? '/' : `/${last}`
+        window.history.pushState(null, '', path)
+        return next
+      })
+    } else if (sessionId && activePage !== 'chat') {
+      setActivePage('chat')
+      window.history.pushState(null, '', '/')
+    }
   }
 
-  const canGoBack = historyStack.length > 0
+  const canGoBack = historyStack.length > 0 || (sessionId && activePage !== 'chat')
 
   useEffect(() => {
     const handlePopState = () => {
@@ -126,6 +132,13 @@ function DashboardContent() {
     window.addEventListener('popstate', handlePopState)
     return () => window.removeEventListener('popstate', handlePopState)
   }, [])
+
+  // ── Reset manual clear flag on active session ───────────────────
+  useEffect(() => {
+    if (sessionId) {
+      setHasManuallyCleared(false)
+    }
+  }, [sessionId])
 
   // ── After upload/import success → auto-navigate to chat ──────────
   useEffect(() => {
@@ -140,6 +153,12 @@ function DashboardContent() {
     handlePageChange('chat')   // always go to chat after activating a dataset
   }
 
+  const handleClearSession = () => {
+    setHasManuallyCleared(true)
+    clearSession()
+    setDatasetCheck('empty')
+  }
+
   // ── Smart no-session routing ─────────────────────────────────────
   // Check if user already has datasets saved → go to registry, else upload
   const [datasetCheck, setDatasetCheck] = useState('loading') // 'loading' | 'has_datasets' | 'empty'
@@ -147,12 +166,33 @@ function DashboardContent() {
   useEffect(() => {
     if (sessionId) return // already in session, skip check
     setDatasetCheck('loading')
-    import('./services/mlApi').then(({ listDatasets }) => {
+    import('./services/mlApi').then(({ listDatasets, activateDataset }) => {
       listDatasets()
-        .then(data => setDatasetCheck(data && data.length > 0 ? 'has_datasets' : 'empty'))
-        .catch(() => setDatasetCheck('empty'))
+        .then(data => {
+          const count = data ? data.length : 0
+          setHasRegistry(count > 0)
+          
+          if (count === 1 && !hasManuallyCleared) {
+            // Auto-activate the single dataset
+            activateDataset(data[0].dataset_id)
+              .then(res => {
+                activateSession(res.sessionId, res.datasetMeta, res.datasetId)
+              })
+              .catch(() => {
+                setDatasetCheck('has_datasets')
+              })
+          } else if (count > 0) {
+            setDatasetCheck('has_datasets')
+          } else {
+            setDatasetCheck('empty')
+          }
+        })
+        .catch(() => {
+          setHasRegistry(false)
+          setDatasetCheck('empty')
+        })
     })
-  }, [sessionId])
+  }, [sessionId, hasManuallyCleared])
 
   if (!sessionId) {
     // While checking the API…
@@ -182,12 +222,12 @@ function DashboardContent() {
           activePage="datasets"
           onPageChange={() => {}}
           datasetMeta={null}
-          onClearSession={clearSession}
+          onClearSession={handleClearSession}
         >
           <DatasetManagement
             onActivateSuccess={handleActivateSession}
             currentDatasetId={currentDatasetId}
-            onDeleteActiveDataset={clearSession}
+            onDeleteActiveDataset={handleClearSession}
             onUploadNew={() => setDatasetCheck('empty')}
           />
         </Layout>
@@ -203,6 +243,8 @@ function DashboardContent() {
         uploadProgress={uploadProgress}
         uploadError={uploadError}
         isSuccess={isSuccess}
+        hasDatasets={hasRegistry}
+        onBack={() => setDatasetCheck('has_datasets')}
       />
     )
   }
@@ -212,7 +254,7 @@ function DashboardContent() {
   const renderPage = () => {
     switch (activePage) {
       case 'chat':
-        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} onClearSession={clearSession} />
+        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} onClearSession={handleClearSession} />
       case 'overview':
         return <OverviewPage datasetMeta={datasetMeta} />
       case 'datasets':
@@ -220,8 +262,8 @@ function DashboardContent() {
           <DatasetManagement
             onActivateSuccess={handleActivateSession}
             currentDatasetId={currentDatasetId}
-            onDeleteActiveDataset={() => { clearSession(); setDatasetCheck('loading') }}
-            onUploadNew={() => { clearSession(); setDatasetCheck('empty') }}
+            onDeleteActiveDataset={() => { handleClearSession(); setDatasetCheck('loading') }}
+            onUploadNew={() => { handleClearSession(); setDatasetCheck('empty') }}
           />
         )
       case 'profile':
@@ -250,7 +292,7 @@ function DashboardContent() {
       case 'traces':
         return <TraceViewer sessionId={sessionId} />
       default:
-        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} onClearSession={clearSession} />
+        return <ChatInterface sessionId={sessionId} datasetMeta={datasetMeta} onClearSession={handleClearSession} />
     }
   }
 
@@ -259,7 +301,7 @@ function DashboardContent() {
       activePage={activePage}
       onPageChange={handlePageChange}
       datasetMeta={datasetMeta}
-      onClearSession={clearSession}
+      onClearSession={handleClearSession}
       canGoBack={canGoBack}
       onGoBack={goBack}
     >

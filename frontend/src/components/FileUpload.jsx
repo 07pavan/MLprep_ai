@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import {
   Upload, Database, CheckCircle, AlertCircle, Link2, FileText,
-  ArrowRight, Sparkles, Cloud, X, ChevronRight, Zap, Info
+  ArrowRight, Sparkles, Cloud, X, ChevronRight, Zap, Info, ArrowLeft
 } from 'lucide-react'
 
 const FORMATS = ['CSV', 'XLSX', 'XLS', 'JSON', 'Parquet']
@@ -154,7 +154,7 @@ function QuickStat({ icon, value, label }) {
 
 
 
-export default function FileUpload({ onUpload, onImportURL, isUploading, uploadProgress = 0, uploadError, isSuccess }) {
+export default function FileUpload({ onUpload, onImportURL, isUploading, uploadProgress = 0, uploadError, isSuccess, hasDatasets, onBack }) {
   const [rejected, setRejected] = useState(null)
   const [url, setUrl] = useState('')
   const [isImportingUrl, setIsImportingUrl] = useState(false)
@@ -232,6 +232,37 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
           className="upload-page-new"
           style={{ width: '100%', maxWidth: 580 }}
         >
+          {/* Back button to registry if registry has items */}
+          {hasDatasets && onBack && (
+            <div style={{ marginBottom: 16, textAlign: 'left' }}>
+              <button
+                onClick={onBack}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7,
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-full)',
+                  background: 'var(--color-fog)',
+                  border: '1px solid rgba(163, 166, 175, 0.4)',
+                  color: 'var(--color-graphite)',
+                  fontSize: '0.8rem', fontWeight: 600,
+                  cursor: 'pointer', fontFamily: 'inherit',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'var(--color-mist)'
+                  e.currentTarget.style.color = 'var(--color-ink)'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'var(--color-fog)'
+                  e.currentTarget.style.color = 'var(--color-graphite)'
+                }}
+              >
+                <ArrowLeft size={14} />
+                Back to Registry
+              </button>
+            </div>
+          )}
+
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{

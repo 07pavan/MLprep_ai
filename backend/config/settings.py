@@ -52,6 +52,8 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "https://datacopilote-ai.netlify.app",
         "https://mlprep-ai.netlify.app",
+        "https://datacopilote-ai.vercel.app",
+        "https://mlprep-ai.vercel.app",
     ]
 
     @field_validator("CORS_ORIGINS", mode="before")

@@ -239,6 +239,17 @@ def run_midnight_cleanup():
     except Exception as e:
         logger.error("❌ Failed to clean up physical storage files: %s", e, exc_info=True)
 
+    # 3. Clean up all tracer traces
+    try:
+        from utils.tracer import tracer
+        if hasattr(tracer, "clear_all"):
+            count = tracer.clear_all()
+            logger.info("🗑️ Cleared all %d trace records from tracer memory.", count)
+        else:
+            logger.warning("⚠️ Tracer does not implement clear_all.")
+    except Exception as e:
+        logger.error("❌ Failed to clean up tracer records: %s", e, exc_info=True)
+
 
 async def midnight_cleanup_scheduler():
     """Async background task that triggers run_midnight_cleanup every night at 12:00 AM local time."""
