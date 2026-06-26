@@ -113,17 +113,12 @@ export default function AuthPage() {
         >
           {/* Logo + Brand */}
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
-            <div style={{
+            <img src="/logo.png" alt="MLprep AI" style={{
               width: 56, height: 56,
               borderRadius: 'var(--radius-full)',
-              background: 'var(--color-apricot)',
-              border: '1.5px solid var(--color-apricot-mid)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 26,
+              objectFit: 'cover',
               margin: '0 auto 16px',
-            }}>
-              🧠
-            </div>
+            }} />
             <h1 style={{
               fontSize: '2rem', fontWeight: 600, letterSpacing: '-0.02em',
               color: 'var(--color-ink)',
