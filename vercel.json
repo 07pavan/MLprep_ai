@@ -6,7 +6,7 @@
       "destination": "https://ai-data-analyst-backend-ni2l.onrender.com/api/:path*"
     },
     {
-      "source": "/((?!api/).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
