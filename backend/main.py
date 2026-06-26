@@ -58,6 +58,7 @@ if settings.FIREBASE_SERVICE_ACCOUNT_JSON:
     except Exception as e:
         logger.error("❌ Failed to decode FIREBASE_SERVICE_ACCOUNT_JSON: %s", e)
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -80,6 +81,74 @@ from utils.llm_middleware import LLMContextMiddleware
 from utils.rate_limit_tracker import router as rate_limit_router
 
 
+# ─── Lifespan Context Manager ──────────────────────────────────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # --- Startup ---
+    storage = Path(settings.STORAGE_DIR)
+    storage.mkdir(parents=True, exist_ok=True)
+
+    # Warn if production is running without persistent storage configured
+    if settings.ENABLE_AUTH:  # Production mode
+        from config.settings import BACKEND_DIR
+        default_storage_dir = str(BACKEND_DIR / "storage")
+        if settings.STORAGE_DIR == default_storage_dir:
+            logger.warning(
+                "⚠️ WARNING: Production is running with default ephemeral storage (%s). "
+                "Uploaded datasets will be lost on container restart or scale-down. "
+                "Please configure a Render Persistent Disk and set STORAGE_DIR=/app/storage.",
+                settings.STORAGE_DIR
+            )
+
+    # Initialize Firebase Admin SDK
+    import firebase_admin
+    from firebase_admin import credentials
+    if not firebase_admin._apps:
+        if settings.GOOGLE_APPLICATION_CREDENTIALS:
+            try:
+                cred = credentials.Certificate(settings.GOOGLE_APPLICATION_CREDENTIALS)
+                firebase_admin.initialize_app(cred)
+                logger.info("🔥 Firebase Admin SDK initialized with certificate")
+            except Exception as e:
+                logger.error("❌ Failed to initialize Firebase Admin with certificate: %s", e)
+        else:
+            try:
+                firebase_admin.initialize_app()
+                logger.info("🔥 Firebase Admin SDK initialized with default credentials")
+            except Exception as e:
+                logger.warning("⚠️ Firebase Admin SDK initialized without credentials (ENABLE_AUTH must be False to allow local calls): %s", e)
+
+    logger.info("🚀 AI Data Analyst API v2.0.0 started")
+    logger.info("   Storage  : %s", storage.resolve())
+    logger.info("   Docs     : http://localhost:8000/docs")
+    logger.info("   CORS     : %s", settings.CORS_ORIGINS)
+
+    # Start background cleanup task and keep a reference to it
+    cleanup_task = asyncio.create_task(midnight_cleanup_scheduler())
+
+    yield
+
+    # --- Shutdown ---
+    # Cancel the scheduler task
+    cleanup_task.cancel()
+    try:
+        await cleanup_task
+    except asyncio.CancelledError:
+        logger.info("⏰ Midnight cleanup scheduler task cancelled cleanly.")
+    except Exception as e:
+        logger.error("⏰ Error cancelling cleanup task: %s", e)
+
+    # Close PostgreSQL Connection Pool
+    try:
+        from graph.graph import db_pool
+        if db_pool is not None:
+            logger.info("🔌 Gracefully closing PostgreSQL connection pool...")
+            db_pool.close()
+            logger.info("🔒 PostgreSQL connection pool closed successfully.")
+    except Exception as e:
+        logger.error("⚠️ Error while closing PostgreSQL pool during shutdown: %s", str(e))
+
+
 # ─── App factory ──────────────────────────────────────────────────────────────
 app = FastAPI(
     title="AI Data Analyst API",
@@ -87,6 +156,7 @@ app = FastAPI(
     description="FastAPI backend with LangGraph orchestration and Vega-Lite visualization",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
@@ -276,61 +346,4 @@ async def midnight_cleanup_scheduler():
             await asyncio.sleep(60)
 
 
-# ─── Startup ──────────────────────────────────────────────────────────────────
-@app.on_event("startup")
-async def on_startup():
-    storage = Path(settings.STORAGE_DIR)
-    storage.mkdir(parents=True, exist_ok=True)
-
-    # Warn if production is running without persistent storage configured
-    if settings.ENABLE_AUTH:  # Production mode
-        # Check if the storage directory is the default relative/ephemeral directory
-        from config.settings import BACKEND_DIR
-        default_storage_dir = str(BACKEND_DIR / "storage")
-        if settings.STORAGE_DIR == default_storage_dir:
-            logger.warning(
-                "⚠️ WARNING: Production is running with default ephemeral storage (%s). "
-                "Uploaded datasets will be lost on container restart or scale-down. "
-                "Please configure a Render Persistent Disk and set STORAGE_DIR=/app/storage.",
-                settings.STORAGE_DIR
-            )
-
-    # Initialize Firebase Admin SDK
-    import firebase_admin
-    from firebase_admin import credentials
-    if not firebase_admin._apps:
-        if settings.GOOGLE_APPLICATION_CREDENTIALS:
-            try:
-                cred = credentials.Certificate(settings.GOOGLE_APPLICATION_CREDENTIALS)
-                firebase_admin.initialize_app(cred)
-                logger.info("🔥 Firebase Admin SDK initialized with certificate")
-            except Exception as e:
-                logger.error("❌ Failed to initialize Firebase Admin with certificate: %s", e)
-        else:
-            try:
-                firebase_admin.initialize_app()
-                logger.info("🔥 Firebase Admin SDK initialized with default credentials")
-            except Exception as e:
-                logger.warning("⚠️ Firebase Admin SDK initialized without credentials (ENABLE_AUTH must be False to allow local calls): %s", e)
-
-    logger.info("🚀 AI Data Analyst API v2.0.0 started")
-    logger.info("   Storage  : %s", storage.resolve())
-    logger.info("   Docs     : http://localhost:8000/docs")
-    logger.info("   CORS     : %s", settings.CORS_ORIGINS)
-
-    # Start background cleanup task
-    asyncio.create_task(midnight_cleanup_scheduler())
-
-
-
-# ─── Shutdown ─────────────────────────────────────────────────────────────────
-@app.on_event("shutdown")
-async def on_shutdown():
-    try:
-        from graph.graph import db_pool
-        if db_pool is not None:
-            logger.info("🔌 Gracefully closing PostgreSQL connection pool...")
-            db_pool.close()
-            logger.info("🔒 PostgreSQL connection pool closed successfully.")
-    except Exception as e:
-        logger.error("⚠️ Error while closing PostgreSQL pool during shutdown: %s", str(e))
+# (Startup and shutdown lifecycle events are handled by the lifespan context manager above)
