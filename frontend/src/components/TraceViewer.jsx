@@ -208,8 +208,10 @@ export default function TraceViewer({ sessionId }) {
     setLoading(true)
     try {
       const data = await getTraces(50)
+      console.log('Fetched all traces:', data.traces, 'Current sessionId:', sessionId)
       const allTraces = data.traces || []
       const filtered = sessionId ? allTraces.filter(t => t.sessionId === sessionId) : allTraces
+      console.log('Filtered traces:', filtered)
       setTraces(filtered)
     } catch (err) {
       console.error('Failed to fetch traces:', err)
