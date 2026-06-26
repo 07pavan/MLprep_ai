@@ -269,7 +269,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
                     color: 'var(--color-ink)',
                     fontFamily: 'var(--font-serif)',
                   }}>
-                    MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span>
+                    MLPrep AI
                   </div>
                   <div style={{ fontSize: '0.65rem', color: 'var(--color-graphite)', marginTop: -1 }}>
                     Data Intelligence Platform
@@ -527,7 +527,7 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
               fontWeight: 700, fontSize: '1.05rem',
               color: 'var(--color-ink)',
               fontFamily: 'var(--font-serif)',
-            }}>MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span></span>
+            }}>MLPrep AI</span>
             <button
               onClick={() => setSidebarOpen(false)}
               style={{

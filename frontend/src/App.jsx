@@ -344,7 +344,7 @@ function AppShell() {
             letterSpacing: '-0.02em',
             fontFamily: 'var(--font-serif)',
           }}>
-            MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span>
+            MLPrep AI
           </div>
           <div style={{ color: 'var(--color-graphite)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.025em' }}>
             Initializing…

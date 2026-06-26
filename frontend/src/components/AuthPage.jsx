@@ -125,10 +125,10 @@ export default function AuthPage() {
               marginBottom: 8,
               fontFamily: 'var(--font-serif)',
             }}>
-              MLPrep AI<span style={{ color: 'var(--color-rust)' }}>*</span>
+              MLPrep AI
             </h1>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Your AI-powered data analyst & ML preparation suite
+              From raw data to ML-ready clarity
             </p>
 
             {/* Feature pills */}
