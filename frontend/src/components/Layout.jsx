@@ -257,15 +257,10 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             flexShrink: 0,
             minHeight: 64,
           }}>
-            <div style={{
+            <img src="/logo.png" alt="MLprep AI" style={{
               width: 36, height: 36, borderRadius: 'var(--radius-full)',
-              background: 'var(--color-ink)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 18, flexShrink: 0,
-              boxShadow: 'none',
-            }}>
-              🧠
-            </div>
+              objectFit: 'cover', flexShrink: 0,
+            }} />
             {!collapsed && (
               <>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -524,12 +519,10 @@ export default function Layout({ children, activePage, onPageChange, datasetMeta
             display: 'flex', alignItems: 'center', gap: 10,
             borderBottom: '1px solid var(--border-subtle)',
           }}>
-            <div style={{
+            <img src="/logo.png" alt="MLprep AI" style={{
               width: 34, height: 34, borderRadius: 'var(--radius-full)',
-              background: 'var(--color-ink)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 17,
-            }}>🧠</div>
+              objectFit: 'cover', flexShrink: 0,
+            }} />
             <span style={{
               fontWeight: 700, fontSize: '1.05rem',
               color: 'var(--color-ink)',

@@ -100,7 +100,7 @@ def _create_openrouter(model: str, temperature: float, timeout: int, api_key: st
             openai_api_key=api_key,
             openai_api_base="https://openrouter.ai/api/v1",
             default_headers={
-                "HTTP-Referer": "https://mlprep-ai.netlify.app",
+                "HTTP-Referer": "https://mlprep-ai.vercel.app",
                 "X-Title": "MLPrep AI v3.0"
             },
             timeout=timeout,

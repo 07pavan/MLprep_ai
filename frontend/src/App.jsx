@@ -325,14 +325,11 @@ function AppShell() {
         background: 'var(--bg-primary)',
         gap: 20,
       }}>
-        <div style={{
+        <img src="/logo.png" alt="MLprep AI" style={{
           width: 56, height: 56,
           borderRadius: 'var(--radius-full)',
-          background: 'var(--color-apricot)',
-          border: '1px solid var(--color-apricot-mid)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 26,
-        }}>🧠</div>
+          objectFit: 'cover',
+        }} />
         <div style={{
           width: 32, height: 32, borderRadius: '50%',
           border: '3px solid rgba(163, 166, 175, 0.25)',
