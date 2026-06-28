@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import {
   Upload, Database, CheckCircle, AlertCircle, Link2, FileText,
-  ArrowRight, Sparkles, Cloud, X, ChevronRight, Zap, Info, ArrowLeft
+  ArrowRight, Sparkles, Cloud, X, ChevronRight, Zap, Info, ArrowLeft,
+  LogOut, LayoutDashboard
 } from 'lucide-react'
+import { useAuth } from '../hooks/useAuth'
 
 const FORMATS = ['CSV', 'XLSX', 'XLS', 'JSON', 'Parquet']
 
@@ -155,6 +157,7 @@ function QuickStat({ icon, value, label }) {
 
 
 export default function FileUpload({ onUpload, onImportURL, isUploading, uploadProgress = 0, uploadError, isSuccess, hasDatasets, onBack }) {
+  const { logOut } = useAuth()
   const [rejected, setRejected] = useState(null)
   const [url, setUrl] = useState('')
   const [isImportingUrl, setIsImportingUrl] = useState(false)
@@ -219,6 +222,95 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
       {/* Background */}
       <div style={{ position: 'fixed', inset: 0, background: 'var(--bg-primary)', zIndex: 0 }} />
 
+      {/* Top Navigation Bar */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '16px 24px',
+        zIndex: 10,
+        boxSizing: 'border-box',
+      }}>
+        {/* Brand/Logo */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontWeight: 700,
+          fontSize: '1.05rem',
+          color: 'var(--color-ink)',
+          fontFamily: 'var(--font-serif)',
+        }}>
+          <Database size={18} style={{ color: 'var(--color-rust)' }} />
+          <span>MLPrep <span style={{ color: 'var(--color-rust)' }}>AI</span></span>
+        </div>
+
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            onClick={onBack}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--color-fog)',
+              border: '1px solid rgba(163, 166, 175, 0.3)',
+              color: 'var(--color-graphite)',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'var(--color-mist)'
+              e.currentTarget.style.color = 'var(--color-ink)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'var(--color-fog)'
+              e.currentTarget.style.color = 'var(--color-graphite)'
+            }}
+          >
+            <LayoutDashboard size={13} />
+            Dashboard
+          </button>
+
+          <button
+            onClick={logOut}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-full)',
+              background: 'rgba(211, 47, 47, 0.06)',
+              border: '1px solid rgba(211, 47, 47, 0.25)',
+              color: 'rgb(211, 47, 47)',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(211, 47, 47, 0.12)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(211, 47, 47, 0.06)'
+            }}
+          >
+            <LogOut size={13} />
+            Log Out
+          </button>
+        </div>
+      </div>
+
       <div style={{
         position: 'relative', zIndex: 1,
         minHeight: '100vh',
@@ -226,42 +318,13 @@ export default function FileUpload({ onUpload, onImportURL, isUploading, uploadP
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '32px 16px',
+        padding: '64px 16px 32px',
+        boxSizing: 'border-box',
       }}>
         <div
           className="upload-page-new"
           style={{ width: '100%', maxWidth: 580 }}
         >
-          {/* Back button to registry if registry has items */}
-          {hasDatasets && onBack && (
-            <div style={{ marginBottom: 16, textAlign: 'left' }}>
-              <button
-                onClick={onBack}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 7,
-                  padding: '6px 14px',
-                  borderRadius: 'var(--radius-full)',
-                  background: 'var(--color-fog)',
-                  border: '1px solid rgba(163, 166, 175, 0.4)',
-                  color: 'var(--color-graphite)',
-                  fontSize: '0.8rem', fontWeight: 600,
-                  cursor: 'pointer', fontFamily: 'inherit',
-                  transition: 'all 0.15s ease',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'var(--color-mist)'
-                  e.currentTarget.style.color = 'var(--color-ink)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'var(--color-fog)'
-                  e.currentTarget.style.color = 'var(--color-graphite)'
-                }}
-              >
-                <ArrowLeft size={14} />
-                Back to Registry
-              </button>
-            </div>
-          )}
 
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
