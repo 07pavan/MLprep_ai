@@ -194,7 +194,13 @@ function DashboardContent() {
     })
   }, [sessionId, hasManuallyCleared])
 
-  if (!sessionId) {
+  useEffect(() => {
+    if (sessionId) {
+      setDatasetCheck('has_datasets')
+    }
+  }, [sessionId])
+
+  if (!sessionId || datasetCheck === 'empty') {
     // While checking the API…
     if (datasetCheck === 'loading') {
       return (
@@ -263,7 +269,7 @@ function DashboardContent() {
             onActivateSuccess={handleActivateSession}
             currentDatasetId={currentDatasetId}
             onDeleteActiveDataset={() => { handleClearSession(); setDatasetCheck('loading') }}
-            onUploadNew={() => { handleClearSession(); setDatasetCheck('empty') }}
+            onUploadNew={() => setDatasetCheck('empty')}
           />
         )
       case 'profile':
